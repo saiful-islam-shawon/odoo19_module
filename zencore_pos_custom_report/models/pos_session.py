@@ -94,7 +94,7 @@ class PosSession(models.Model):
         info_rows = [
             ('SALES TOTAL', f"{sales_total:,.2f}"),
             ('NET TOTAL', f"{net_total:,.2f}"),
-            ('GRAND TOTAL', f"{grand_total:,.2f}"),
+            ('GRAND TOTAL (Including Vat)', f"{grand_total:,.2f}"),
             ('TICKET COUNT', f"{ticket_count:.2f}"),
             ('NUMBER OF GUESTS', f"{guest_count:.2f}"),
             ('Grand Total / Ticket', f"{grand_per_ticket:,.2f}"),
