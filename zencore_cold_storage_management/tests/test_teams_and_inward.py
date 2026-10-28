@@ -137,3 +137,276 @@ class TestTeamsAndInward(TransactionCase):
                         'date_start': self.today,
                         'date_end': self.today + timedelta(days=30),
                     })
+
+    def test_08_storage_allocation_valid_and_partial(self):
+        """Test valid full and partial storage allocation lines."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 1'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 1'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 1'})
+        pocket_a = self.env['cold.storage.pocket'].create({'name': 'Pocket A'})
+        pocket_b = self.env['cold.storage.pocket'].create({'name': 'Pocket B'})
+
+        slot_a = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_a.id,
+            'activate': True,
+        })
+        slot_b = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_b.id,
+            'activate': True,
+        })
+
+        inward = self.Inward.create({
+            'partner_id': self.customer.id,
+            'season_id': self.season.id,
+            'product_name': 'Potato 10 Bosta',
+            'bag_quantity': 20,
+            'date_start': self.today,
+            'date_end': self.today + timedelta(days=30),
+            'allocation_ids': [
+                (0, 0, {'slot_id': slot_a.id, 'quantity': 10}),
+                (0, 0, {'slot_id': slot_b.id, 'quantity': 5}),
+            ],
+        })
+        self.assertEqual(len(inward.allocation_ids), 2)
+        total_allocated = sum(inward.allocation_ids.mapped('quantity'))
+        self.assertEqual(total_allocated, 15)
+        self.assertLessEqual(total_allocated, inward.bag_quantity)
+
+        # Later, add another 5 bags to reach total 20
+        inward.write({
+            'allocation_ids': [(0, 0, {'slot_id': slot_a.id, 'quantity': 5})]
+        })
+        self.assertEqual(sum(inward.allocation_ids.mapped('quantity')), 20)
+
+    def test_09_storage_allocation_exceeds_total_quantity(self):
+        """Test that sum of allocated quantities exceeding bag_quantity raises ValidationError."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 2'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 2'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 2'})
+        pocket = self.env['cold.storage.pocket'].create({'name': 'Pocket C'})
+
+        slot = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket.id,
+            'activate': True,
+        })
+
+        with self.assertRaises(ValidationError):
+            self.Inward.create({
+                'partner_id': self.customer.id,
+                'season_id': self.season.id,
+                'product_name': 'Overallocated Potato',
+                'bag_quantity': 20,
+                'date_start': self.today,
+                'date_end': self.today + timedelta(days=30),
+                'allocation_ids': [
+                    (0, 0, {'slot_id': slot.id, 'quantity': 25}),  # 25 > 20
+                ],
+            })
+
+    def test_10_storage_allocation_non_positive_quantity(self):
+        """Test that allocation line quantity <= 0 raises ValidationError."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 3'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 3'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 3'})
+        pocket = self.env['cold.storage.pocket'].create({'name': 'Pocket D'})
+
+        slot = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket.id,
+            'activate': True,
+        })
+
+        with self.assertRaises(ValidationError):
+            self.Inward.create({
+                'partner_id': self.customer.id,
+                'season_id': self.season.id,
+                'product_name': 'Zero Quantity Line',
+                'bag_quantity': 20,
+                'date_start': self.today,
+                'date_end': self.today + timedelta(days=30),
+                'allocation_ids': [
+                    (0, 0, {'slot_id': slot.id, 'quantity': 0}),
+                ],
+            })
+
+    def test_11_slot_plotting_success_and_auto_sync(self):
+        """Test creating a plotting record reduces from_slot and increases to_slot."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 4'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 4'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 4'})
+        pocket_a = self.env['cold.storage.pocket'].create({'name': 'Pocket 4A'})
+        pocket_b = self.env['cold.storage.pocket'].create({'name': 'Pocket 4B'})
+        pocket_c = self.env['cold.storage.pocket'].create({'name': 'Pocket 4C'})
+
+        slot_a = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_a.id,
+            'activate': True,
+        })
+        slot_b = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_b.id,
+            'activate': True,
+        })
+        slot_c = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_c.id,
+            'activate': True,
+        })
+
+        inward = self.Inward.create({
+            'partner_id': self.customer.id,
+            'season_id': self.season.id,
+            'product_name': 'Potato Batch 4',
+            'bag_quantity': 20,
+            'date_start': self.today,
+            'date_end': self.today + timedelta(days=30),
+            'allocation_ids': [
+                (0, 0, {'slot_id': slot_a.id, 'quantity': 15}),
+                (0, 0, {'slot_id': slot_b.id, 'quantity': 5}),
+            ],
+        })
+        self.assertEqual(inward.plotting_count, 0)
+
+        # Plot 10 bags from Slot A to Slot C
+        plotting = self.env['cold.storage.inward.plotting'].create({
+            'inward_id': inward.id,
+            'from_slot_id': slot_a.id,
+            'to_slot_id': slot_c.id,
+            'quantity': 10,
+        })
+        self.assertTrue(plotting.name.startswith('PLT/'))
+        self.assertEqual(inward.plotting_count, 1)
+
+        # Check allocations in inward
+        line_a = inward.allocation_ids.filtered(lambda a: a.slot_id == slot_a)
+        line_b = inward.allocation_ids.filtered(lambda a: a.slot_id == slot_b)
+        line_c = inward.allocation_ids.filtered(lambda a: a.slot_id == slot_c)
+
+        self.assertEqual(line_a.quantity, 5)   # 15 - 10 = 5
+        self.assertEqual(line_b.quantity, 5)   # untouched = 5
+        self.assertEqual(line_c.quantity, 10)  # new = 10
+        self.assertEqual(sum(inward.allocation_ids.mapped('quantity')), 20)
+
+        # Smart button action check
+        action = inward.action_view_plottings()
+        self.assertEqual(action['res_model'], 'cold.storage.inward.plotting')
+        self.assertEqual(action['domain'], [('inward_id', '=', inward.id)])
+
+    def test_12_slot_plotting_complete_depletion(self):
+        """Test moving all remaining quantity unlinks the source allocation line."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 5'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 5'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 5'})
+        pocket_a = self.env['cold.storage.pocket'].create({'name': 'Pocket 5A'})
+        pocket_b = self.env['cold.storage.pocket'].create({'name': 'Pocket 5B'})
+
+        slot_a = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_a.id,
+            'activate': True,
+        })
+        slot_b = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_b.id,
+            'activate': True,
+        })
+
+        inward = self.Inward.create({
+            'partner_id': self.customer.id,
+            'season_id': self.season.id,
+            'product_name': 'Potato Batch 5',
+            'bag_quantity': 10,
+            'date_start': self.today,
+            'date_end': self.today + timedelta(days=30),
+            'allocation_ids': [
+                (0, 0, {'slot_id': slot_a.id, 'quantity': 10}),
+            ],
+        })
+
+        # Transfer all 10 bags from A to B
+        self.env['cold.storage.inward.plotting'].create({
+            'inward_id': inward.id,
+            'from_slot_id': slot_a.id,
+            'to_slot_id': slot_b.id,
+            'quantity': 10,
+        })
+
+        line_a = inward.allocation_ids.filtered(lambda a: a.slot_id == slot_a)
+        line_b = inward.allocation_ids.filtered(lambda a: a.slot_id == slot_b)
+        self.assertFalse(line_a)
+        self.assertEqual(line_b.quantity, 10)
+
+    def test_13_slot_plotting_constraints(self):
+        """Test over-transfer and same-slot validation constraints."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 6'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 6'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 6'})
+        pocket_a = self.env['cold.storage.pocket'].create({'name': 'Pocket 6A'})
+        pocket_b = self.env['cold.storage.pocket'].create({'name': 'Pocket 6B'})
+
+        slot_a = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_a.id,
+            'activate': True,
+        })
+        slot_b = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_b.id,
+            'activate': True,
+        })
+
+        inward = self.Inward.create({
+            'partner_id': self.customer.id,
+            'season_id': self.season.id,
+            'product_name': 'Potato Batch 6',
+            'bag_quantity': 10,
+            'date_start': self.today,
+            'date_end': self.today + timedelta(days=30),
+            'allocation_ids': [
+                (0, 0, {'slot_id': slot_a.id, 'quantity': 10}),
+            ],
+        })
+
+        # Same slot error
+        with self.assertRaises(ValidationError):
+            self.env['cold.storage.inward.plotting'].create({
+                'inward_id': inward.id,
+                'from_slot_id': slot_a.id,
+                'to_slot_id': slot_a.id,
+                'quantity': 5,
+            })
+
+        # Over-transfer error (15 > 10)
+        with self.assertRaises(ValidationError):
+            self.env['cold.storage.inward.plotting'].create({
+                'inward_id': inward.id,
+                'from_slot_id': slot_a.id,
+                'to_slot_id': slot_b.id,
+                'quantity': 15,
+            })

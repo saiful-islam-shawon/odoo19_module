@@ -26,6 +26,14 @@
         <field name="arch" type="xml">
             <form string="Inward Deposit">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_plottings"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-exchange">
+                            <field name="plotting_count" widget="statinfo" string="Plotting"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <label for="name" string="Lot Number"/>
                         <h1>
@@ -46,6 +54,16 @@
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                         </group>
                     </group>
+                    <notebook>
+                        <page string="Storage Allocation" name="storage_allocation">
+                            <field name="allocation_ids">
+                                <list editable="bottom">
+                                    <field name="slot_id" options="{'no_create_edit': False, 'no_quick_create': True}"/>
+                                    <field name="quantity"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>

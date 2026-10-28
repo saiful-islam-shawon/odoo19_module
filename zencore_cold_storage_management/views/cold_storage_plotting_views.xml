@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Plotting List View -->
+    <record id="view_cold_storage_inward_plotting_list" model="ir.ui.view">
+        <field name="name">cold.storage.inward.plotting.list</field>
+        <field name="model">cold.storage.inward.plotting</field>
+        <field name="arch" type="xml">
+            <list string="Plottings">
+                <field name="name" string="Reference"/>
+                <field name="inward_id" string="Inward Lot"/>
+                <field name="date"/>
+                <field name="from_slot_id"/>
+                <field name="to_slot_id"/>
+                <field name="quantity" string="Quantity (Bosta)"/>
+                <field name="user_id"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Plotting Form View -->
+    <record id="view_cold_storage_inward_plotting_form" model="ir.ui.view">
+        <field name="name">cold.storage.inward.plotting.form</field>
+        <field name="model">cold.storage.inward.plotting</field>
+        <field name="arch" type="xml">
+            <form string="Slot Plotting / Relocation">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Reference"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Lot &amp; Date Details">
+                            <field name="inward_id" options="{'no_create': True}"/>
+                            <field name="date"/>
+                            <field name="user_id" options="{'no_create': True}"/>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Slot Relocation Details">
+                            <field name="from_slot_id" options="{'no_create': True}"/>
+                            <field name="available_quantity"/>
+                            <field name="to_slot_id" options="{'no_create': True}"/>
+                            <field name="quantity"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Plotting Search View -->
+    <record id="view_cold_storage_inward_plotting_search" model="ir.ui.view">
+        <field name="name">cold.storage.inward.plotting.search</field>
+        <field name="model">cold.storage.inward.plotting</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Reference"/>
+                <field name="inward_id"/>
+                <field name="from_slot_id"/>
+                <field name="to_slot_id"/>
+                <group>
+                    <filter string="Inward Lot" name="group_by_inward" context="{'group_by': 'inward_id'}"/>
+                    <filter string="From Slot" name="group_by_from_slot" context="{'group_by': 'from_slot_id'}"/>
+                    <filter string="To Slot" name="group_by_to_slot" context="{'group_by': 'to_slot_id'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Plotting Window Action -->
+    <record id="action_cold_storage_inward_plotting" model="ir.actions.act_window">
+        <field name="name">Plottings</field>
+        <field name="res_model">cold.storage.inward.plotting</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_cold_storage_inward_plotting_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record your first slot-to-slot product relocation!
+            </p>
+            <p>
+                Transfer products between cold storage slots and automatically track location history.
+            </p>
+        </field>
+    </record>
+</odoo>

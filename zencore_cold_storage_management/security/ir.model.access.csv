@@ -15,3 +15,7 @@ access_cold_storage_team_user,cold.storage.team user,model_cold_storage_team,bas
 access_cold_storage_team_manager,cold.storage.team manager,model_cold_storage_team,base.group_system,1,1,1,1
 access_cold_storage_inward_user,cold.storage.inward user,model_cold_storage_inward,base.group_user,1,0,0,0
 access_cold_storage_inward_manager,cold.storage.inward manager,model_cold_storage_inward,base.group_system,1,1,1,1
+access_cold_storage_inward_allocation_user,cold.storage.inward.allocation user,model_cold_storage_inward_allocation,base.group_user,1,0,0,0
+access_cold_storage_inward_allocation_manager,cold.storage.inward.allocation manager,model_cold_storage_inward_allocation,base.group_system,1,1,1,1
+access_cold_storage_inward_plotting_user,cold.storage.inward.plotting user,model_cold_storage_inward_plotting,base.group_user,1,0,0,0
+access_cold_storage_inward_plotting_manager,cold.storage.inward.plotting manager,model_cold_storage_inward_plotting,base.group_system,1,1,1,1

@@ -70,11 +70,47 @@ class ColdStorageInward(models.Model):
         string='Company',
         default=lambda self: self.env.company
     )
+    allocation_ids = fields.One2many(
+        'cold.storage.inward.allocation',
+        'inward_id',
+        string='Storage Allocations',
+        help="Storage slot allocations for this inward lot."
+    )
+    plotting_ids = fields.One2many(
+        'cold.storage.inward.plotting',
+        'inward_id',
+        string='Plottings',
+        help="Internal slot relocation history for this inward lot."
+    )
+    plotting_count = fields.Integer(
+        string='Plotting Count',
+        compute='_compute_plotting_count',
+        help="Number of times goods were relocated between slots."
+    )
 
     _name_uniq = models.Constraint(
         'unique (name)',
         'Lot number must be unique across all records! Two customers cannot have the same lot number.',
     )
+
+    @api.depends('plotting_ids')
+    def _compute_plotting_count(self):
+        for record in self:
+            record.plotting_count = len(record.plotting_ids)
+
+    def action_view_plottings(self):
+        self.ensure_one()
+        return {
+            'name': _('Plottings - Lot %s') % (self.name or ''),
+            'type': 'ir.actions.act_window',
+            'res_model': 'cold.storage.inward.plotting',
+            'view_mode': 'list,form',
+            'domain': [('inward_id', '=', self.id)],
+            'context': {
+                'default_inward_id': self.id,
+                'search_default_inward_id': self.id,
+            },
+        }
 
     @api.depends('name')
     def _compute_lot_number(self):
@@ -103,6 +139,19 @@ class ColdStorageInward(models.Model):
         for record in self:
             if record.bag_rate < 0.0:
                 raise ValidationError(_("Bag Rate cannot be negative."))
+
+    @api.constrains('allocation_ids', 'bag_quantity')
+    def _check_allocation_total(self):
+        for record in self:
+            total_allocated = sum(record.allocation_ids.mapped('quantity'))
+            if total_allocated > record.bag_quantity:
+                raise ValidationError(_(
+                    "Total allocated quantity (%(allocated)s bosta) cannot exceed total product quantity (%(total)s bosta) for Lot '%(lot)s'."
+                ) % {
+                    'allocated': total_allocated,
+                    'total': record.bag_quantity,
+                    'lot': record.name or '',
+                })
 
     @api.model_create_multi
     def create(self, vals_list):

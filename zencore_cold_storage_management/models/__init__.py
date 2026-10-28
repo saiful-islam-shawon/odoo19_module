@@ -7,3 +7,5 @@ from . import cold_storage_pocket
 from . import cold_storage_master_setup
 from . import cold_storage_team
 from . import cold_storage_inward
+from . import cold_storage_inward_allocation
+from . import cold_storage_inward_plotting
