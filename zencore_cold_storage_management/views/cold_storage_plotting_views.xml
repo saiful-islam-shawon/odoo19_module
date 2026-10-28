@@ -25,6 +25,7 @@
         <field name="arch" type="xml">
             <form string="Slot Plotting / Relocation">
                 <sheet>
+                    <field name="allowed_from_slot_ids" invisible="1"/>
                     <div class="oe_title">
                         <label for="name" string="Reference"/>
                         <h1>
@@ -39,9 +40,9 @@
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                         </group>
                         <group string="Slot Relocation Details">
-                            <field name="from_slot_id" options="{'no_create': True}"/>
+                            <field name="from_slot_id" domain="[('id', 'in', allowed_from_slot_ids)]" options="{'no_create': True, 'no_quick_create': True}"/>
                             <field name="available_quantity"/>
-                            <field name="to_slot_id" options="{'no_create': True}"/>
+                            <field name="to_slot_id" options="{'no_create': True, 'no_quick_create': True}"/>
                             <field name="quantity"/>
                         </group>
                     </group>

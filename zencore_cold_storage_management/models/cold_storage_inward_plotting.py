@@ -37,6 +37,12 @@ class ColdStorageInwardPlotting(models.Model):
         ondelete='restrict',
         help="Current storage slot of the products."
     )
+    allowed_from_slot_ids = fields.Many2many(
+        'cold.storage.master.setup',
+        compute='_compute_allowed_from_slot_ids',
+        string="Allowed From Slots",
+        help="Dynamic list of slots currently holding products in this inward lot."
+    )
     available_quantity = fields.Integer(
         string='Available in From Slot',
         compute='_compute_available_quantity',
@@ -71,6 +77,15 @@ class ColdStorageInwardPlotting(models.Model):
         store=True,
         readonly=True
     )
+
+    @api.depends('inward_id.allocation_ids.slot_id', 'inward_id.allocation_ids.quantity')
+    def _compute_allowed_from_slot_ids(self):
+        for record in self:
+            if record.inward_id:
+                allocated_slots = record.inward_id.allocation_ids.filtered(lambda a: a.quantity > 0).mapped('slot_id')
+                record.allowed_from_slot_ids = allocated_slots
+            else:
+                record.allowed_from_slot_ids = self.env['cold.storage.master.setup']
 
     @api.depends('from_slot_id', 'inward_id.allocation_ids.quantity', 'inward_id.allocation_ids.slot_id')
     def _compute_available_quantity(self):

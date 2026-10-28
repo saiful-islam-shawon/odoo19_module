@@ -285,6 +285,11 @@ class TestTeamsAndInward(TransactionCase):
         })
         self.assertEqual(inward.plotting_count, 0)
 
+        # Check allowed_from_slot_ids strictly matches allocated slots (Slot A and B, not C)
+        test_draft = self.env['cold.storage.inward.plotting'].new({'inward_id': inward.id})
+        self.assertEqual(set(test_draft.allowed_from_slot_ids.ids), {slot_a.id, slot_b.id})
+        self.assertNotIn(slot_c.id, test_draft.allowed_from_slot_ids.ids)
+
         # Plot 10 bags from Slot A to Slot C
         plotting = self.env['cold.storage.inward.plotting'].create({
             'inward_id': inward.id,
