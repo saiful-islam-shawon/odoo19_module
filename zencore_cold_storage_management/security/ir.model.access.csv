@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_cold_storage_season_user,cold.storage.season user,model_cold_storage_season,base.group_user,1,0,0,0
+access_cold_storage_season_manager,cold.storage.season manager,model_cold_storage_season,base.group_system,1,1,1,1
+access_cold_storage_chamber_user,cold.storage.chamber user,model_cold_storage_chamber,base.group_user,1,0,0,0
+access_cold_storage_chamber_manager,cold.storage.chamber manager,model_cold_storage_chamber,base.group_system,1,1,1,1
+access_cold_storage_floor_user,cold.storage.floor user,model_cold_storage_floor,base.group_user,1,0,0,0
+access_cold_storage_floor_manager,cold.storage.floor manager,model_cold_storage_floor,base.group_system,1,1,1,1
+access_cold_storage_line_user,cold.storage.line user,model_cold_storage_line,base.group_user,1,0,0,0
+access_cold_storage_line_manager,cold.storage.line manager,model_cold_storage_line,base.group_system,1,1,1,1
+access_cold_storage_pocket_user,cold.storage.pocket user,model_cold_storage_pocket,base.group_user,1,0,0,0
+access_cold_storage_pocket_manager,cold.storage.pocket manager,model_cold_storage_pocket,base.group_system,1,1,1,1
+access_cold_storage_master_setup_user,cold.storage.master.setup user,model_cold_storage_master_setup,base.group_user,1,0,0,0
+access_cold_storage_master_setup_manager,cold.storage.master.setup manager,model_cold_storage_master_setup,base.group_system,1,1,1,1

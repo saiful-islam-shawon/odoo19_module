@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Storage Master Setup List View -->
+    <record id="view_cold_storage_master_setup_list" model="ir.ui.view">
+        <field name="name">cold.storage.master.setup.list</field>
+        <field name="model">cold.storage.master.setup</field>
+        <field name="arch" type="xml">
+            <list string="Storage Master Setup">
+                <field name="name"/>
+                <field name="chamber_id"/>
+                <field name="floor_id"/>
+                <field name="line_id"/>
+                <field name="pocket_id"/>
+                <field name="activate" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Storage Master Setup Form View -->
+    <record id="view_cold_storage_master_setup_form" model="ir.ui.view">
+        <field name="name">cold.storage.master.setup.form</field>
+        <field name="model">cold.storage.master.setup</field>
+        <field name="arch" type="xml">
+            <form string="Storage Master Setup">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Slot Identifier"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Physical Storage Dimensions">
+                            <field name="chamber_id" options="{'no_create_edit': False, 'no_quick_create': False}"/>
+                            <field name="floor_id" options="{'no_create_edit': False, 'no_quick_create': False}"/>
+                            <field name="line_id" options="{'no_create_edit': False, 'no_quick_create': False}"/>
+                            <field name="pocket_id" options="{'no_create_edit': False, 'no_quick_create': False}"/>
+                        </group>
+                        <group string="Operational Status">
+                            <field name="activate" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Storage Master Setup Search View -->
+    <record id="view_cold_storage_master_setup_search" model="ir.ui.view">
+        <field name="name">cold.storage.master.setup.search</field>
+        <field name="model">cold.storage.master.setup</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="chamber_id"/>
+                <field name="floor_id"/>
+                <field name="line_id"/>
+                <field name="pocket_id"/>
+                <filter string="Active Slots" name="filter_active" domain="[('activate', '=', True)]"/>
+                <filter string="Inactive Slots" name="filter_inactive" domain="[('activate', '=', False)]"/>
+                <group>
+                    <filter string="Chamber" name="group_by_chamber" context="{'group_by': 'chamber_id'}"/>
+                    <filter string="Floor" name="group_by_floor" context="{'group_by': 'floor_id'}"/>
+                    <filter string="Line" name="group_by_line" context="{'group_by': 'line_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Storage Master Setup Action -->
+    <record id="action_cold_storage_master_setup" model="ir.actions.act_window">
+        <field name="name">Storage Master Setup</field>
+        <field name="res_model">cold.storage.master.setup</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_cold_storage_master_setup_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Configure your Cold Storage Master Locations!
+            </p>
+            <p>
+                Link Chambers, Floors, Lines, and Pockets into uniquely identifiable cold storage slots.
+            </p>
+        </field>
+    </record>
+
+    <!-- Submenu under Configuration -->
+    <menuitem id="menu_cold_storage_master_setup"
+              name="Storage Master Setup"
+              parent="menu_cold_storage_configuration"
+              action="action_cold_storage_master_setup"
+              sequence="10"/>
+</odoo>

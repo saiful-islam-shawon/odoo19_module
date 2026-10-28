@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Season List View -->
+    <record id="view_cold_storage_season_list" model="ir.ui.view">
+        <field name="name">cold.storage.season.list</field>
+        <field name="model">cold.storage.season</field>
+        <field name="arch" type="xml">
+            <list string="Seasons" decoration-info="state == 'draft'" decoration-success="state == 'open'" decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="default_bag_rate"/>
+                <field name="team"/>
+                <field name="season_manager"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'open'" decoration-muted="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Season Form View -->
+    <record id="view_cold_storage_season_form" model="ir.ui.view">
+        <field name="name">cold.storage.season.form</field>
+        <field name="model">cold.storage.season</field>
+        <field name="arch" type="xml">
+            <form string="Season">
+                <header>
+                    <button name="action_open" string="Open Season" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_close" string="Close Season" type="object" class="btn-danger" invisible="state != 'open'"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object" invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,open,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Season Name"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Potato Season 2026-27" readonly="state == 'closed'"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Operating Period &amp; Rate">
+                            <field name="date_start" readonly="state == 'closed'"/>
+                            <field name="date_end" readonly="state == 'closed'"/>
+                            <field name="default_bag_rate" readonly="state == 'closed'"/>
+                        </group>
+                        <group string="Operational Personnel">
+                            <field name="team" readonly="state == 'closed'"/>
+                            <field name="season_manager" readonly="state == 'closed'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Season Search View -->
+    <record id="view_cold_storage_season_search" model="ir.ui.view">
+        <field name="name">cold.storage.season.search</field>
+        <field name="model">cold.storage.season</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="team"/>
+                <field name="season_manager"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Open" name="filter_open" domain="[('state', '=', 'open')]"/>
+                <filter string="Closed" name="filter_closed" domain="[('state', '=', 'closed')]"/>
+                <group>
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Season Window Action -->
+    <record id="action_cold_storage_season" model="ir.actions.act_window">
+        <field name="name">Season</field>
+        <field name="res_model">cold.storage.season</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_cold_storage_season_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Cold Storage Season!
+            </p>
+            <p>
+                Track operational periods, default bag rates, assigned teams, and managers.
+            </p>
+        </field>
+    </record>
+
+    <!-- Season Menuitem under Root -->
+    <menuitem id="menu_cold_storage_season"
+              name="Season"
+              parent="menu_cold_storage_root"
+              action="action_cold_storage_season"
+              sequence="10"/>
+</odoo>
