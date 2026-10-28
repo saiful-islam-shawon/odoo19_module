@@ -11,3 +11,7 @@ access_cold_storage_pocket_user,cold.storage.pocket user,model_cold_storage_pock
 access_cold_storage_pocket_manager,cold.storage.pocket manager,model_cold_storage_pocket,base.group_system,1,1,1,1
 access_cold_storage_master_setup_user,cold.storage.master.setup user,model_cold_storage_master_setup,base.group_user,1,0,0,0
 access_cold_storage_master_setup_manager,cold.storage.master.setup manager,model_cold_storage_master_setup,base.group_system,1,1,1,1
+access_cold_storage_team_user,cold.storage.team user,model_cold_storage_team,base.group_user,1,0,0,0
+access_cold_storage_team_manager,cold.storage.team manager,model_cold_storage_team,base.group_system,1,1,1,1
+access_cold_storage_inward_user,cold.storage.inward user,model_cold_storage_inward,base.group_user,1,0,0,0
+access_cold_storage_inward_manager,cold.storage.inward manager,model_cold_storage_inward,base.group_system,1,1,1,1

@@ -6,6 +6,12 @@
               sequence="10"
               web_icon="base,static/description/icon.png"/>
 
+    <!-- Parent "Inward & lots" Menu -->
+    <menuitem id="menu_cold_storage_inward_root"
+              name="Inward &amp; lots"
+              parent="menu_cold_storage_root"
+              sequence="20"/>
+
     <!-- Parent Configuration Menu -->
     <menuitem id="menu_cold_storage_configuration"
               name="Configuration"

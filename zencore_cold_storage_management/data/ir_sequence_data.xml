@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sequence for Cold Storage Inward Reference -->
+        <record id="seq_cold_storage_inward" model="ir.sequence">
+            <field name="name">Cold Storage Inward</field>
+            <field name="code">cold.storage.inward</field>
+            <field name="prefix">INW/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for Cold Storage Lot Number -->
+        <record id="seq_cold_storage_lot" model="ir.sequence">
+            <field name="name">Cold Storage Lot</field>
+            <field name="code">cold.storage.lot</field>
+            <field name="prefix">LOT/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

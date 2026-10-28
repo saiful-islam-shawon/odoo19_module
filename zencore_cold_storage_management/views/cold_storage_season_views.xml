@@ -10,7 +10,7 @@
                 <field name="date_start"/>
                 <field name="date_end"/>
                 <field name="default_bag_rate"/>
-                <field name="team"/>
+                <field name="team_id"/>
                 <field name="season_manager"/>
                 <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'open'" decoration-muted="state == 'closed'"/>
             </list>
@@ -43,7 +43,7 @@
                             <field name="default_bag_rate" readonly="state == 'closed'"/>
                         </group>
                         <group string="Operational Personnel">
-                            <field name="team" readonly="state == 'closed'"/>
+                            <field name="team_id" readonly="state == 'closed'" options="{'no_create_edit': False}"/>
                             <field name="season_manager" readonly="state == 'closed'"/>
                         </group>
                     </group>
@@ -59,13 +59,14 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
-                <field name="team"/>
+                <field name="team_id"/>
                 <field name="season_manager"/>
                 <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Open" name="filter_open" domain="[('state', '=', 'open')]"/>
                 <filter string="Closed" name="filter_closed" domain="[('state', '=', 'closed')]"/>
                 <group>
                     <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Team" name="group_by_team" context="{'group_by': 'team_id'}"/>
                 </group>
             </search>
         </field>

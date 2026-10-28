@@ -21,13 +21,23 @@ class ColdStorageSeason(models.Model):
         default=0.0,
         help="Default storage charge rate per bag for this season."
     )
-    team = fields.Char(string='Team', help="Operational team assigned to this season.")
+    team_id = fields.Many2one(
+        'cold.storage.team',
+        string='Team',
+        ondelete='restrict',
+        help="Operational team assigned to this season."
+    )
     season_manager = fields.Char(string='Season Manager', help="Person managing this season.")
     state = fields.Selection([
         ('draft', 'Draft'),
         ('open', 'Open'),
         ('closed', 'Closed'),
     ], string='Status', default='draft', required=True)
+
+    @api.onchange('team_id')
+    def _onchange_team_id(self):
+        if self.team_id and self.team_id.leader_id:
+            self.season_manager = self.team_id.leader_id.name
 
     @api.constrains('date_start', 'date_end')
     def _check_dates(self):

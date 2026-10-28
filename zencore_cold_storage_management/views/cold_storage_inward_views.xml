@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inward List View -->
+    <record id="view_cold_storage_inward_list" model="ir.ui.view">
+        <field name="name">cold.storage.inward.list</field>
+        <field name="model">cold.storage.inward</field>
+        <field name="arch" type="xml">
+            <list string="Inward &amp; Lots">
+                <field name="name" string="Lot Number"/>
+                <field name="partner_id"/>
+                <field name="product_name"/>
+                <field name="bag_quantity"/>
+                <field name="season_id"/>
+                <field name="bag_rate"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Inward Form View -->
+    <record id="view_cold_storage_inward_form" model="ir.ui.view">
+        <field name="name">cold.storage.inward.form</field>
+        <field name="model">cold.storage.inward</field>
+        <field name="arch" type="xml">
+            <form string="Inward Deposit">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Lot Number"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Customer &amp; Storage Agreement">
+                            <field name="partner_id" options="{'no_create_edit': False, 'no_quick_create': False}"/>
+                            <field name="season_id" options="{'no_create_edit': False, 'no_quick_create': False}"/>
+                            <field name="bag_rate"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                        <group string="Product &amp; Storage Details">
+                            <field name="product_name" placeholder="e.g. Cardinal Potato, Granola Seed"/>
+                            <field name="bag_quantity"/>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Inward Search View -->
+    <record id="view_cold_storage_inward_search" model="ir.ui.view">
+        <field name="name">cold.storage.inward.search</field>
+        <field name="model">cold.storage.inward</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Lot Number"/>
+                <field name="partner_id"/>
+                <field name="product_name"/>
+                <field name="season_id"/>
+                <group>
+                    <filter string="Customer" name="group_by_customer" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Season" name="group_by_season" context="{'group_by': 'season_id'}"/>
+                    <filter string="Start Date" name="group_by_start_date" context="{'group_by': 'date_start'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Inward Window Action -->
+    <record id="action_cold_storage_inward" model="ir.actions.act_window">
+        <field name="name">Inward &amp; lots</field>
+        <field name="res_model">cold.storage.inward</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_cold_storage_inward_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record your first Cold Storage Inward deposit!
+            </p>
+            <p>
+                Track customer bags, products, storage agreements, and auto-generated unique lot numbers.
+            </p>
+        </field>
+    </record>
+
+    <!-- Submenu 1: Inward & lots under Inward & lots Root -->
+    <menuitem id="menu_cold_storage_inward"
+              name="Inward &amp; lots"
+              parent="menu_cold_storage_inward_root"
+              action="action_cold_storage_inward"
+              sequence="10"/>
+
+    <!-- Submenu 2: Scrap placeholder under Inward & lots Root -->
+    <menuitem id="menu_cold_storage_scrap"
+              name="Scrap"
+              parent="menu_cold_storage_inward_root"
+              sequence="20"/>
+</odoo>

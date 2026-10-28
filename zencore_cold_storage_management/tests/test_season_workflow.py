@@ -14,17 +14,18 @@ class TestSeasonWorkflow(TransactionCase):
 
     def test_01_create_season_success(self):
         """Test successful season creation in draft state."""
+        team = self.env['cold.storage.team'].create({'name': 'Operations Team Alpha'})
         season = self.Season.create({
             'name': 'Potato Season 2026-27',
             'date_start': self.today,
             'date_end': self.today + timedelta(days=180),
             'default_bag_rate': 120.50,
-            'team': 'Operations Team Alpha',
+            'team_id': team.id,
             'season_manager': 'Manager Rahim',
         })
         self.assertEqual(season.state, 'draft')
         self.assertEqual(season.default_bag_rate, 120.50)
-        self.assertEqual(season.team, 'Operations Team Alpha')
+        self.assertEqual(season.team_id, team)
 
     def test_02_date_validation_constraint(self):
         """Test that date_end < date_start raises ValidationError."""
