@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Scrap List View -->
+    <record id="view_cold_storage_inward_scrap_list" model="ir.ui.view">
+        <field name="name">cold.storage.inward.scrap.list</field>
+        <field name="model">cold.storage.inward.scrap</field>
+        <field name="arch" type="xml">
+            <list string="Scraps">
+                <field name="name" string="Reference"/>
+                <field name="inward_id" string="Inward Lot"/>
+                <field name="date"/>
+                <field name="slot_id"/>
+                <field name="quantity" string="Scrap Quantity (Bosta)"/>
+                <field name="reason"/>
+                <field name="user_id"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Scrap Form View -->
+    <record id="view_cold_storage_inward_scrap_form" model="ir.ui.view">
+        <field name="name">cold.storage.inward.scrap.form</field>
+        <field name="model">cold.storage.inward.scrap</field>
+        <field name="arch" type="xml">
+            <form string="Scrap / Damage &amp; Loss">
+                <sheet>
+                    <field name="allowed_slot_ids" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name" string="Reference"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Lot &amp; Date Details">
+                            <field name="inward_id" options="{'no_create': True}"/>
+                            <field name="date"/>
+                            <field name="user_id" options="{'no_create': True}"/>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Scrap Details">
+                            <field name="slot_id" domain="[('id', 'in', allowed_slot_ids)]" options="{'no_create': True, 'no_quick_create': True}"/>
+                            <field name="available_quantity"/>
+                            <field name="quantity"/>
+                            <field name="reason" placeholder="e.g. Rotten, damaged during handling, moisture loss..."/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Scrap Search View -->
+    <record id="view_cold_storage_inward_scrap_search" model="ir.ui.view">
+        <field name="name">cold.storage.inward.scrap.search</field>
+        <field name="model">cold.storage.inward.scrap</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Reference"/>
+                <field name="inward_id"/>
+                <field name="slot_id"/>
+                <field name="reason"/>
+                <group>
+                    <filter string="Inward Lot" name="group_by_inward" context="{'group_by': 'inward_id'}"/>
+                    <filter string="Storage Slot" name="group_by_slot" context="{'group_by': 'slot_id'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Scrap Window Action -->
+    <record id="action_cold_storage_inward_scrap" model="ir.actions.act_window">
+        <field name="name">Scraps</field>
+        <field name="res_model">cold.storage.inward.scrap</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_cold_storage_inward_scrap_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record your first scrap / damaged product entry!
+            </p>
+            <p>
+                Log damaged or lost bags from specific storage slots and track reason and stock impact.
+            </p>
+        </field>
+    </record>
+
+    <!-- Top Navbar Submenu: Inward & lots > Scrap -->
+    <menuitem id="menu_cold_storage_scrap"
+              name="Scrap"
+              parent="menu_cold_storage_inward_root"
+              action="action_cold_storage_inward_scrap"
+              sequence="20"/>
+</odoo>

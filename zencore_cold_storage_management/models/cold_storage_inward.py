@@ -87,6 +87,29 @@ class ColdStorageInward(models.Model):
         compute='_compute_plotting_count',
         help="Number of times goods were relocated between slots."
     )
+    scrap_ids = fields.One2many(
+        'cold.storage.inward.scrap',
+        'inward_id',
+        string='Scraps',
+        help="Loss and damage (scrap) history for this inward lot."
+    )
+    scrap_count = fields.Integer(
+        string='Scrap Count',
+        compute='_compute_scrap_count',
+        help="Number of scrap / damage events for this lot."
+    )
+    scrapped_quantity = fields.Integer(
+        string='Scrapped Quantity',
+        compute='_compute_stock_quantities',
+        store=True,
+        help="Total bags scrapped/damaged across all scrap records for this lot."
+    )
+    remaining_quantity = fields.Integer(
+        string='Remaining Quantity',
+        compute='_compute_stock_quantities',
+        store=True,
+        help="Net remaining bags available (Total Deposited Quantity - Total Scrapped Quantity)."
+    )
 
     _name_uniq = models.Constraint(
         'unique (name)',
@@ -98,12 +121,38 @@ class ColdStorageInward(models.Model):
         for record in self:
             record.plotting_count = len(record.plotting_ids)
 
+    @api.depends('scrap_ids')
+    def _compute_scrap_count(self):
+        for record in self:
+            record.scrap_count = len(record.scrap_ids)
+
+    @api.depends('scrap_ids.quantity', 'bag_quantity')
+    def _compute_stock_quantities(self):
+        for record in self:
+            scrapped = sum(record.scrap_ids.mapped('quantity'))
+            record.scrapped_quantity = scrapped
+            record.remaining_quantity = max(record.bag_quantity - scrapped, 0)
+
     def action_view_plottings(self):
         self.ensure_one()
         return {
             'name': _('Plottings - Lot %s') % (self.name or ''),
             'type': 'ir.actions.act_window',
             'res_model': 'cold.storage.inward.plotting',
+            'view_mode': 'list,form',
+            'domain': [('inward_id', '=', self.id)],
+            'context': {
+                'default_inward_id': self.id,
+                'search_default_inward_id': self.id,
+            },
+        }
+
+    def action_view_scraps(self):
+        self.ensure_one()
+        return {
+            'name': _('Scraps - Lot %s') % (self.name or ''),
+            'type': 'ir.actions.act_window',
+            'res_model': 'cold.storage.inward.scrap',
             'view_mode': 'list,form',
             'domain': [('inward_id', '=', self.id)],
             'context': {
@@ -140,16 +189,18 @@ class ColdStorageInward(models.Model):
             if record.bag_rate < 0.0:
                 raise ValidationError(_("Bag Rate cannot be negative."))
 
-    @api.constrains('allocation_ids', 'bag_quantity')
+    @api.constrains('allocation_ids', 'bag_quantity', 'scrap_ids')
     def _check_allocation_total(self):
         for record in self:
             total_allocated = sum(record.allocation_ids.mapped('quantity'))
-            if total_allocated > record.bag_quantity:
+            total_scrapped = sum(record.scrap_ids.mapped('quantity'))
+            max_allocatable = record.bag_quantity - total_scrapped
+            if total_allocated > max_allocatable:
                 raise ValidationError(_(
-                    "Total allocated quantity (%(allocated)s bosta) cannot exceed total product quantity (%(total)s bosta) for Lot '%(lot)s'."
+                    "Total allocated quantity (%(allocated)s bosta) cannot exceed remaining available quantity (%(max_qty)s bosta) for Lot '%(lot)s'."
                 ) % {
                     'allocated': total_allocated,
-                    'total': record.bag_quantity,
+                    'max_qty': max_allocatable,
                     'lot': record.name or '',
                 })
 

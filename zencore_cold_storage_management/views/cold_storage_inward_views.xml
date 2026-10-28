@@ -33,6 +33,12 @@
                                 icon="fa-exchange">
                             <field name="plotting_count" widget="statinfo" string="Plotting"/>
                         </button>
+                        <button name="action_view_scraps"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-trash-o">
+                            <field name="scrap_count" widget="statinfo" string="Scrap"/>
+                        </button>
                     </div>
                     <div class="oe_title">
                         <label for="name" string="Lot Number"/>
@@ -51,6 +57,8 @@
                         <group string="Product &amp; Storage Details">
                             <field name="product_name" placeholder="e.g. Cardinal Potato, Granola Seed"/>
                             <field name="bag_quantity"/>
+                            <field name="scrapped_quantity" readonly="1"/>
+                            <field name="remaining_quantity" readonly="1"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                         </group>
                     </group>
@@ -110,10 +118,4 @@
               parent="menu_cold_storage_inward_root"
               action="action_cold_storage_inward"
               sequence="10"/>
-
-    <!-- Submenu 2: Scrap placeholder under Inward & lots Root -->
-    <menuitem id="menu_cold_storage_scrap"
-              name="Scrap"
-              parent="menu_cold_storage_inward_root"
-              sequence="20"/>
 </odoo>

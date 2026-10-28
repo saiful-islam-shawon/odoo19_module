@@ -415,3 +415,165 @@ class TestTeamsAndInward(TransactionCase):
                 'to_slot_id': slot_b.id,
                 'quantity': 15,
             })
+
+    def test_14_scrap_creation_and_auto_deduction(self):
+        """Test scrap creation, sequence generation, auto-deduction, and inward quantities."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 7'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 7'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 7'})
+        pocket_a = self.env['cold.storage.pocket'].create({'name': 'Pocket 7A'})
+        pocket_b = self.env['cold.storage.pocket'].create({'name': 'Pocket 7B'})
+
+        slot_a = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_a.id,
+            'activate': True,
+        })
+        slot_b = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_b.id,
+            'activate': True,
+        })
+
+        inward = self.Inward.create({
+            'partner_id': self.customer.id,
+            'season_id': self.season.id,
+            'product_name': 'Potato Batch 7',
+            'bag_quantity': 50,
+            'date_start': self.today,
+            'date_end': self.today + timedelta(days=30),
+            'allocation_ids': [
+                (0, 0, {'slot_id': slot_a.id, 'quantity': 20}),
+                (0, 0, {'slot_id': slot_b.id, 'quantity': 30}),
+            ],
+        })
+
+        self.assertEqual(inward.scrapped_quantity, 0)
+        self.assertEqual(inward.remaining_quantity, 50)
+        self.assertEqual(inward.scrap_count, 0)
+
+        # Create scrap of 8 bags from slot_a
+        scrap = self.env['cold.storage.inward.scrap'].create({
+            'inward_id': inward.id,
+            'slot_id': slot_a.id,
+            'quantity': 8,
+            'reason': 'Rotten due to moisture',
+        })
+
+        self.assertTrue(scrap.name.startswith('SCP/'))
+        self.assertEqual(scrap.available_quantity, 12)  # Available after deduction
+        self.assertEqual(inward.scrap_count, 1)
+        self.assertEqual(inward.scrapped_quantity, 8)
+        self.assertEqual(inward.remaining_quantity, 42)
+
+        line_a = inward.allocation_ids.filtered(lambda a: a.slot_id == slot_a)
+        line_b = inward.allocation_ids.filtered(lambda a: a.slot_id == slot_b)
+        self.assertEqual(line_a.quantity, 12)
+        self.assertEqual(line_b.quantity, 30)
+
+    def test_15_scrap_exact_deduction_and_unlink(self):
+        """Test that scrapping all bags in a slot unlinks the allocation line."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 8'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 8'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 8'})
+        pocket_a = self.env['cold.storage.pocket'].create({'name': 'Pocket 8A'})
+
+        slot_a = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_a.id,
+            'activate': True,
+        })
+
+        inward = self.Inward.create({
+            'partner_id': self.customer.id,
+            'season_id': self.season.id,
+            'product_name': 'Potato Batch 8',
+            'bag_quantity': 15,
+            'date_start': self.today,
+            'date_end': self.today + timedelta(days=30),
+            'allocation_ids': [
+                (0, 0, {'slot_id': slot_a.id, 'quantity': 15}),
+            ],
+        })
+
+        # Scrap entire 15 bags
+        self.env['cold.storage.inward.scrap'].create({
+            'inward_id': inward.id,
+            'slot_id': slot_a.id,
+            'quantity': 15,
+            'reason': 'Total loss in transit',
+        })
+
+        line_a = inward.allocation_ids.filtered(lambda a: a.slot_id == slot_a)
+        self.assertFalse(line_a)
+        self.assertEqual(inward.scrapped_quantity, 15)
+        self.assertEqual(inward.remaining_quantity, 0)
+
+    def test_16_scrap_validation_constraints(self):
+        """Test over-scrap and non-positive quantity validation errors."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 9'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 9'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 9'})
+        pocket_a = self.env['cold.storage.pocket'].create({'name': 'Pocket 9A'})
+        pocket_b = self.env['cold.storage.pocket'].create({'name': 'Pocket 9B'})
+
+        slot_a = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_a.id,
+            'activate': True,
+        })
+        slot_unallocated = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_b.id,
+            'activate': True,
+        })
+
+        inward = self.Inward.create({
+            'partner_id': self.customer.id,
+            'season_id': self.season.id,
+            'product_name': 'Potato Batch 9',
+            'bag_quantity': 10,
+            'date_start': self.today,
+            'date_end': self.today + timedelta(days=30),
+            'allocation_ids': [
+                (0, 0, {'slot_id': slot_a.id, 'quantity': 10}),
+            ],
+        })
+
+        # Non-positive quantity
+        with self.assertRaises(ValidationError):
+            self.env['cold.storage.inward.scrap'].create({
+                'inward_id': inward.id,
+                'slot_id': slot_a.id,
+                'quantity': 0,
+                'reason': 'Invalid zero scrap',
+            })
+
+        # Over-scrap (12 > 10)
+        with self.assertRaises(ValidationError):
+            self.env['cold.storage.inward.scrap'].create({
+                'inward_id': inward.id,
+                'slot_id': slot_a.id,
+                'quantity': 12,
+                'reason': 'More than available',
+            })
+
+        # Unallocated slot
+        with self.assertRaises(ValidationError):
+            self.env['cold.storage.inward.scrap'].create({
+                'inward_id': inward.id,
+                'slot_id': slot_unallocated.id,
+                'quantity': 5,
+                'reason': 'Slot not allocated',
+            })
+

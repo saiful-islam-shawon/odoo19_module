@@ -19,3 +19,5 @@ access_cold_storage_inward_allocation_user,cold.storage.inward.allocation user,m
 access_cold_storage_inward_allocation_manager,cold.storage.inward.allocation manager,model_cold_storage_inward_allocation,base.group_system,1,1,1,1
 access_cold_storage_inward_plotting_user,cold.storage.inward.plotting user,model_cold_storage_inward_plotting,base.group_user,1,0,0,0
 access_cold_storage_inward_plotting_manager,cold.storage.inward.plotting manager,model_cold_storage_inward_plotting,base.group_system,1,1,1,1
+access_cold_storage_inward_scrap_user,cold.storage.inward.scrap user,model_cold_storage_inward_scrap,base.group_user,1,0,0,0
+access_cold_storage_inward_scrap_manager,cold.storage.inward.scrap manager,model_cold_storage_inward_scrap,base.group_system,1,1,1,1
