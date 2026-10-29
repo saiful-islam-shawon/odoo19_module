@@ -11,7 +11,7 @@
                 <field name="date"/>
                 <field name="from_slot_id"/>
                 <field name="to_slot_id"/>
-                <field name="quantity" string="Quantity (Bosta)"/>
+                <field name="quantity" string="Transferred Bags"/>
                 <field name="user_id"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide"/>
             </list>

@@ -15,12 +15,10 @@
                             <field name="receiver_name" placeholder="e.g. Abdul Karim (Driver / Representative)"/>
                             <field name="vehicle_no" placeholder="e.g. Dhaka Metro-Ta 11-2233"/>
                         </group>
-                        <group string="Billing &amp; Payment">
+                        <group string="Release Quantities &amp; Charges">
                             <field name="bag_rate" readonly="1" force_save="1"/>
                             <field name="total_release_quantity" readonly="1"/>
                             <field name="total_amount" readonly="1"/>
-                            <field name="payment_mode" widget="radio"/>
-                            <field name="journal_id" options="{'no_create': True}" invisible="payment_mode != 'immediate'" required="payment_mode == 'immediate'"/>
                         </group>
                     </group>
                     <group string="Delivery Remarks">

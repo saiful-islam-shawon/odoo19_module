@@ -178,7 +178,6 @@ class TestSeasonWorkflow(TransactionCase):
         ).create({
             'inward_id': inward.id,
             'receiver_name': 'Driver Joynal',
-            'payment_mode': 'credit',  # credit mode leaves due, but Option A permits closing
         })
         wizard.line_ids.filtered(lambda l: l.slot_id == slot).quantity = 10
         wizard.action_confirm_release()

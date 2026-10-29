@@ -164,7 +164,7 @@ class TestTeamsAndInward(TransactionCase):
         inward = self.Inward.create({
             'partner_id': self.customer.id,
             'season_id': self.season.id,
-            'product_name': 'Potato 10 Bosta',
+            'product_name': 'Potato 10 Bags',
             'bag_quantity': 20,
             'date_start': self.today,
             'date_end': self.today + timedelta(days=30),
@@ -628,8 +628,6 @@ class TestTeamsAndInward(TransactionCase):
             'inward_id': inward.id,
             'receiver_name': 'Driver Kalam',
             'vehicle_no': 'Dhaka Metro-Ta 11-2233',
-            'payment_mode': 'immediate',
-            'journal_id': journal.id,
         })
 
         self.assertEqual(len(wizard.line_ids), 2)
@@ -642,15 +640,17 @@ class TestTeamsAndInward(TransactionCase):
 
         # Confirm release
         action = wizard.action_confirm_release()
-        release = self.env['cold.storage.inward.release'].browse(action['res_id'])
+        self.assertEqual(action.get('type'), 'ir.actions.act_window_close')
 
+        release = self.env['cold.storage.inward.release'].search([('inward_id', '=', inward.id)], limit=1)
+        self.assertTrue(release)
         self.assertTrue(release.name.startswith('REL/'))
         self.assertEqual(release.quantity, 10)
         self.assertEqual(release.total_amount, 500.00)
         self.assertTrue(release.move_id)
         self.assertEqual(release.move_id.move_type, 'out_invoice')
-        self.assertEqual(release.move_id.state, 'posted')
-        self.assertIn(release.move_id.payment_state, ('paid', 'in_payment'))
+        # Invoice created in Draft state
+        self.assertEqual(release.move_id.state, 'draft')
 
         # Check slot deduction
         alloc_a = inward.allocation_ids.filtered(lambda a: a.slot_id == slot_a)
@@ -664,8 +664,33 @@ class TestTeamsAndInward(TransactionCase):
         self.assertEqual(inward.release_count, 1)
         self.assertEqual(inward.invoice_count, 1)
 
+        # Smart button action test: strictly filtered to this lot's invoice
+        inv_action = inward.action_view_invoices()
+        self.assertEqual(inv_action['name'], f"Invoices - Lot {inward.name}")
+        self.assertIn(release.move_id.id, inv_action['domain'][0][2])
+
+        # Validate / Confirm invoice manually
+        release.move_id.action_post()
+        self.assertEqual(release.move_id.state, 'posted')
+        self.assertEqual(inward.payment_status, 'due')
+        self.assertEqual(inward.due_amount, 500.00)
+
+        # Register payment via standard Odoo payment register
+        payment_register = self.env['account.payment.register'].with_context(
+            active_model='account.move',
+            active_ids=release.move_id.ids,
+        ).create({
+            'journal_id': journal.id,
+            'amount': 500.00,
+            'payment_date': self.today,
+        })
+        payment_register._create_payments()
+        self.assertIn(release.move_id.payment_state, ('paid', 'in_payment'))
+        self.assertEqual(inward.payment_status, 'paid')
+        self.assertEqual(inward.due_amount, 0.0)
+
     def test_18_release_credit_due_invoice(self):
-        """Test partial release on credit creates unpaid customer invoice."""
+        """Test partial release creates draft customer invoice and remains due on post."""
         chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 11'})
         floor = self.env['cold.storage.floor'].create({'name': 'Floor 11'})
         line = self.env['cold.storage.line'].create({'name': 'Line 11'})
@@ -697,19 +722,23 @@ class TestTeamsAndInward(TransactionCase):
         ).create({
             'inward_id': inward.id,
             'receiver_name': 'Farmer Jamal',
-            'payment_mode': 'credit',
         })
 
         wizard.line_ids[0].quantity = 5
         self.assertEqual(wizard.total_amount, 300.00)
 
         action = wizard.action_confirm_release()
-        release = self.env['cold.storage.inward.release'].browse(action['res_id'])
+        self.assertEqual(action.get('type'), 'ir.actions.act_window_close')
+        release = self.env['cold.storage.inward.release'].search([('inward_id', '=', inward.id)], limit=1)
 
+        self.assertEqual(release.move_id.state, 'draft')
+        release.move_id.action_post()
         self.assertEqual(release.move_id.state, 'posted')
         self.assertEqual(release.move_id.payment_state, 'not_paid')
         self.assertEqual(inward.released_quantity, 5)
         self.assertEqual(inward.remaining_quantity, 20)
+        self.assertEqual(inward.due_amount, 300.00)
+        self.assertEqual(inward.payment_status, 'due')
 
     def test_19_release_full_depletion_unlinks_slot(self):
         """Test that releasing all bags in a slot unlinks the allocation line."""
@@ -744,7 +773,6 @@ class TestTeamsAndInward(TransactionCase):
         ).create({
             'inward_id': inward.id,
             'receiver_name': 'Farmer Jamal',
-            'payment_mode': 'credit',
         })
         wizard.line_ids[0].quantity = 10
 
@@ -789,7 +817,6 @@ class TestTeamsAndInward(TransactionCase):
         ).create({
             'inward_id': inward.id,
             'receiver_name': 'Receiver',
-            'payment_mode': 'credit',
         })
         wizard_zero.line_ids[0].quantity = 0
         with self.assertRaises(ValidationError):
@@ -801,7 +828,6 @@ class TestTeamsAndInward(TransactionCase):
         ).create({
             'inward_id': inward.id,
             'receiver_name': 'Receiver',
-            'payment_mode': 'credit',
         })
         wizard_over.line_ids[0].quantity = 15
         with self.assertRaises(ValidationError):

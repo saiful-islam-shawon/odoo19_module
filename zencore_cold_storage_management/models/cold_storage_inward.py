@@ -40,10 +40,10 @@ class ColdStorageInward(models.Model):
         help="Manual description of the stored product (e.g., Potato, Seed Potato)."
     )
     bag_quantity = fields.Integer(
-        string='Product Quantity (Bosta)',
+        string='Product Quantity (Bags)',
         required=True,
         default=1,
-        help="Quantity in bags / bosta."
+        help="Quantity in bags."
     )
     lot_number = fields.Char(
         string='Lot Tracking Reference',
@@ -203,15 +203,17 @@ class ColdStorageInward(models.Model):
     @api.depends('release_ids.move_id.payment_state', 'release_ids.move_id.amount_residual', 'release_ids.move_id.amount_total', 'release_ids.move_id.state')
     def _compute_due_and_payment_status(self):
         for record in self:
-            invoices = record.release_ids.mapped('move_id').filtered(lambda inv: inv.state == 'posted')
+            invoices = record.release_ids.mapped('move_id').filtered(lambda inv: inv.state != 'cancel')
             if not invoices:
                 record.due_amount = 0.0
                 record.payment_status = 'no_invoice'
             else:
-                total_residual = sum(invoices.mapped('amount_residual'))
+                posted_invoices = invoices.filtered(lambda inv: inv.state == 'posted')
+                draft_invoices = invoices.filtered(lambda inv: inv.state == 'draft')
+                total_residual = sum(posted_invoices.mapped('amount_residual')) + sum(draft_invoices.mapped('amount_total'))
                 total_amount = sum(invoices.mapped('amount_total'))
                 record.due_amount = total_residual
-                if total_residual <= 0.0:
+                if total_residual <= 0.0 and posted_invoices and not draft_invoices:
                     record.payment_status = 'paid'
                 elif total_residual >= total_amount:
                     record.payment_status = 'due'
@@ -279,7 +281,7 @@ class ColdStorageInward(models.Model):
         self.ensure_one()
         invoices = self.invoice_ids
         action = {
-            'name': _('Journal / Invoices - Lot %s') % (self.name or ''),
+            'name': _('Invoices - Lot %s') % (self.name or ''),
             'type': 'ir.actions.act_window',
             'res_model': 'account.move',
             'domain': [('id', 'in', invoices.ids)],
@@ -312,7 +314,7 @@ class ColdStorageInward(models.Model):
     def _check_quantity(self):
         for record in self:
             if record.bag_quantity <= 0:
-                raise ValidationError(_("Product Quantity (Bosta) must be greater than zero."))
+                raise ValidationError(_("Product Quantity (Bags) must be greater than zero."))
 
     @api.constrains('bag_rate')
     def _check_bag_rate(self):
@@ -329,7 +331,7 @@ class ColdStorageInward(models.Model):
             max_allocatable = record.bag_quantity - total_scrapped - total_released
             if total_allocated > max_allocatable:
                 raise ValidationError(_(
-                    "Total allocated quantity (%(allocated)s bosta) cannot exceed remaining available quantity (%(max_qty)s bosta) for Lot '%(lot)s'."
+                    "Total allocated quantity (%(allocated)s bags) cannot exceed remaining available quantity (%(max_qty)s bags) for Lot '%(lot)s'."
                 ) % {
                     'allocated': total_allocated,
                     'max_qty': max_allocatable,

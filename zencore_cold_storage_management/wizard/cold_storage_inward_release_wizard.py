@@ -53,15 +53,6 @@ class ColdStorageInwardReleaseWizard(models.TransientModel):
         string='Total Charge',
         compute='_compute_totals'
     )
-    payment_mode = fields.Selection([
-        ('immediate', 'Immediate Payment (Cash / Bank)'),
-        ('credit', 'Pay Later / Credit (Due)'),
-    ], string='Payment Mode', default='immediate', required=True)
-    journal_id = fields.Many2one(
-        'account.journal',
-        string='Payment Journal',
-        domain="[('type', 'in', ['cash', 'bank'])]"
-    )
 
     @api.model
     def default_get(self, fields_list):
@@ -70,13 +61,6 @@ class ColdStorageInwardReleaseWizard(models.TransientModel):
         if inward_id:
             inward = self.env['cold.storage.inward'].browse(inward_id)
             res['inward_id'] = inward.id
-            default_journal = self.env['account.journal'].search([
-                ('type', 'in', ['cash', 'bank']),
-                ('company_id', '=', inward.company_id.id if inward.company_id else self.env.company.id)
-            ], limit=1)
-            if default_journal:
-                res['journal_id'] = default_journal.id
-
             lines = []
             for alloc in inward.allocation_ids.filtered(lambda a: a.quantity > 0):
                 lines.append((0, 0, {
@@ -99,9 +83,6 @@ class ColdStorageInwardReleaseWizard(models.TransientModel):
         inward = self.inward_id
         if self.total_release_quantity <= 0:
             raise ValidationError(_("Please specify a release quantity greater than 0 for at least one slot."))
-
-        if self.payment_mode == 'immediate' and not self.journal_id:
-            raise ValidationError(_("Please select a Payment Journal (Cash / Bank) for immediate payment."))
 
         # Validate line quantities and deduct from inward.allocation_ids
         release_lines_vals = []
@@ -148,12 +129,10 @@ class ColdStorageInwardReleaseWizard(models.TransientModel):
             'quantity': self.total_release_quantity,
             'bag_rate': self.bag_rate,
             'total_amount': self.total_amount,
-            'payment_mode': self.payment_mode,
-            'journal_id': self.journal_id.id if self.payment_mode == 'immediate' else False,
             'line_ids': release_lines_vals,
         })
 
-        # Create Customer Invoice (account.move)
+        # Create Draft Customer Invoice (account.move)
         move_vals = {
             'move_type': 'out_invoice',
             'partner_id': inward.partner_id.id,
@@ -169,29 +148,10 @@ class ColdStorageInwardReleaseWizard(models.TransientModel):
             move_vals['company_id'] = inward.company_id.id
 
         move = self.env['account.move'].create(move_vals)
-        move.action_post()
         release.move_id = move.id
 
-        # Register payment if immediate
-        if self.payment_mode == 'immediate' and self.total_amount > 0:
-            payment_register = self.env['account.payment.register'].with_context(
-                active_model='account.move',
-                active_ids=move.ids,
-            ).create({
-                'journal_id': self.journal_id.id,
-                'amount': self.total_amount,
-                'payment_date': self.date,
-            })
-            payment_register._create_payments()
-
-        return {
-            'name': _('Release Order'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'cold.storage.inward.release',
-            'res_id': release.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
+        # Close wizard and keep user on current Inward form
+        return {'type': 'ir.actions.act_window_close'}
 
 
 class ColdStorageInwardReleaseWizardLine(models.TransientModel):

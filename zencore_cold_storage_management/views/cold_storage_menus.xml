@@ -2,9 +2,9 @@
 <odoo>
     <!-- Top-Level Root Application Menu -->
     <menuitem id="menu_cold_storage_root"
-              name="Cold Storage Management"
+              name="CSMS"
               sequence="10"
-              web_icon="base,static/description/icon.png"/>
+              web_icon="zencore_cold_storage_management,static/description/icon.png"/>
 
     <!-- Parent "Inward & lots" Menu -->
     <menuitem id="menu_cold_storage_inward_root"

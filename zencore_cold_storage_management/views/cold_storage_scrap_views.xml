@@ -10,7 +10,7 @@
                 <field name="inward_id" string="Inward Lot"/>
                 <field name="date"/>
                 <field name="slot_id"/>
-                <field name="quantity" string="Scrap Quantity (Bosta)"/>
+                <field name="quantity" string="Scrapped Bags"/>
                 <field name="reason"/>
                 <field name="user_id"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide"/>

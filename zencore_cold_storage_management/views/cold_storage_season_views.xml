@@ -6,12 +6,12 @@
         <field name="model">cold.storage.season</field>
         <field name="arch" type="xml">
             <list string="Seasons" decoration-info="state == 'draft'" decoration-success="state == 'open'" decoration-muted="state == 'closed'">
-                <field name="name"/>
-                <field name="date_start"/>
-                <field name="date_end"/>
-                <field name="default_bag_rate"/>
-                <field name="team_id"/>
-                <field name="season_manager"/>
+                <field name="name" string="Season Name"/>
+                <field name="date_start" string="Start Date"/>
+                <field name="date_end" string="End Date"/>
+                <field name="default_bag_rate" string="Default Bag Rate"/>
+                <field name="team_id" string="Assigned Team"/>
+                <field name="season_manager" string="Manager"/>
                 <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'open'" decoration-muted="state == 'closed'"/>
             </list>
         </field>

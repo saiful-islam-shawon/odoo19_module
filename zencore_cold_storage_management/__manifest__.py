@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Zencore Cold Storage Management',
+    'name': 'CSMS - Cold Storage Management System',
     'version': '19.0.1.0.0',
     'category': 'GAPL',
     'summary': 'Cold Storage Season Management and Physical Storage Slot Setup',

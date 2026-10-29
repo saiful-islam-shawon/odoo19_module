@@ -25,10 +25,10 @@ class ColdStorageInwardAllocation(models.Model):
         help="Physical cold storage slot (Chamber / Floor / Line / Pocket). Only active slots are selectable."
     )
     quantity = fields.Integer(
-        string='Allocated Quantity (Bosta)',
+        string='Allocated Quantity (Bags)',
         required=True,
         default=1,
-        help="Quantity in bags / bosta placed into this storage slot."
+        help="Quantity in bags placed into this storage slot."
     )
     company_id = fields.Many2one(
         'res.company',
@@ -42,4 +42,4 @@ class ColdStorageInwardAllocation(models.Model):
     def _check_quantity(self):
         for record in self:
             if record.quantity <= 0:
-                raise ValidationError(_("Allocated Quantity (Bosta) must be greater than zero."))
+                raise ValidationError(_("Allocated Quantity (Bags) must be greater than zero."))

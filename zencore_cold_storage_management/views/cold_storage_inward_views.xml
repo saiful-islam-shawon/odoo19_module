@@ -5,15 +5,27 @@
         <field name="name">cold.storage.inward.list</field>
         <field name="model">cold.storage.inward</field>
         <field name="arch" type="xml">
-            <list string="Inward &amp; Lots">
+            <list string="Inward Lots">
                 <field name="name" string="Lot Number"/>
-                <field name="partner_id"/>
-                <field name="product_name"/>
-                <field name="bag_quantity"/>
-                <field name="season_id"/>
-                <field name="bag_rate"/>
-                <field name="date_start"/>
-                <field name="date_end"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="product_name" string="Product"/>
+                <field name="bag_quantity" string="Total Bags"/>
+                <field name="released_quantity" string="Released Bags"/>
+                <field name="remaining_quantity" string="Remaining Bags"/>
+                <field name="release_status" widget="badge"
+                       decoration-danger="release_status == 'unreleased'"
+                       decoration-warning="release_status == 'partial'"
+                       decoration-success="release_status == 'full'"/>
+                <field name="payment_status" widget="badge"
+                       decoration-success="payment_status == 'paid'"
+                       decoration-warning="payment_status == 'partial'"
+                       decoration-danger="payment_status == 'due'"
+                       decoration-muted="payment_status == 'no_invoice'"/>
+                <field name="due_amount" string="Due"/>
+                <field name="bag_rate" string="Bag Rate"/>
+                <field name="season_id" string="Season"/>
+                <field name="date_start" string="Start Date"/>
+                <field name="date_end" string="End Date"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide"/>
             </list>
         </field>
@@ -56,7 +68,7 @@
                                 type="object"
                                 class="oe_stat_button"
                                 icon="fa-money">
-                            <field name="invoice_count" widget="statinfo" string="Journal"/>
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
                         </button>
                     </div>
                     <div class="oe_title">
@@ -86,8 +98,8 @@
                         <page string="Storage Allocation" name="storage_allocation">
                             <field name="allocation_ids">
                                 <list editable="bottom">
-                                    <field name="slot_id" options="{'no_create_edit': False, 'no_quick_create': True}"/>
-                                    <field name="quantity"/>
+                                    <field name="slot_id" string="Storage Slot" options="{'no_create_edit': False, 'no_quick_create': True}"/>
+                                    <field name="quantity" string="Allocated Bags"/>
                                 </list>
                             </field>
                         </page>

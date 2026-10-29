@@ -50,10 +50,10 @@ class ColdStorageInwardScrap(models.Model):
         help="Quantity of bags currently available in the selected slot."
     )
     quantity = fields.Integer(
-        string='Scrap Quantity (Bosta)',
+        string='Scrap Quantity (Bags)',
         required=True,
         default=1,
-        help="Quantity in bags / bosta lost, rotten, or damaged."
+        help="Quantity in bags lost, rotten, or damaged."
     )
     reason = fields.Char(
         string='Reason / Cause of Damage',
@@ -112,7 +112,7 @@ class ColdStorageInwardScrap(models.Model):
     def _check_quantity_positive(self):
         for record in self:
             if record.quantity <= 0:
-                raise ValidationError(_("Scrap Quantity (Bosta) must be greater than zero."))
+                raise ValidationError(_("Scrap Quantity (Bags) must be greater than zero."))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -136,7 +136,7 @@ class ColdStorageInwardScrap(models.Model):
         total_avail = sum(slot_alloc.mapped('quantity'))
         if self.quantity > total_avail:
             raise ValidationError(_(
-                "Scrap quantity (%(qty)s bosta) cannot exceed available quantity (%(avail)s bosta) in Slot '%(slot)s'."
+                "Scrap quantity (%(qty)s bags) cannot exceed available quantity (%(avail)s bags) in Slot '%(slot)s'."
             ) % {
                 'qty': self.quantity,
                 'avail': total_avail,

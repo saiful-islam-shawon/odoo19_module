@@ -68,10 +68,11 @@ class ColdStorageInwardRelease(models.Model):
     payment_mode = fields.Selection([
         ('immediate', 'Immediate Payment (Cash / Bank)'),
         ('credit', 'Pay Later / Credit (Due)'),
-    ], string='Payment Mode', default='immediate')
+    ], string='Payment Mode', required=False)
     journal_id = fields.Many2one(
         'account.journal',
         string='Payment Journal',
+        required=False,
         help="Cash or Bank journal where payment was collected."
     )
     move_id = fields.Many2one(

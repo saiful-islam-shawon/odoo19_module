@@ -58,10 +58,10 @@ class ColdStorageInwardPlotting(models.Model):
         help="Destination active storage slot."
     )
     quantity = fields.Integer(
-        string='Transfer Quantity (Bosta)',
+        string='Transfer Quantity (Bags)',
         required=True,
         default=1,
-        help="Quantity in bags / bosta to transfer to the destination slot."
+        help="Quantity in bags to transfer to the destination slot."
     )
     user_id = fields.Many2one(
         'res.users',
@@ -121,7 +121,7 @@ class ColdStorageInwardPlotting(models.Model):
     def _check_quantity_positive(self):
         for record in self:
             if record.quantity <= 0:
-                raise ValidationError(_("Transfer Quantity (Bosta) must be greater than zero."))
+                raise ValidationError(_("Transfer Quantity (Bags) must be greater than zero."))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -145,7 +145,7 @@ class ColdStorageInwardPlotting(models.Model):
         total_avail = sum(from_alloc.mapped('quantity'))
         if self.quantity > total_avail:
             raise ValidationError(_(
-                "Transfer quantity (%(qty)s bosta) cannot exceed available quantity (%(avail)s bosta) in From Slot '%(slot)s'."
+                "Transfer quantity (%(qty)s bags) cannot exceed available quantity (%(avail)s bags) in From Slot '%(slot)s'."
             ) % {
                 'qty': self.quantity,
                 'avail': total_avail,

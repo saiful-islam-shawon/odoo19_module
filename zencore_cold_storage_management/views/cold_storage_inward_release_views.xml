@@ -14,8 +14,8 @@
                 <field name="quantity" string="Bags"/>
                 <field name="bag_rate"/>
                 <field name="total_amount" sum="Total Billed"/>
-                <field name="payment_mode"/>
-                <field name="move_id" string="Invoice / Journal"/>
+                <field name="move_id" string="Customer Invoice"/>
+                <field name="payment_mode" optional="hide"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide"/>
             </list>
         </field>
@@ -46,9 +46,9 @@
                             <field name="quantity"/>
                             <field name="bag_rate"/>
                             <field name="total_amount"/>
-                            <field name="payment_mode"/>
-                            <field name="journal_id" invisible="payment_mode != 'immediate'"/>
-                            <field name="move_id" options="{'no_create': True}"/>
+                            <field name="move_id" string="Customer Invoice" options="{'no_create': True}"/>
+                            <field name="payment_mode" invisible="not payment_mode"/>
+                            <field name="journal_id" invisible="not journal_id"/>
                             <field name="user_id"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                         </group>
