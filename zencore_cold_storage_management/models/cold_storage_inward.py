@@ -6,6 +6,7 @@ from odoo.exceptions import ValidationError
 class ColdStorageInward(models.Model):
     _name = 'cold.storage.inward'
     _description = 'Cold Storage Inward & Lot'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'id desc'
 
     name = fields.Char(
@@ -13,6 +14,7 @@ class ColdStorageInward(models.Model):
         required=True,
         copy=False,
         readonly=True,
+        tracking=True,
         default=lambda self: _('New'),
         help="Unique auto-generated lot tracking identifier."
     )
@@ -20,28 +22,33 @@ class ColdStorageInward(models.Model):
         'res.partner',
         string='Customer',
         required=True,
+        tracking=True,
         ondelete='restrict',
         help="Customer or depositor of the goods."
     )
     date_start = fields.Date(
         string='Start Date',
         required=True,
+        tracking=True,
         default=fields.Date.context_today,
         help="Storage period start date."
     )
     date_end = fields.Date(
         string='End Date',
         required=True,
+        tracking=True,
         help="Expected storage period expiration date."
     )
     product_name = fields.Char(
         string='Product Name',
         required=True,
+        tracking=True,
         help="Manual description of the stored product (e.g., Potato, Seed Potato)."
     )
     bag_quantity = fields.Integer(
         string='Product Quantity (Bags)',
         required=True,
+        tracking=True,
         default=1,
         help="Quantity in bags."
     )
@@ -56,6 +63,7 @@ class ColdStorageInward(models.Model):
         'cold.storage.season',
         string='Season',
         required=True,
+        tracking=True,
         ondelete='restrict',
         help="Operational season applicable to this inward deposit."
     )
@@ -63,6 +71,7 @@ class ColdStorageInward(models.Model):
         string='Bag Rate',
         digits=(16, 2),
         default=0.0,
+        tracking=True,
         help="Storage charge rate per bag (auto-filled from Season, manually overridable)."
     )
     company_id = fields.Many2one(
@@ -141,10 +150,10 @@ class ColdStorageInward(models.Model):
         ('unreleased', 'In Storage'),
         ('partial', 'Partially Released'),
         ('full', 'Fully Released'),
-    ], string='Release Status', compute='_compute_release_status', store=True)
+    ], string='Release Status', compute='_compute_release_status', store=True, tracking=True)
     due_amount = fields.Float(
         string='Due Amount',
-        compute='_compute_due_and_payment_status',
+        compute='_compute_due_amount',
         digits=(16, 2)
     )
     payment_status = fields.Selection([
@@ -152,7 +161,7 @@ class ColdStorageInward(models.Model):
         ('paid', 'Paid'),
         ('partial', 'Partial Due'),
         ('due', 'Unpaid Due'),
-    ], string='Payment Status', compute='_compute_due_and_payment_status')
+    ], string='Payment Status', compute='_compute_payment_status', store=True, tracking=True)
 
     _name_uniq = models.Constraint(
         'unique (name)',
@@ -201,18 +210,27 @@ class ColdStorageInward(models.Model):
                 record.release_status = 'unreleased'
 
     @api.depends('release_ids.move_id.payment_state', 'release_ids.move_id.amount_residual', 'release_ids.move_id.amount_total', 'release_ids.move_id.state')
-    def _compute_due_and_payment_status(self):
+    def _compute_due_amount(self):
         for record in self:
             invoices = record.release_ids.mapped('move_id').filtered(lambda inv: inv.state != 'cancel')
             if not invoices:
                 record.due_amount = 0.0
+            else:
+                posted_invoices = invoices.filtered(lambda inv: inv.state == 'posted')
+                draft_invoices = invoices.filtered(lambda inv: inv.state == 'draft')
+                record.due_amount = sum(posted_invoices.mapped('amount_residual')) + sum(draft_invoices.mapped('amount_total'))
+
+    @api.depends('release_ids.move_id.payment_state', 'release_ids.move_id.amount_residual', 'release_ids.move_id.amount_total', 'release_ids.move_id.state')
+    def _compute_payment_status(self):
+        for record in self:
+            invoices = record.release_ids.mapped('move_id').filtered(lambda inv: inv.state != 'cancel')
+            if not invoices:
                 record.payment_status = 'no_invoice'
             else:
                 posted_invoices = invoices.filtered(lambda inv: inv.state == 'posted')
                 draft_invoices = invoices.filtered(lambda inv: inv.state == 'draft')
                 total_residual = sum(posted_invoices.mapped('amount_residual')) + sum(draft_invoices.mapped('amount_total'))
                 total_amount = sum(invoices.mapped('amount_total'))
-                record.due_amount = total_residual
                 if total_residual <= 0.0 and posted_invoices and not draft_invoices:
                     record.payment_status = 'paid'
                 elif total_residual >= total_amount:

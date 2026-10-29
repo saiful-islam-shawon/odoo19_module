@@ -6,33 +6,37 @@ from odoo.exceptions import ValidationError
 class ColdStorageSeason(models.Model):
     _name = 'cold.storage.season'
     _description = 'Cold Storage Season'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'date_start desc, name'
 
-    name = fields.Char(string='Season Name', required=True, copy=False)
+    name = fields.Char(string='Season Name', required=True, copy=False, tracking=True)
     date_start = fields.Date(
         string='Start Date',
         required=True,
-        default=fields.Date.context_today
+        default=fields.Date.context_today,
+        tracking=True
     )
-    date_end = fields.Date(string='End Date', required=True)
+    date_end = fields.Date(string='End Date', required=True, tracking=True)
     default_bag_rate = fields.Float(
         string='Default Bag Rate',
         digits=(16, 2),
         default=0.0,
+        tracking=True,
         help="Default storage charge rate per bag for this season."
     )
     team_id = fields.Many2one(
         'cold.storage.team',
         string='Team',
         ondelete='restrict',
+        tracking=True,
         help="Operational team assigned to this season."
     )
-    season_manager = fields.Char(string='Season Manager', help="Person managing this season.")
+    season_manager = fields.Char(string='Season Manager', tracking=True, help="Person managing this season.")
     state = fields.Selection([
         ('draft', 'Draft'),
         ('open', 'Open'),
         ('closed', 'Closed'),
-    ], string='Status', default='draft', required=True)
+    ], string='Status', default='draft', required=True, tracking=True)
     inward_ids = fields.One2many(
         'cold.storage.inward',
         'season_id',

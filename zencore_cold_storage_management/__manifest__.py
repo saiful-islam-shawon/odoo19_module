@@ -15,7 +15,7 @@ Zencore Cold Storage Management System
     'author': 'Zencore / Antigravity AI',
     'website': 'https://zencore.com',
     'license': 'LGPL-3',
-    'depends': ['base', 'hr', 'account'],
+    'depends': ['base', 'hr', 'account', 'mail'],
     'data': [
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',

@@ -5,6 +5,7 @@ from odoo import models, fields, api, _
 class ColdStorageInwardRelease(models.Model):
     _name = 'cold.storage.inward.release'
     _description = 'Cold Storage Inward Product Release (Delivery)'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'date desc, id desc'
 
     name = fields.Char(
@@ -12,6 +13,7 @@ class ColdStorageInwardRelease(models.Model):
         required=True,
         copy=False,
         readonly=True,
+        tracking=True,
         default=lambda self: _('New'),
         help="Unique auto-generated delivery reference."
     )
@@ -19,6 +21,7 @@ class ColdStorageInwardRelease(models.Model):
         'cold.storage.inward',
         string='Inward Lot',
         required=True,
+        tracking=True,
         ondelete='cascade',
         index=True,
         help="Inward lot being released."
@@ -34,16 +37,19 @@ class ColdStorageInwardRelease(models.Model):
     date = fields.Date(
         string='Release Date',
         required=True,
+        tracking=True,
         default=fields.Date.context_today,
         help="Date when goods were released from storage."
     )
     receiver_name = fields.Char(
         string='Receiver / Delivered To',
         required=True,
+        tracking=True,
         help="Person who collected the bags (customer, driver, representative)."
     )
     vehicle_no = fields.Char(
         string='Vehicle / Gate Pass No',
+        tracking=True,
         help="Vehicle plate number, transport note, or gate pass reference."
     )
     notes = fields.Text(
@@ -53,16 +59,19 @@ class ColdStorageInwardRelease(models.Model):
         string='Total Released Bags',
         required=True,
         default=1,
+        tracking=True,
         help="Total quantity in bags released in this delivery."
     )
     bag_rate = fields.Float(
         string='Bag Rate',
         digits=(16, 2),
+        tracking=True,
         help="Storage charge rate per bag."
     )
     total_amount = fields.Float(
         string='Total Charge',
         digits=(16, 2),
+        tracking=True,
         help="Total storage fee billed for this release."
     )
     payment_mode = fields.Selection([
@@ -79,6 +88,7 @@ class ColdStorageInwardRelease(models.Model):
         'account.move',
         string='Customer Invoice',
         readonly=True,
+        tracking=True,
         help="Generated customer invoice and journal entry in Sales Journal."
     )
     line_ids = fields.One2many(

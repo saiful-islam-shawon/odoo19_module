@@ -6,6 +6,7 @@ from odoo.exceptions import ValidationError
 class ColdStorageInwardScrap(models.Model):
     _name = 'cold.storage.inward.scrap'
     _description = 'Cold Storage Inward Scrap (Damage & Loss)'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'date desc, id desc'
 
     name = fields.Char(
@@ -13,6 +14,7 @@ class ColdStorageInwardScrap(models.Model):
         required=True,
         copy=False,
         readonly=True,
+        tracking=True,
         default=lambda self: _('New'),
         help="Unique auto-generated scrap reference."
     )
@@ -20,6 +22,7 @@ class ColdStorageInwardScrap(models.Model):
         'cold.storage.inward',
         string='Inward Lot',
         required=True,
+        tracking=True,
         ondelete='cascade',
         index=True,
         help="Inward lot experiencing damage or loss."
@@ -27,6 +30,7 @@ class ColdStorageInwardScrap(models.Model):
     date = fields.Date(
         string='Date',
         required=True,
+        tracking=True,
         default=fields.Date.context_today,
         help="Date when damage or loss was identified."
     )
@@ -34,6 +38,7 @@ class ColdStorageInwardScrap(models.Model):
         'cold.storage.master.setup',
         string='Storage Slot',
         required=True,
+        tracking=True,
         ondelete='restrict',
         help="Storage slot where damaged goods were located."
     )
@@ -52,12 +57,14 @@ class ColdStorageInwardScrap(models.Model):
     quantity = fields.Integer(
         string='Scrap Quantity (Bags)',
         required=True,
+        tracking=True,
         default=1,
         help="Quantity in bags lost, rotten, or damaged."
     )
     reason = fields.Char(
         string='Reason / Cause of Damage',
         required=True,
+        tracking=True,
         help="Description or reason for scrap (e.g. Rotten, damaged during handling, moisture loss)."
     )
     user_id = fields.Many2one(
@@ -65,6 +72,7 @@ class ColdStorageInwardScrap(models.Model):
         string='Responsible',
         default=lambda self: self.env.user,
         readonly=True,
+        tracking=True,
         help="User responsible for recording this scrap entry."
     )
     company_id = fields.Many2one(

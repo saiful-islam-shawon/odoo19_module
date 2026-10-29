@@ -6,6 +6,7 @@ from odoo.exceptions import ValidationError
 class ColdStorageInwardPlotting(models.Model):
     _name = 'cold.storage.inward.plotting'
     _description = 'Cold Storage Inward Slot Plotting (Relocation)'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'date desc, id desc'
 
     name = fields.Char(
@@ -13,6 +14,7 @@ class ColdStorageInwardPlotting(models.Model):
         required=True,
         copy=False,
         readonly=True,
+        tracking=True,
         default=lambda self: _('New'),
         help="Unique auto-generated plotting reference."
     )
@@ -20,6 +22,7 @@ class ColdStorageInwardPlotting(models.Model):
         'cold.storage.inward',
         string='Inward Lot',
         required=True,
+        tracking=True,
         ondelete='cascade',
         index=True,
         help="Inward lot being relocated."
@@ -27,6 +30,7 @@ class ColdStorageInwardPlotting(models.Model):
     date = fields.Date(
         string='Date',
         required=True,
+        tracking=True,
         default=fields.Date.context_today,
         help="Date of physical slot relocation."
     )
@@ -34,6 +38,7 @@ class ColdStorageInwardPlotting(models.Model):
         'cold.storage.master.setup',
         string='From Slot',
         required=True,
+        tracking=True,
         ondelete='restrict',
         help="Current storage slot of the products."
     )
@@ -53,6 +58,7 @@ class ColdStorageInwardPlotting(models.Model):
         'cold.storage.master.setup',
         string='To Slot',
         required=True,
+        tracking=True,
         domain="[('activate', '=', True)]",
         ondelete='restrict',
         help="Destination active storage slot."
@@ -60,6 +66,7 @@ class ColdStorageInwardPlotting(models.Model):
     quantity = fields.Integer(
         string='Transfer Quantity (Bags)',
         required=True,
+        tracking=True,
         default=1,
         help="Quantity in bags to transfer to the destination slot."
     )
@@ -68,6 +75,7 @@ class ColdStorageInwardPlotting(models.Model):
         string='Responsible',
         default=lambda self: self.env.user,
         readonly=True,
+        tracking=True,
         help="User responsible for recording this transfer."
     )
     company_id = fields.Many2one(

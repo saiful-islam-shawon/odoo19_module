@@ -5,6 +5,7 @@ from odoo import models, fields, api, _
 class ColdStorageMasterSetup(models.Model):
     _name = 'cold.storage.master.setup'
     _description = 'Storage Master Setup'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'chamber_id, floor_id, line_id, pocket_id'
 
     name = fields.Char(string='Slot Name', compute='_compute_name', store=True)
@@ -12,29 +13,34 @@ class ColdStorageMasterSetup(models.Model):
         'cold.storage.chamber',
         string='Chamber',
         required=True,
+        tracking=True,
         ondelete='restrict'
     )
     floor_id = fields.Many2one(
         'cold.storage.floor',
         string='Floor',
         required=True,
+        tracking=True,
         ondelete='restrict'
     )
     line_id = fields.Many2one(
         'cold.storage.line',
         string='Line',
         required=True,
+        tracking=True,
         ondelete='restrict'
     )
     pocket_id = fields.Many2one(
         'cold.storage.pocket',
         string='Pocket',
         required=True,
+        tracking=True,
         ondelete='restrict'
     )
     activate = fields.Boolean(
         string='Activate',
         default=False,
+        tracking=True,
         help="Activation toggle indicating slot operational readiness."
     )
 

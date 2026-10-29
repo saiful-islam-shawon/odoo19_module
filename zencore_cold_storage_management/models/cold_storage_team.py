@@ -5,13 +5,15 @@ from odoo import models, fields
 class ColdStorageTeam(models.Model):
     _name = 'cold.storage.team'
     _description = 'Cold Storage Operational Team'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'name'
 
-    name = fields.Char(string='Team Name', required=True)
+    name = fields.Char(string='Team Name', required=True, tracking=True)
     leader_id = fields.Many2one(
         'hr.employee',
         string='Team Leader',
         ondelete='set null',
+        tracking=True,
         help="Designated leader of this operational cold storage team."
     )
     member_ids = fields.Many2many(
@@ -25,6 +27,7 @@ class ColdStorageTeam(models.Model):
     active = fields.Boolean(
         string='Active',
         default=True,
+        tracking=True,
         help="If unchecked, allows archiving the team without deleting it."
     )
     company_id = fields.Many2one(
