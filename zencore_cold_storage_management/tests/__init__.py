@@ -3,4 +3,5 @@ from . import test_season_workflow
 from . import test_storage_master_setup
 from . import test_teams_and_inward
 from . import test_chatter_and_tracking
+from . import test_reporting_dashboard
 

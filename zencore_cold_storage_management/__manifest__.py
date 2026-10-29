@@ -29,6 +29,7 @@ Zencore Cold Storage Management System
         'views/cold_storage_scrap_views.xml',
         'views/cold_storage_inward_release_views.xml',
         'wizard/cold_storage_inward_release_wizard_views.xml',
+        'views/cold_storage_reporting_views.xml',
     ],
     'installable': True,
     'application': True,

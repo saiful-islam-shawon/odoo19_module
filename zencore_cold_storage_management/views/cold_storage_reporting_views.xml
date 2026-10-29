@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Storage Stock Analysis Graph View -->
+    <record id="view_cold_storage_stock_analysis_graph" model="ir.ui.view">
+        <field name="name">cold.storage.inward.allocation.graph</field>
+        <field name="model">cold.storage.inward.allocation</field>
+        <field name="arch" type="xml">
+            <graph string="Storage Stock by Chamber" type="bar" sample="1">
+                <field name="chamber_id"/>
+                <field name="quantity" type="measure" string="Bags"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Storage Stock Analysis Pivot View -->
+    <record id="view_cold_storage_stock_analysis_pivot" model="ir.ui.view">
+        <field name="name">cold.storage.inward.allocation.pivot</field>
+        <field name="model">cold.storage.inward.allocation</field>
+        <field name="arch" type="xml">
+            <pivot string="Storage Stock Analysis" sample="1">
+                <field name="chamber_id" type="row"/>
+                <field name="floor_id" type="row"/>
+                <field name="quantity" type="measure" string="Bags"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Storage Stock Analysis List View -->
+    <record id="view_cold_storage_stock_analysis_list" model="ir.ui.view">
+        <field name="name">cold.storage.inward.allocation.list</field>
+        <field name="model">cold.storage.inward.allocation</field>
+        <field name="arch" type="xml">
+            <list string="Storage Stock" create="0" delete="0" edit="0">
+                <field name="inward_id" string="Inward Lot"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="product_name" string="Product"/>
+                <field name="slot_id" string="Storage Slot"/>
+                <field name="chamber_id" string="Chamber"/>
+                <field name="floor_id" string="Floor"/>
+                <field name="line_id" string="Line"/>
+                <field name="pocket_id" string="Pocket"/>
+                <field name="quantity" string="Allocated Bags" sum="Total Stored Bags"/>
+                <field name="season_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Storage Stock Analysis Search View -->
+    <record id="view_cold_storage_stock_analysis_search" model="ir.ui.view">
+        <field name="name">cold.storage.inward.allocation.search</field>
+        <field name="model">cold.storage.inward.allocation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="inward_id" string="Inward Lot"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="product_name" string="Product"/>
+                <field name="slot_id" string="Storage Slot"/>
+                <field name="chamber_id" string="Chamber"/>
+                <field name="floor_id" string="Floor"/>
+                <field name="line_id" string="Line"/>
+                <field name="pocket_id" string="Pocket"/>
+                <field name="season_id" string="Season"/>
+                <filter string="In Stock (>0 Bags)" name="filter_in_stock" domain="[('quantity', '>', 0)]"/>
+                <group>
+                    <filter string="Chamber" name="group_by_chamber" context="{'group_by': 'chamber_id'}"/>
+                    <filter string="Floor" name="group_by_floor" context="{'group_by': 'floor_id'}"/>
+                    <filter string="Line" name="group_by_line" context="{'group_by': 'line_id'}"/>
+                    <filter string="Pocket" name="group_by_pocket" context="{'group_by': 'pocket_id'}"/>
+                    <filter string="Customer" name="group_by_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Product" name="group_by_product" context="{'group_by': 'product_name'}"/>
+                    <filter string="Season" name="group_by_season" context="{'group_by': 'season_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Storage Stock Analysis Window Action -->
+    <record id="action_cold_storage_stock_analysis" model="ir.actions.act_window">
+        <field name="name">Storage Stock Analysis</field>
+        <field name="res_model">cold.storage.inward.allocation</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="search_view_id" ref="view_cold_storage_stock_analysis_search"/>
+        <field name="context">{'search_default_group_by_chamber': 1, 'search_default_filter_in_stock': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No storage allocation stock data available!
+            </p>
+            <p>
+                Allocate incoming customer lots to storage slots to monitor real-time stock across Chambers, Floors, Lines, and Pockets.
+            </p>
+        </field>
+    </record>
+
+    <!-- Top-Level Navbar Parent Menu: Reports (sequence 40, before Configuration) -->
+    <menuitem id="menu_cold_storage_reports"
+              name="Reports"
+              parent="menu_cold_storage_root"
+              sequence="40"/>
+
+    <!-- Submenu: Reports > Storage Stock Analysis -->
+    <menuitem id="menu_cold_storage_stock_analysis"
+              name="Storage Stock Analysis"
+              parent="menu_cold_storage_reports"
+              action="action_cold_storage_stock_analysis"
+              sequence="10"/>
+</odoo>
