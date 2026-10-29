@@ -33,6 +33,33 @@ class ColdStorageSeason(models.Model):
         ('open', 'Open'),
         ('closed', 'Closed'),
     ], string='Status', default='draft', required=True)
+    inward_ids = fields.One2many(
+        'cold.storage.inward',
+        'season_id',
+        string='Inward Lots',
+        readonly=True
+    )
+    total_inward_count = fields.Integer(
+        string='Total Inward Lots',
+        compute='_compute_inward_kpis'
+    )
+    total_received_bags = fields.Integer(
+        string='Total Received Bags',
+        compute='_compute_inward_kpis'
+    )
+    total_released_bags = fields.Integer(
+        string='Total Released Bags',
+        compute='_compute_inward_kpis'
+    )
+    total_remaining_bags = fields.Integer(
+        string='Total Remaining Bags',
+        compute='_compute_inward_kpis'
+    )
+    total_due_amount = fields.Float(
+        string='Total Due Amount',
+        digits=(16, 2),
+        compute='_compute_inward_kpis'
+    )
 
     @api.onchange('team_id')
     def _onchange_team_id(self):
@@ -51,12 +78,39 @@ class ColdStorageSeason(models.Model):
             if record.default_bag_rate < 0.0:
                 raise ValidationError(_("Default Bag Rate cannot be negative."))
 
+    @api.depends(
+        'inward_ids',
+        'inward_ids.bag_quantity',
+        'inward_ids.released_quantity',
+        'inward_ids.remaining_quantity',
+        'inward_ids.due_amount'
+    )
+    def _compute_inward_kpis(self):
+        for record in self:
+            record.total_inward_count = len(record.inward_ids)
+            record.total_received_bags = sum(record.inward_ids.mapped('bag_quantity'))
+            record.total_released_bags = sum(record.inward_ids.mapped('released_quantity'))
+            record.total_remaining_bags = sum(record.inward_ids.mapped('remaining_quantity'))
+            record.total_due_amount = sum(record.inward_ids.mapped('due_amount'))
+
     def action_open(self):
         for record in self:
             record.state = 'open'
 
     def action_close(self):
         for record in self:
+            unreleased_inwards = record.inward_ids.filtered(lambda inv: inv.remaining_quantity > 0)
+            if unreleased_inwards:
+                lot_details = ", ".join([f"{inv.name} ({inv.remaining_quantity} bags)" for inv in unreleased_inwards])
+                total_unreleased = sum(unreleased_inwards.mapped('remaining_quantity'))
+                raise ValidationError(_(
+                    "Cannot close Season '%(season)s' because there are still %(qty)s unreleased bag(s) in storage across %(count)s lot(s):\n%(lots)s\n\nAll goods must be fully released before closing the season."
+                ) % {
+                    'season': record.name,
+                    'qty': total_unreleased,
+                    'count': len(unreleased_inwards),
+                    'lots': lot_details,
+                })
             record.state = 'closed'
 
     def action_reset_draft(self):

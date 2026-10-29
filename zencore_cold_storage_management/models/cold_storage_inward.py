@@ -137,6 +137,22 @@ class ColdStorageInward(models.Model):
         compute='_compute_invoice_ids',
         help="Number of invoices and journal entries."
     )
+    release_status = fields.Selection([
+        ('unreleased', 'In Storage'),
+        ('partial', 'Partially Released'),
+        ('full', 'Fully Released'),
+    ], string='Release Status', compute='_compute_release_status', store=True)
+    due_amount = fields.Float(
+        string='Due Amount',
+        compute='_compute_due_and_payment_status',
+        digits=(16, 2)
+    )
+    payment_status = fields.Selection([
+        ('no_invoice', 'N/A'),
+        ('paid', 'Paid'),
+        ('partial', 'Partial Due'),
+        ('due', 'Unpaid Due'),
+    ], string='Payment Status', compute='_compute_due_and_payment_status')
 
     _name_uniq = models.Constraint(
         'unique (name)',
@@ -173,6 +189,34 @@ class ColdStorageInward(models.Model):
             record.scrapped_quantity = scrapped
             record.released_quantity = released
             record.remaining_quantity = max(record.bag_quantity - scrapped - released, 0)
+
+    @api.depends('bag_quantity', 'released_quantity', 'remaining_quantity')
+    def _compute_release_status(self):
+        for record in self:
+            if record.bag_quantity > 0 and record.remaining_quantity == 0:
+                record.release_status = 'full'
+            elif record.released_quantity > 0 and record.remaining_quantity > 0:
+                record.release_status = 'partial'
+            else:
+                record.release_status = 'unreleased'
+
+    @api.depends('release_ids.move_id.payment_state', 'release_ids.move_id.amount_residual', 'release_ids.move_id.amount_total', 'release_ids.move_id.state')
+    def _compute_due_and_payment_status(self):
+        for record in self:
+            invoices = record.release_ids.mapped('move_id').filtered(lambda inv: inv.state == 'posted')
+            if not invoices:
+                record.due_amount = 0.0
+                record.payment_status = 'no_invoice'
+            else:
+                total_residual = sum(invoices.mapped('amount_residual'))
+                total_amount = sum(invoices.mapped('amount_total'))
+                record.due_amount = total_residual
+                if total_residual <= 0.0:
+                    record.payment_status = 'paid'
+                elif total_residual >= total_amount:
+                    record.payment_status = 'due'
+                else:
+                    record.payment_status = 'partial'
 
     def action_view_plottings(self):
         self.ensure_one()

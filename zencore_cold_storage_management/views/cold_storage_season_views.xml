@@ -47,6 +47,41 @@
                             <field name="season_manager" readonly="state == 'closed'"/>
                         </group>
                     </group>
+                    <group string="Season Summary &amp; Stock Statistics">
+                        <group>
+                            <field name="total_inward_count" readonly="1"/>
+                            <field name="total_received_bags" readonly="1"/>
+                            <field name="total_released_bags" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="total_remaining_bags" readonly="1"/>
+                            <field name="total_due_amount" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Inwards History" name="inward_history">
+                            <field name="inward_ids" readonly="1">
+                                <list create="0" delete="0" decoration-danger="remaining_quantity &gt; 0" decoration-success="remaining_quantity == 0 and bag_quantity &gt; 0">
+                                    <field name="name" string="Lot Number"/>
+                                    <field name="partner_id" string="Customer"/>
+                                    <field name="product_name" string="Product"/>
+                                    <field name="bag_quantity" string="Received Bags"/>
+                                    <field name="released_quantity" string="Released Bags"/>
+                                    <field name="remaining_quantity" string="Remaining Bags"/>
+                                    <field name="release_status" widget="badge"
+                                           decoration-danger="release_status == 'unreleased'"
+                                           decoration-warning="release_status == 'partial'"
+                                           decoration-success="release_status == 'full'"/>
+                                    <field name="payment_status" widget="badge"
+                                           decoration-success="payment_status == 'paid'"
+                                           decoration-warning="payment_status == 'partial'"
+                                           decoration-danger="payment_status == 'due'"
+                                           decoration-muted="payment_status == 'no_invoice'"/>
+                                    <field name="due_amount" string="Due Amount"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
