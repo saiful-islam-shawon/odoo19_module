@@ -36,5 +36,14 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
+        <!-- Sequence for Cold Storage Inward Release -->
+        <record id="seq_cold_storage_release" model="ir.sequence">
+            <field name="name">Cold Storage Release</field>
+            <field name="code">cold.storage.release</field>
+            <field name="prefix">REL/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

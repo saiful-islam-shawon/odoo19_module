@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Release Wizard Form View -->
+    <record id="view_cold_storage_inward_release_wizard_form" model="ir.ui.view">
+        <field name="name">cold.storage.inward.release.wizard.form</field>
+        <field name="model">cold.storage.inward.release.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Release Product from Storage">
+                <sheet>
+                    <group>
+                        <group string="Lot &amp; Receiver Details">
+                            <field name="inward_id" readonly="1" force_save="1"/>
+                            <field name="partner_id" readonly="1" force_save="1"/>
+                            <field name="date"/>
+                            <field name="receiver_name" placeholder="e.g. Abdul Karim (Driver / Representative)"/>
+                            <field name="vehicle_no" placeholder="e.g. Dhaka Metro-Ta 11-2233"/>
+                        </group>
+                        <group string="Billing &amp; Payment">
+                            <field name="bag_rate" readonly="1" force_save="1"/>
+                            <field name="total_release_quantity" readonly="1"/>
+                            <field name="total_amount" readonly="1"/>
+                            <field name="payment_mode" widget="radio"/>
+                            <field name="journal_id" options="{'no_create': True}" invisible="payment_mode != 'immediate'" required="payment_mode == 'immediate'"/>
+                        </group>
+                    </group>
+                    <group string="Delivery Remarks">
+                        <field name="notes" nolabel="1" placeholder="Optional delivery notes or special instructions..."/>
+                    </group>
+                    <notebook>
+                        <page string="Slot Allocation &amp; Release Quantities" name="slot_allocation_lines">
+                            <p class="text-muted">
+                                Enter the quantity of bags to release from each currently allocated storage slot:
+                            </p>
+                            <field name="line_ids">
+                                <list editable="bottom" create="0" delete="0">
+                                    <field name="slot_id" readonly="1" force_save="1"/>
+                                    <field name="available_quantity" readonly="1" force_save="1" string="Available Bags"/>
+                                    <field name="quantity" string="Release Quantity"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_release"
+                            string="Confirm &amp; Release"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

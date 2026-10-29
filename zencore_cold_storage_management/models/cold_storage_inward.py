@@ -104,11 +104,38 @@ class ColdStorageInward(models.Model):
         store=True,
         help="Total bags scrapped/damaged across all scrap records for this lot."
     )
+    released_quantity = fields.Integer(
+        string='Released Quantity',
+        compute='_compute_stock_quantities',
+        store=True,
+        help="Total bags released / delivered to customer."
+    )
     remaining_quantity = fields.Integer(
         string='Remaining Quantity',
         compute='_compute_stock_quantities',
         store=True,
-        help="Net remaining bags available (Total Deposited Quantity - Total Scrapped Quantity)."
+        help="Net remaining bags available (Total Deposited - Scrapped - Released)."
+    )
+    release_ids = fields.One2many(
+        'cold.storage.inward.release',
+        'inward_id',
+        string='Releases',
+        help="Product release and delivery history."
+    )
+    release_count = fields.Integer(
+        string='Release Count',
+        compute='_compute_release_count',
+        help="Number of deliveries / releases."
+    )
+    invoice_ids = fields.Many2many(
+        'account.move',
+        compute='_compute_invoice_ids',
+        string='Customer Invoices'
+    )
+    invoice_count = fields.Integer(
+        string='Journal / Invoice Count',
+        compute='_compute_invoice_ids',
+        help="Number of invoices and journal entries."
     )
 
     _name_uniq = models.Constraint(
@@ -126,12 +153,26 @@ class ColdStorageInward(models.Model):
         for record in self:
             record.scrap_count = len(record.scrap_ids)
 
-    @api.depends('scrap_ids.quantity', 'bag_quantity')
+    @api.depends('release_ids')
+    def _compute_release_count(self):
+        for record in self:
+            record.release_count = len(record.release_ids)
+
+    @api.depends('release_ids.move_id')
+    def _compute_invoice_ids(self):
+        for record in self:
+            invoices = record.release_ids.mapped('move_id')
+            record.invoice_ids = invoices
+            record.invoice_count = len(invoices)
+
+    @api.depends('scrap_ids.quantity', 'release_ids.quantity', 'bag_quantity')
     def _compute_stock_quantities(self):
         for record in self:
             scrapped = sum(record.scrap_ids.mapped('quantity'))
+            released = sum(record.release_ids.mapped('quantity'))
             record.scrapped_quantity = scrapped
-            record.remaining_quantity = max(record.bag_quantity - scrapped, 0)
+            record.released_quantity = released
+            record.remaining_quantity = max(record.bag_quantity - scrapped - released, 0)
 
     def action_view_plottings(self):
         self.ensure_one()
@@ -161,6 +202,52 @@ class ColdStorageInward(models.Model):
             },
         }
 
+    def action_open_release_wizard(self):
+        self.ensure_one()
+        if self.remaining_quantity <= 0:
+            raise ValidationError(_("No bags remaining in storage to release."))
+        return {
+            'name': _('Release Product - Lot %s') % (self.name or ''),
+            'type': 'ir.actions.act_window',
+            'res_model': 'cold.storage.inward.release.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_inward_id': self.id,
+            },
+        }
+
+    def action_view_releases(self):
+        self.ensure_one()
+        return {
+            'name': _('Releases - Lot %s') % (self.name or ''),
+            'type': 'ir.actions.act_window',
+            'res_model': 'cold.storage.inward.release',
+            'view_mode': 'list,form',
+            'domain': [('inward_id', '=', self.id)],
+            'context': {
+                'default_inward_id': self.id,
+                'search_default_inward_id': self.id,
+            },
+        }
+
+    def action_view_invoices(self):
+        self.ensure_one()
+        invoices = self.invoice_ids
+        action = {
+            'name': _('Journal / Invoices - Lot %s') % (self.name or ''),
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.move',
+            'domain': [('id', 'in', invoices.ids)],
+            'context': {'default_move_type': 'out_invoice'},
+        }
+        if len(invoices) == 1:
+            action['views'] = [(False, 'form')]
+            action['res_id'] = invoices.id
+        else:
+            action['views'] = [(False, 'list'), (False, 'form')]
+        return action
+
     @api.depends('name')
     def _compute_lot_number(self):
         for record in self:
@@ -189,12 +276,13 @@ class ColdStorageInward(models.Model):
             if record.bag_rate < 0.0:
                 raise ValidationError(_("Bag Rate cannot be negative."))
 
-    @api.constrains('allocation_ids', 'bag_quantity', 'scrap_ids')
+    @api.constrains('allocation_ids', 'bag_quantity', 'scrap_ids', 'release_ids')
     def _check_allocation_total(self):
         for record in self:
             total_allocated = sum(record.allocation_ids.mapped('quantity'))
             total_scrapped = sum(record.scrap_ids.mapped('quantity'))
-            max_allocatable = record.bag_quantity - total_scrapped
+            total_released = sum(record.release_ids.mapped('quantity'))
+            max_allocatable = record.bag_quantity - total_scrapped - total_released
             if total_allocated > max_allocatable:
                 raise ValidationError(_(
                     "Total allocated quantity (%(allocated)s bosta) cannot exceed remaining available quantity (%(max_qty)s bosta) for Lot '%(lot)s'."

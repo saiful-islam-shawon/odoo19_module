@@ -10,3 +10,4 @@ from . import cold_storage_inward
 from . import cold_storage_inward_allocation
 from . import cold_storage_inward_plotting
 from . import cold_storage_inward_scrap
+from . import cold_storage_inward_release

@@ -577,3 +577,234 @@ class TestTeamsAndInward(TransactionCase):
                 'reason': 'Slot not allocated',
             })
 
+    def test_17_release_wizard_immediate_payment(self):
+        """Test release wizard, slot deduction, customer invoice creation, and payment reconciliation."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 10'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 10'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 10'})
+        pocket_a = self.env['cold.storage.pocket'].create({'name': 'Pocket 10A'})
+        pocket_b = self.env['cold.storage.pocket'].create({'name': 'Pocket 10B'})
+
+        slot_a = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_a.id,
+            'activate': True,
+        })
+        slot_b = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_b.id,
+            'activate': True,
+        })
+
+        inward = self.Inward.create({
+            'partner_id': self.customer.id,
+            'season_id': self.season.id,
+            'product_name': 'Potato Batch 10',
+            'bag_quantity': 50,
+            'bag_rate': 50.00,
+            'date_start': self.today,
+            'date_end': self.today + timedelta(days=30),
+            'allocation_ids': [
+                (0, 0, {'slot_id': slot_a.id, 'quantity': 20}),
+                (0, 0, {'slot_id': slot_b.id, 'quantity': 30}),
+            ],
+        })
+
+        self.assertEqual(inward.released_quantity, 0)
+        self.assertEqual(inward.remaining_quantity, 50)
+        self.assertEqual(inward.release_count, 0)
+        self.assertEqual(inward.invoice_count, 0)
+
+        journal = self.env['account.journal'].search([('type', 'in', ['cash', 'bank'])], limit=1)
+
+        # Launch wizard and pre-populate
+        wizard = self.env['cold.storage.inward.release.wizard'].with_context(
+            default_inward_id=inward.id
+        ).create({
+            'inward_id': inward.id,
+            'receiver_name': 'Driver Kalam',
+            'vehicle_no': 'Dhaka Metro-Ta 11-2233',
+            'payment_mode': 'immediate',
+            'journal_id': journal.id,
+        })
+
+        self.assertEqual(len(wizard.line_ids), 2)
+        # Set 10 bags from slot_a
+        line_a = wizard.line_ids.filtered(lambda l: l.slot_id == slot_a)
+        line_a.quantity = 10
+
+        self.assertEqual(wizard.total_release_quantity, 10)
+        self.assertEqual(wizard.total_amount, 500.00)
+
+        # Confirm release
+        action = wizard.action_confirm_release()
+        release = self.env['cold.storage.inward.release'].browse(action['res_id'])
+
+        self.assertTrue(release.name.startswith('REL/'))
+        self.assertEqual(release.quantity, 10)
+        self.assertEqual(release.total_amount, 500.00)
+        self.assertTrue(release.move_id)
+        self.assertEqual(release.move_id.move_type, 'out_invoice')
+        self.assertEqual(release.move_id.state, 'posted')
+        self.assertIn(release.move_id.payment_state, ('paid', 'in_payment'))
+
+        # Check slot deduction
+        alloc_a = inward.allocation_ids.filtered(lambda a: a.slot_id == slot_a)
+        alloc_b = inward.allocation_ids.filtered(lambda a: a.slot_id == slot_b)
+        self.assertEqual(alloc_a.quantity, 10)
+        self.assertEqual(alloc_b.quantity, 30)
+
+        # Check inward stock & counts
+        self.assertEqual(inward.released_quantity, 10)
+        self.assertEqual(inward.remaining_quantity, 40)
+        self.assertEqual(inward.release_count, 1)
+        self.assertEqual(inward.invoice_count, 1)
+
+    def test_18_release_credit_due_invoice(self):
+        """Test partial release on credit creates unpaid customer invoice."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 11'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 11'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 11'})
+        pocket_a = self.env['cold.storage.pocket'].create({'name': 'Pocket 11A'})
+
+        slot_a = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_a.id,
+            'activate': True,
+        })
+
+        inward = self.Inward.create({
+            'partner_id': self.customer.id,
+            'season_id': self.season.id,
+            'product_name': 'Potato Batch 11',
+            'bag_quantity': 25,
+            'bag_rate': 60.00,
+            'date_start': self.today,
+            'date_end': self.today + timedelta(days=30),
+            'allocation_ids': [
+                (0, 0, {'slot_id': slot_a.id, 'quantity': 25}),
+            ],
+        })
+
+        wizard = self.env['cold.storage.inward.release.wizard'].with_context(
+            default_inward_id=inward.id
+        ).create({
+            'inward_id': inward.id,
+            'receiver_name': 'Farmer Jamal',
+            'payment_mode': 'credit',
+        })
+
+        wizard.line_ids[0].quantity = 5
+        self.assertEqual(wizard.total_amount, 300.00)
+
+        action = wizard.action_confirm_release()
+        release = self.env['cold.storage.inward.release'].browse(action['res_id'])
+
+        self.assertEqual(release.move_id.state, 'posted')
+        self.assertEqual(release.move_id.payment_state, 'not_paid')
+        self.assertEqual(inward.released_quantity, 5)
+        self.assertEqual(inward.remaining_quantity, 20)
+
+    def test_19_release_full_depletion_unlinks_slot(self):
+        """Test that releasing all bags in a slot unlinks the allocation line."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 12'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 12'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 12'})
+        pocket_a = self.env['cold.storage.pocket'].create({'name': 'Pocket 12A'})
+
+        slot_a = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_a.id,
+            'activate': True,
+        })
+
+        inward = self.Inward.create({
+            'partner_id': self.customer.id,
+            'season_id': self.season.id,
+            'product_name': 'Potato Batch 12',
+            'bag_quantity': 10,
+            'bag_rate': 50.00,
+            'date_start': self.today,
+            'date_end': self.today + timedelta(days=30),
+            'allocation_ids': [
+                (0, 0, {'slot_id': slot_a.id, 'quantity': 10}),
+            ],
+        })
+
+        wizard = self.env['cold.storage.inward.release.wizard'].with_context(
+            default_inward_id=inward.id
+        ).create({
+            'inward_id': inward.id,
+            'receiver_name': 'Farmer Jamal',
+            'payment_mode': 'credit',
+        })
+        wizard.line_ids[0].quantity = 10
+
+        wizard.action_confirm_release()
+
+        alloc_a = inward.allocation_ids.filtered(lambda a: a.slot_id == slot_a)
+        self.assertFalse(alloc_a)
+        self.assertEqual(inward.remaining_quantity, 0)
+        self.assertEqual(inward.released_quantity, 10)
+
+    def test_20_release_validation_errors(self):
+        """Test over-release and zero-quantity validation errors."""
+        chamber = self.env['cold.storage.chamber'].create({'name': 'Chamber 13'})
+        floor = self.env['cold.storage.floor'].create({'name': 'Floor 13'})
+        line = self.env['cold.storage.line'].create({'name': 'Line 13'})
+        pocket_a = self.env['cold.storage.pocket'].create({'name': 'Pocket 13A'})
+
+        slot_a = self.env['cold.storage.master.setup'].create({
+            'chamber_id': chamber.id,
+            'floor_id': floor.id,
+            'line_id': line.id,
+            'pocket_id': pocket_a.id,
+            'activate': True,
+        })
+
+        inward = self.Inward.create({
+            'partner_id': self.customer.id,
+            'season_id': self.season.id,
+            'product_name': 'Potato Batch 13',
+            'bag_quantity': 10,
+            'bag_rate': 50.00,
+            'date_start': self.today,
+            'date_end': self.today + timedelta(days=30),
+            'allocation_ids': [
+                (0, 0, {'slot_id': slot_a.id, 'quantity': 10}),
+            ],
+        })
+
+        # Zero quantity error
+        wizard_zero = self.env['cold.storage.inward.release.wizard'].with_context(
+            default_inward_id=inward.id
+        ).create({
+            'inward_id': inward.id,
+            'receiver_name': 'Receiver',
+            'payment_mode': 'credit',
+        })
+        wizard_zero.line_ids[0].quantity = 0
+        with self.assertRaises(ValidationError):
+            wizard_zero.action_confirm_release()
+
+        # Over-release error (15 > 10)
+        wizard_over = self.env['cold.storage.inward.release.wizard'].with_context(
+            default_inward_id=inward.id
+        ).create({
+            'inward_id': inward.id,
+            'receiver_name': 'Receiver',
+            'payment_mode': 'credit',
+        })
+        wizard_over.line_ids[0].quantity = 15
+        with self.assertRaises(ValidationError):
+            wizard_over.action_confirm_release()
+
+

@@ -21,3 +21,11 @@ access_cold_storage_inward_plotting_user,cold.storage.inward.plotting user,model
 access_cold_storage_inward_plotting_manager,cold.storage.inward.plotting manager,model_cold_storage_inward_plotting,base.group_system,1,1,1,1
 access_cold_storage_inward_scrap_user,cold.storage.inward.scrap user,model_cold_storage_inward_scrap,base.group_user,1,0,0,0
 access_cold_storage_inward_scrap_manager,cold.storage.inward.scrap manager,model_cold_storage_inward_scrap,base.group_system,1,1,1,1
+access_cold_storage_inward_release_user,cold.storage.inward.release user,model_cold_storage_inward_release,base.group_user,1,0,0,0
+access_cold_storage_inward_release_manager,cold.storage.inward.release manager,model_cold_storage_inward_release,base.group_system,1,1,1,1
+access_cold_storage_inward_release_line_user,cold.storage.inward.release.line user,model_cold_storage_inward_release_line,base.group_user,1,0,0,0
+access_cold_storage_inward_release_line_manager,cold.storage.inward.release.line manager,model_cold_storage_inward_release_line,base.group_system,1,1,1,1
+access_cold_storage_inward_release_wizard_user,cold.storage.inward.release.wizard user,model_cold_storage_inward_release_wizard,base.group_user,1,1,1,1
+access_cold_storage_inward_release_wizard_manager,cold.storage.inward.release.wizard manager,model_cold_storage_inward_release_wizard,base.group_system,1,1,1,1
+access_cold_storage_inward_release_wizard_line_user,cold.storage.inward.release.wizard.line user,model_cold_storage_inward_release_wizard_line,base.group_user,1,1,1,1
+access_cold_storage_inward_release_wizard_line_manager,cold.storage.inward.release.wizard.line manager,model_cold_storage_inward_release_wizard_line,base.group_system,1,1,1,1

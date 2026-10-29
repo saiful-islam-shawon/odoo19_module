@@ -25,6 +25,13 @@
         <field name="model">cold.storage.inward</field>
         <field name="arch" type="xml">
             <form string="Inward Deposit">
+                <header>
+                    <button name="action_open_release_wizard"
+                            string="Release"
+                            type="object"
+                            class="btn-primary"
+                            invisible="remaining_quantity &lt;= 0"/>
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_plottings"
@@ -38,6 +45,18 @@
                                 class="oe_stat_button"
                                 icon="fa-trash-o">
                             <field name="scrap_count" widget="statinfo" string="Scrap"/>
+                        </button>
+                        <button name="action_view_releases"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck">
+                            <field name="release_count" widget="statinfo" string="Release"/>
+                        </button>
+                        <button name="action_view_invoices"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-money">
+                            <field name="invoice_count" widget="statinfo" string="Journal"/>
                         </button>
                     </div>
                     <div class="oe_title">
@@ -58,6 +77,7 @@
                             <field name="product_name" placeholder="e.g. Cardinal Potato, Granola Seed"/>
                             <field name="bag_quantity"/>
                             <field name="scrapped_quantity" readonly="1"/>
+                            <field name="released_quantity" readonly="1"/>
                             <field name="remaining_quantity" readonly="1"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                         </group>
