@@ -99,7 +99,7 @@
                             <field name="allocation_ids">
                                 <list editable="bottom">
                                     <field name="slot_id" string="Storage Slot" options="{'no_create_edit': False, 'no_quick_create': True}"/>
-                                    <field name="quantity" string="Allocated Bags"/>
+                                    <field name="quantity" string="Allocated Bags" width="180px"/>
                                 </list>
                             </field>
                         </page>
