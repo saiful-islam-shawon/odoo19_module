@@ -2,6 +2,7 @@
 from datetime import date, timedelta
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import ValidationError
+from .common import setup_test_accounting
 
 
 class TestSeasonWorkflow(TransactionCase):
@@ -11,6 +12,7 @@ class TestSeasonWorkflow(TransactionCase):
         super().setUpClass()
         cls.Season = cls.env['cold.storage.season']
         cls.today = date.today()
+        cls.acc_setup = setup_test_accounting(cls.env)
 
     def test_01_create_season_success(self):
         """Test successful season creation in draft state."""
@@ -139,6 +141,7 @@ class TestSeasonWorkflow(TransactionCase):
     def test_07_close_season_allowed_when_all_bags_released(self):
         """Test that action_close() succeeds when all inward lots are fully released."""
         customer = self.env['res.partner'].create({'name': 'Farmer Jahangir'})
+        setup_test_accounting(self.env, customer)
         season = self.Season.create({
             'name': 'Season Complete Release Test',
             'date_start': self.today,
@@ -172,7 +175,7 @@ class TestSeasonWorkflow(TransactionCase):
         })
 
         # Release all 10 bags via release wizard
-        journal = self.env['account.journal'].search([('type', 'in', ['cash', 'bank'])], limit=1)
+        journal = self.acc_setup['cash_journal']
         wizard = self.env['cold.storage.inward.release.wizard'].with_context(
             default_inward_id=inward.id
         ).create({

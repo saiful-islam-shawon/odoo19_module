@@ -4,6 +4,7 @@ from psycopg2 import IntegrityError
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import ValidationError
 from odoo.tools import mute_logger
+from .common import setup_test_accounting
 
 
 class TestTeamsAndInward(TransactionCase):
@@ -25,6 +26,9 @@ class TestTeamsAndInward(TransactionCase):
 
         # Create customer
         cls.customer = cls.Partner.create({'name': 'Farmer Jamal'})
+
+        # Setup test accounting (ensures journals & accounts exist on fresh DBs like Odoo.sh)
+        cls.acc_setup = setup_test_accounting(cls.env, cls.customer)
 
         # Create season
         cls.season = cls.Season.create({
@@ -619,7 +623,7 @@ class TestTeamsAndInward(TransactionCase):
         self.assertEqual(inward.release_count, 0)
         self.assertEqual(inward.invoice_count, 0)
 
-        journal = self.env['account.journal'].search([('type', 'in', ['cash', 'bank'])], limit=1)
+        journal = self.acc_setup['cash_journal']
 
         # Launch wizard and pre-populate
         wizard = self.env['cold.storage.inward.release.wizard'].with_context(
