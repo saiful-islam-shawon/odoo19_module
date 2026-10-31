@@ -65,7 +65,7 @@ def setup_test_accounting(env, partner=None):
     elif not sale_journal.default_account_id:
         sale_journal.default_account_id = income_acc.id
 
-    # 5. Cash / Bank Journal
+    # 5. Cash / Bank Journal & Outstanding Account
     cash_journal = Journal.search([
         ('company_id', '=', company.id),
         ('type', 'in', ['cash', 'bank']),
@@ -80,6 +80,19 @@ def setup_test_accounting(env, partner=None):
         })
     elif not cash_journal.default_account_id:
         cash_journal.default_account_id = cash_acc.id
+
+    # Set transfer_account_id on company if unset (needed by Odoo payment outstanding account resolution)
+    if not company.transfer_account_id:
+        company.transfer_account_id = cash_acc.id
+
+    # Ensure payment method lines point to cash_acc if unset
+    for line in cash_journal.inbound_payment_method_line_ids:
+        if not line.payment_account_id:
+            line.payment_account_id = cash_acc.id
+
+    for line in cash_journal.outbound_payment_method_line_ids:
+        if not line.payment_account_id:
+            line.payment_account_id = cash_acc.id
 
     # 6. Partner Receivable
     if partner and not partner.property_account_receivable_id:
