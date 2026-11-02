@@ -235,6 +235,8 @@ class ZencoreSeedLabTest(models.Model):
         return super().write(vals)
 
     def action_submit(self):
+        if not self.env.user.has_group('zencore_quality_check.group_zencore_quality_technician'):
+            raise ValidationError(_("Access Denied: Only users with 'QC Technician' rights can submit lab tests."))
         for rec in self:
             if rec.state != 'draft':
                 raise ValidationError(_("Only draft tests can be submitted for verification."))
@@ -248,6 +250,8 @@ class ZencoreSeedLabTest(models.Model):
         return True
 
     def action_verify(self):
+        if not self.env.user.has_group('zencore_quality_check.group_zencore_quality_checker'):
+            raise ValidationError(_("Access Denied: Only users with 'QC Checker' rights can verify lab tests."))
         for rec in self:
             if rec.state != 'to_verify':
                 raise ValidationError(_("Only tests in 'To Verify' state can be verified."))
@@ -259,6 +263,9 @@ class ZencoreSeedLabTest(models.Model):
         return True
 
     def action_return_to_draft(self):
+        if not (self.env.user.has_group('zencore_quality_check.group_zencore_quality_checker') or
+                self.env.user.has_group('zencore_quality_check.group_zencore_quality_approver')):
+            raise ValidationError(_("Access Denied: Only QC Checkers or Approvers can return tests to draft."))
         for rec in self:
             if rec.state not in ['to_verify', 'to_approve']:
                 raise ValidationError(_("Only tests under review can be returned to draft."))
@@ -276,6 +283,8 @@ class ZencoreSeedLabTest(models.Model):
         return True
 
     def action_approve(self):
+        if not self.env.user.has_group('zencore_quality_check.group_zencore_quality_approver'):
+            raise ValidationError(_("Access Denied: Only users with 'QC Approver' rights can approve lab tests."))
         for rec in self:
             if rec.state != 'to_approve':
                 raise ValidationError(_("Only verified tests in 'To Approve' state can be approved."))
@@ -288,6 +297,9 @@ class ZencoreSeedLabTest(models.Model):
 
     def action_reject(self):
         self.ensure_one()
+        if not (self.env.user.has_group('zencore_quality_check.group_zencore_quality_checker') or
+                self.env.user.has_group('zencore_quality_check.group_zencore_quality_approver')):
+            raise ValidationError(_("Access Denied: Only QC Checkers or Approvers can reject a lab test."))
         if self.state not in ['to_verify', 'to_approve']:
             raise ValidationError(_("Only tests in 'To Verify' or 'To Approve' state can be rejected."))
         return {

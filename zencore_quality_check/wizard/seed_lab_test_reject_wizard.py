@@ -23,6 +23,9 @@ class ZencoreSeedLabTestRejectWizard(models.TransientModel):
 
     def action_confirm_reject(self):
         self.ensure_one()
+        if not (self.env.user.has_group('zencore_quality_check.group_zencore_quality_checker') or
+                self.env.user.has_group('zencore_quality_check.group_zencore_quality_approver')):
+            raise ValidationError(_("Access Denied: Only QC Checkers or Approvers can confirm lab test rejection."))
         if not self.rejection_reason or not self.rejection_reason.strip():
             raise ValidationError(_("Please provide a valid rejection reason."))
 

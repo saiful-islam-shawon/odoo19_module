@@ -23,7 +23,7 @@
                             string="Return to Draft" 
                             type="object" 
                             invisible="state not in ['to_verify', 'to_approve']"
-                            groups="zencore_quality_check.group_zencore_quality_checker"/>
+                            groups="zencore_quality_check.group_zencore_quality_checker,zencore_quality_check.group_zencore_quality_approver"/>
                     <button name="action_approve" 
                             string="Approve" 
                             type="object" 
@@ -35,7 +35,7 @@
                             type="object" 
                             class="btn-danger" 
                             invisible="state not in ['to_verify', 'to_approve']"
-                            groups="zencore_quality_check.group_zencore_quality_checker"/>
+                            groups="zencore_quality_check.group_zencore_quality_checker,zencore_quality_check.group_zencore_quality_approver"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,to_verify,to_approve,approved,rejected"/>
                 </header>
                 <sheet>

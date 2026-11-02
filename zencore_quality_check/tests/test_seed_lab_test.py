@@ -212,3 +212,75 @@ class TestSeedLabTest(TransactionCase):
         action = self.receipt_passed.action_view_lab_tests()
         self.assertEqual(action['res_model'], 'zencore.seed.lab.test')
         self.assertEqual(action['domain'], [('receipt_id', '=', self.receipt_passed.id)])
+
+    def test_07_strict_role_based_permissions(self):
+        """Test that only users with the specific role group can submit, verify, or approve."""
+        User = self.env['res.users']
+        tech_group = self.env.ref('zencore_quality_check.group_zencore_quality_technician')
+        checker_group = self.env.ref('zencore_quality_check.group_zencore_quality_checker')
+        approver_group = self.env.ref('zencore_quality_check.group_zencore_quality_approver')
+
+        tech_user = User.create({
+            'name': 'QC Technician User',
+            'login': 'qc_tech_user_test',
+            'group_ids': [(6, 0, [tech_group.id, self.env.ref('base.group_user').id])],
+        })
+        checker_user = User.create({
+            'name': 'QC Checker User',
+            'login': 'qc_checker_user_test',
+            'group_ids': [(6, 0, [checker_group.id, self.env.ref('base.group_user').id])],
+        })
+        approver_user = User.create({
+            'name': 'QC Approver User',
+            'login': 'qc_approver_user_test',
+            'group_ids': [(6, 0, [approver_group.id, self.env.ref('base.group_user').id])],
+        })
+        plain_user = User.create({
+            'name': 'Plain User',
+            'login': 'plain_user_test',
+            'group_ids': [(6, 0, [self.env.ref('base.group_user').id])],
+        })
+
+        lab_test = self.SeedLabTest.create({
+            'receipt_id': self.receipt_passed.id,
+            'sample_id': 'SAMPLE-ROLE-TEST',
+            'line_ids': [
+                (0, 0, {'parameter_name': 'Germination', 'unit': '%', 'standard_value': 'Min 80%', 'measured_value': '88', 'result': 'pass'}),
+            ]
+        })
+
+        # Plain user cannot submit
+        with self.assertRaises(ValidationError):
+            lab_test.with_user(plain_user).action_submit()
+
+        # Checker cannot submit
+        with self.assertRaises(ValidationError):
+            lab_test.with_user(checker_user).action_submit()
+
+        # Tech user can submit
+        lab_test.with_user(tech_user).action_submit()
+        self.assertEqual(lab_test.state, 'to_verify')
+        self.assertEqual(lab_test.submitted_by_id, tech_user)
+
+        # Tech user cannot verify
+        with self.assertRaises(ValidationError):
+            lab_test.with_user(tech_user).action_verify()
+
+        # Approver cannot verify
+        with self.assertRaises(ValidationError):
+            lab_test.with_user(approver_user).action_verify()
+
+        # Checker user can verify
+        lab_test.with_user(checker_user).action_verify()
+        self.assertEqual(lab_test.state, 'to_approve')
+        self.assertEqual(lab_test.verified_by_id, checker_user)
+
+        # Checker user cannot approve
+        with self.assertRaises(ValidationError):
+            lab_test.with_user(checker_user).action_approve()
+
+        # Approver user can approve
+        lab_test.with_user(approver_user).action_approve()
+        self.assertEqual(lab_test.state, 'approved')
+        self.assertEqual(lab_test.approved_by_id, approver_user)
+

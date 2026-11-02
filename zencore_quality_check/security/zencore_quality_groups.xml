@@ -1,50 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
-        <record model="res.groups.privilege" id="res_groups_privilege_zencore_quality">
-            <field name="name">Quality Check</field>
-            <field name="sequence">30</field>
-            <field name="category_id" ref="base.module_category_supply_chain"/>
+        <!-- Dedicated Module Category for Seed Quality Management -->
+        <record model="ir.module.category" id="module_category_seed_quality">
+            <field name="name">Seed Quality Management</field>
+            <field name="description">Manage user roles and permissions for seed quality inspection and laboratory testing.</field>
+            <field name="sequence">25</field>
         </record>
 
-        <!-- Base User Group -->
+        <!-- Base Internal Quality User (implied by all quality groups to view menus and records) -->
         <record id="group_zencore_quality_user" model="res.groups">
-            <field name="name">Quality User</field>
-            <field name="sequence">5</field>
-            <field name="privilege_id" ref="res_groups_privilege_zencore_quality"/>
+            <field name="name">Quality User (Base Access)</field>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         </record>
 
-        <!-- Tier 1: QC Technician (Seed Science) -->
-        <record id="group_zencore_quality_technician" model="res.groups">
-            <field name="name">QC Technician (Seed Science)</field>
+        <!-- Privilege 1: Lab Test & Submission -->
+        <record model="res.groups.privilege" id="res_groups_privilege_qc_technician">
+            <field name="name">Lab Test &amp; Submission</field>
             <field name="sequence">10</field>
-            <field name="privilege_id" ref="res_groups_privilege_zencore_quality"/>
-            <field name="implied_ids" eval="[(4, ref('group_zencore_quality_user'))]"/>
+            <field name="category_id" ref="module_category_seed_quality"/>
         </record>
 
-        <!-- Tier 2: QC Checker (QC Manager) -->
-        <record id="group_zencore_quality_checker" model="res.groups">
-            <field name="name">QC Checker (QC Manager)</field>
+        <!-- Group 1: QC Technician -->
+        <record id="group_zencore_quality_technician" model="res.groups">
+            <field name="name">QC Technician</field>
+            <field name="sequence">10</field>
+            <field name="privilege_id" ref="res_groups_privilege_qc_technician"/>
+            <field name="comment">Authorized to record lab parameters and submit tests for verification.</field>
+            <field name="implied_ids" eval="[(6, 0, [ref('group_zencore_quality_user')])]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Privilege 2: Quality Verification -->
+        <record model="res.groups.privilege" id="res_groups_privilege_qc_checker">
+            <field name="name">Quality Verification</field>
             <field name="sequence">20</field>
-            <field name="privilege_id" ref="res_groups_privilege_zencore_quality"/>
-            <field name="implied_ids" eval="[(4, ref('group_zencore_quality_technician'))]"/>
+            <field name="category_id" ref="module_category_seed_quality"/>
         </record>
 
-        <!-- Tier 3: QC Approver (GM - Agrobusiness) -->
-        <record id="group_zencore_quality_approver" model="res.groups">
-            <field name="name">QC Approver (GM - Agrobusiness)</field>
+        <!-- Group 2: QC Checker -->
+        <record id="group_zencore_quality_checker" model="res.groups">
+            <field name="name">QC Checker</field>
+            <field name="sequence">20</field>
+            <field name="privilege_id" ref="res_groups_privilege_qc_checker"/>
+            <field name="comment">Authorized to review testing metrics, verify, return to draft, or reject tests.</field>
+            <field name="implied_ids" eval="[(6, 0, [ref('group_zencore_quality_user')])]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Privilege 3: Executive Approval -->
+        <record model="res.groups.privilege" id="res_groups_privilege_qc_approver">
+            <field name="name">Executive Approval</field>
             <field name="sequence">30</field>
-            <field name="privilege_id" ref="res_groups_privilege_zencore_quality"/>
-            <field name="implied_ids" eval="[(4, ref('group_zencore_quality_checker'))]"/>
+            <field name="category_id" ref="module_category_seed_quality"/>
         </record>
 
-        <!-- Administrator -->
+        <!-- Group 3: QC Approver -->
+        <record id="group_zencore_quality_approver" model="res.groups">
+            <field name="name">QC Approver</field>
+            <field name="sequence">30</field>
+            <field name="privilege_id" ref="res_groups_privilege_qc_approver"/>
+            <field name="comment">Authorized to grant final acceptance approval or executive rejection.</field>
+            <field name="implied_ids" eval="[(6, 0, [ref('group_zencore_quality_user')])]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Quality Administrator (retained for full backend control and system administration) -->
         <record id="group_zencore_quality_manager" model="res.groups">
-            <field name="name">Administrator</field>
+            <field name="name">Quality Administrator</field>
             <field name="sequence">40</field>
-            <field name="privilege_id" ref="res_groups_privilege_zencore_quality"/>
-            <field name="implied_ids" eval="[(4, ref('group_zencore_quality_approver'))]"/>
+            <field name="comment">Full administrative control over all seed quality check records and configurations.</field>
+            <field name="implied_ids" eval="[(6, 0, [ref('group_zencore_quality_technician'), ref('group_zencore_quality_checker'), ref('group_zencore_quality_approver')])]"/>
             <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
     </data>
