@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Zencore Quality Check',
-    'version': '19.0.2.0.0',
+    'version': '19.0.3.0.0',
     'category': 'Quality Management',
     'summary': 'Seed Physical Arrival, Gate Receiving, Physical & Laboratory Quality Testing',
     'description': """
@@ -13,6 +13,7 @@ Zencore Quality Check Management
 - 3-tier review and approval lifecycle: Technician (Submit) -> Checker (Verify/Return) -> Approver (Approve/Return/Reject).
 - Strict Segregation of Duties and permanent terminal state locking.
 - Mandatory rejection reason wizards.
+- Strict 1-to-1 Seed Receipt Linkage & Duplicate Prevention.
 - Dedicated Menu: Quality Check -> Seed Receiving & Lab Testing.
     """,
     'author': 'Antigravity / Zencore',

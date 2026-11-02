@@ -209,10 +209,22 @@ class ZencoreSeedReceipt(models.Model):
         string='Lab Test Count',
         compute='_compute_lab_test_count'
     )
+    has_lab_test = fields.Boolean(
+        string='Has Lab Test',
+        compute='_compute_has_lab_test',
+        store=True,
+        index=True,
+        help="Technical flag indicating whether this receipt already has a lab quality test created."
+    )
 
     def _compute_lab_test_count(self):
         for rec in self:
             rec.lab_test_count = len(rec.lab_test_ids)
+
+    @api.depends('lab_test_ids')
+    def _compute_has_lab_test(self):
+        for rec in self:
+            rec.has_lab_test = bool(rec.lab_test_ids)
 
     @api.depends('challan_weight', 'received_weight')
     def _compute_shortage_weight(self):

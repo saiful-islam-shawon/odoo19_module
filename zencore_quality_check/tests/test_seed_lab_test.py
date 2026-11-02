@@ -284,3 +284,42 @@ class TestSeedLabTest(TransactionCase):
         self.assertEqual(lab_test.state, 'approved')
         self.assertEqual(lab_test.approved_by_id, approver_user)
 
+    def test_08_duplicate_receipt_prevention_and_domain_filtering(self):
+        """Test strict 1-to-1 linkage, duplicate prevention constraint, and domain exclusion."""
+        new_receipt = self.SeedReceipt.create({
+            'partner_id': self.vendor.id,
+            'product_id': self.seed_product.id,
+            'variety': 'BR-29 Hybrid Fresh',
+            'challan_no': 'CHAL-TEST-008',
+            'bag_count': 50,
+            'challan_weight': 2500.0,
+            'received_weight': 2500.0,
+        })
+        new_receipt.action_send_to_testing()
+        new_receipt.action_approve()
+        self.assertEqual(new_receipt.state, 'passed')
+        self.assertFalse(new_receipt.has_lab_test, "Un-tested receipt must have has_lab_test False.")
+
+        # Create first lab test -> succeeds
+        test_1 = self.SeedLabTest.create({
+            'receipt_id': new_receipt.id,
+            'sample_id': 'SAMPLE-TEST-008-A',
+        })
+        self.assertTrue(new_receipt.has_lab_test, "Receipt must have has_lab_test True after test creation.")
+
+        # Attempt to create duplicate lab test for the same receipt -> raises ValidationError
+        with self.assertRaises(ValidationError) as cm:
+            self.SeedLabTest.create({
+                'receipt_id': new_receipt.id,
+                'sample_id': 'SAMPLE-TEST-008-DUPLICATE',
+            })
+        self.assertIn("already has an associated Lab Test", str(cm.exception))
+
+        # Verify domain search excludes new_receipt
+        available_receipts = self.SeedReceipt.search([
+            ('state', '=', 'passed'),
+            ('has_lab_test', '=', False)
+        ])
+        self.assertNotIn(new_receipt, available_receipts, "Receipt with existing lab test must not be in available domain.")
+
+

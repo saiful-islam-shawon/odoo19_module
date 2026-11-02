@@ -204,6 +204,21 @@ class ZencoreSeedLabTest(models.Model):
             ]
         return res
 
+    @api.constrains('receipt_id')
+    def _check_unique_receipt_id(self):
+        for rec in self:
+            if rec.receipt_id:
+                duplicate = self.search([
+                    ('receipt_id', '=', rec.receipt_id.id),
+                    ('id', '!=', rec.id)
+                ], limit=1)
+                if duplicate:
+                    raise ValidationError(
+                        _("Seed Receipt '%s' already has an associated Lab Test (%s). Duplicate tests for the same receipt are strictly prohibited.") % (
+                            rec.receipt_id.name, duplicate.name
+                        )
+                    )
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:

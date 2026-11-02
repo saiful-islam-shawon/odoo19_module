@@ -53,7 +53,7 @@
                         <group string="Seed Receipt Linkage">
                             <field name="receipt_id" 
                                    readonly="state != 'draft'" 
-                                   domain="[('state', '=', 'passed')]" 
+                                   domain="[('state', '=', 'passed'), '|', ('has_lab_test', '=', False), ('id', '=', receipt_id)]" 
                                    options="{'no_create': True, 'no_open': False}"/>
                             <field name="partner_id"/>
                             <field name="product_id"/>
