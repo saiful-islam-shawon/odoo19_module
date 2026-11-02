@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root Menu: Quality Check -->
+    <menuitem id="menu_zencore_quality_root"
+              name="Quality Check"
+              sequence="55"/>
+
+    <!-- Category 1: Seed Receiving -->
+    <menuitem id="menu_zencore_quality_receiving"
+              name="Seed Receiving"
+              parent="menu_zencore_quality_root"
+              sequence="10"/>
+
+    <!-- Submenu: Seed Arrival & Inspection -->
+    <menuitem id="menu_zencore_seed_receipt"
+              name="Seed Arrival &amp; Inspection"
+              parent="menu_zencore_quality_receiving"
+              action="action_zencore_seed_receipt"
+              sequence="10"/>
+
+    <!-- Category 2: Lab Testing -->
+    <menuitem id="menu_zencore_quality_lab_testing"
+              name="Lab Testing"
+              parent="menu_zencore_quality_root"
+              sequence="20"/>
+
+    <!-- Submenu: Seed Quality Testing -->
+    <menuitem id="menu_zencore_seed_lab_test"
+              name="Seed Quality Testing"
+              parent="menu_zencore_quality_lab_testing"
+              action="action_zencore_seed_lab_test"
+              sequence="10"/>
+</odoo>

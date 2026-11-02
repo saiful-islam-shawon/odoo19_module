@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_seed_lab_test_reject_wizard_form" model="ir.ui.view">
+        <field name="name">zencore.seed.lab.test.reject.wizard.form</field>
+        <field name="model">zencore.seed.lab.test.reject.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reject Laboratory Test">
+                <group>
+                    <field name="test_id" invisible="1"/>
+                    <field name="rejection_reason" placeholder="Specify laboratory failure reasons, out-of-tolerance parameters, or quality non-compliance details..."/>
+                </group>
+                <footer>
+                    <button name="action_confirm_reject" string="Confirm Reject" type="object" class="btn-danger"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

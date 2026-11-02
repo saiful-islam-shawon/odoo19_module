@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="view_zencore_seed_receipt_form" model="ir.ui.view">
+        <field name="name">zencore.seed.receipt.form</field>
+        <field name="model">zencore.seed.receipt</field>
+        <field name="arch" type="xml">
+            <form string="Seed Arrival &amp; Inspection">
+                <header>
+                    <button name="action_send_to_testing" 
+                            string="Send to Testing" 
+                            type="object" 
+                            class="oe_highlight" 
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" 
+                            string="Approve" 
+                            type="object" 
+                            class="oe_highlight" 
+                            invisible="state != 'testing'"/>
+                    <button name="action_reject" 
+                            string="Reject" 
+                            type="object" 
+                            class="btn-danger" 
+                            invisible="state not in ['draft', 'testing']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,testing,passed,rejected"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_lab_tests" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-flask" 
+                                invisible="state != 'passed'">
+                            <field name="lab_test_count" widget="statinfo" string="Lab Tests"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <span class="o_form_label" invisible="state != 'draft'">Draft Seed Receipt</span>
+                        <span class="o_form_label text-warning" invisible="state != 'testing'">Testing in Progress</span>
+                        <span class="o_form_label text-success" invisible="state != 'passed'">Receipt Passed</span>
+                        <span class="o_form_label text-danger" invisible="state != 'rejected'">Receipt Rejected</span>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Vendor &amp; Seed Information">
+                            <field name="partner_id" readonly="state != 'draft'"/>
+                            <field name="product_id" readonly="state != 'draft'"/>
+                            <field name="variety" readonly="state != 'draft'"/>
+                            <field name="date_receipt" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Challan &amp; Transport">
+                            <field name="challan_no" readonly="state != 'draft'"/>
+                            <field name="challan_date" readonly="state != 'draft'"/>
+                            <field name="vehicle_no" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="Quantity &amp; Weight Breakdown">
+                        <group>
+                            <field name="bag_count" readonly="state != 'draft'"/>
+                            <field name="challan_weight" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="received_weight" readonly="state != 'draft'"/>
+                            <field name="shortage_weight" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Physical Inspection" name="physical_inspection">
+                            <group>
+                                <group string="Inspection Parameters">
+                                    <field name="damaged_bag_count" readonly="state != 'testing'"/>
+                                    <field name="pest_infestation" widget="radio" readonly="state != 'testing'"/>
+                                    <field name="moisture_condition" widget="radio" readonly="state != 'testing'"/>
+                                    <field name="label_condition" widget="radio" readonly="state != 'testing'"/>
+                                </group>
+                                <group string="Inspector &amp; Schedule">
+                                    <field name="inspected_by_id" readonly="state != 'testing'"/>
+                                    <field name="inspection_date" readonly="state != 'testing'"/>
+                                </group>
+                            </group>
+                            <group string="Inspection Remarks">
+                                <field name="inspection_notes" placeholder="Enter physical observations, bag condition remarks..." nolabel="1" readonly="state != 'testing'"/>
+                            </group>
+                        </page>
+                        <page string="Rejection Details" name="rejection_details" invisible="state != 'rejected'">
+                            <group>
+                                <group>
+                                    <field name="rejected_by_id" readonly="1"/>
+                                    <field name="rejection_date" readonly="1"/>
+                                </group>
+                            </group>
+                            <group string="Rejection Reason">
+                                <field name="rejection_reason" readonly="1" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree / List View -->
+    <record id="view_zencore_seed_receipt_tree" model="ir.ui.view">
+        <field name="name">zencore.seed.receipt.list</field>
+        <field name="model">zencore.seed.receipt</field>
+        <field name="arch" type="xml">
+            <list string="Seed Arrival &amp; Inspection" 
+                  decoration-info="state == 'draft'" 
+                  decoration-warning="state == 'testing'" 
+                  decoration-success="state == 'passed'" 
+                  decoration-danger="state == 'rejected'">
+                <field name="name"/>
+                <field name="date_receipt"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="variety"/>
+                <field name="challan_no"/>
+                <field name="vehicle_no"/>
+                <field name="bag_count"/>
+                <field name="challan_weight"/>
+                <field name="received_weight"/>
+                <field name="shortage_weight"/>
+                <field name="state" widget="badge" 
+                       decoration-info="state == 'draft'" 
+                       decoration-warning="state == 'testing'" 
+                       decoration-success="state == 'passed'" 
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_zencore_seed_receipt_search" model="ir.ui.view">
+        <field name="name">zencore.seed.receipt.search</field>
+        <field name="model">zencore.seed.receipt</field>
+        <field name="arch" type="xml">
+            <search string="Search Seed Receipts">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="challan_no"/>
+                <field name="vehicle_no"/>
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_testing" string="Testing" domain="[('state', '=', 'testing')]"/>
+                <filter name="filter_passed" string="Passed" domain="[('state', '=', 'passed')]"/>
+                <filter name="filter_rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                <group>
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_partner" string="Vendor" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_by_product" string="Product" context="{'group_by': 'product_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_zencore_seed_receipt" model="ir.actions.act_window">
+        <field name="name">Seed Arrival &amp; Inspection</field>
+        <field name="res_model">zencore.seed.receipt</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_zencore_seed_receipt_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register a new Seed Arrival &amp; Inspection Receipt
+            </p>
+            <p>
+                Record incoming seed shipments, track challan and bag weights, and conduct physical gate inspection.
+            </p>
+        </field>
+    </record>
+</odoo>

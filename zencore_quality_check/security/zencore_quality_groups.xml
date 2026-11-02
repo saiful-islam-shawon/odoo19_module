@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record model="res.groups.privilege" id="res_groups_privilege_zencore_quality">
+            <field name="name">Quality Check</field>
+            <field name="sequence">30</field>
+            <field name="category_id" ref="base.module_category_supply_chain"/>
+        </record>
+
+        <!-- Base User Group -->
+        <record id="group_zencore_quality_user" model="res.groups">
+            <field name="name">Quality User</field>
+            <field name="sequence">5</field>
+            <field name="privilege_id" ref="res_groups_privilege_zencore_quality"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- Tier 1: QC Technician (Seed Science) -->
+        <record id="group_zencore_quality_technician" model="res.groups">
+            <field name="name">QC Technician (Seed Science)</field>
+            <field name="sequence">10</field>
+            <field name="privilege_id" ref="res_groups_privilege_zencore_quality"/>
+            <field name="implied_ids" eval="[(4, ref('group_zencore_quality_user'))]"/>
+        </record>
+
+        <!-- Tier 2: QC Checker (QC Manager) -->
+        <record id="group_zencore_quality_checker" model="res.groups">
+            <field name="name">QC Checker (QC Manager)</field>
+            <field name="sequence">20</field>
+            <field name="privilege_id" ref="res_groups_privilege_zencore_quality"/>
+            <field name="implied_ids" eval="[(4, ref('group_zencore_quality_technician'))]"/>
+        </record>
+
+        <!-- Tier 3: QC Approver (GM - Agrobusiness) -->
+        <record id="group_zencore_quality_approver" model="res.groups">
+            <field name="name">QC Approver (GM - Agrobusiness)</field>
+            <field name="sequence">30</field>
+            <field name="privilege_id" ref="res_groups_privilege_zencore_quality"/>
+            <field name="implied_ids" eval="[(4, ref('group_zencore_quality_checker'))]"/>
+        </record>
+
+        <!-- Administrator -->
+        <record id="group_zencore_quality_manager" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="sequence">40</field>
+            <field name="privilege_id" ref="res_groups_privilege_zencore_quality"/>
+            <field name="implied_ids" eval="[(4, ref('group_zencore_quality_approver'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+    </data>
+</odoo>

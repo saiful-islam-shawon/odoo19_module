@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_zencore_seed_receipt" model="ir.sequence">
+            <field name="name">Seed Receipt Sequence</field>
+            <field name="code">zencore.seed.receipt.seq</field>
+            <field name="prefix">QC/REC/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_zencore_seed_lab_test" model="ir.sequence">
+            <field name="name">Seed Lab Test Sequence</field>
+            <field name="code">zencore.seed.lab.test.seq</field>
+            <field name="prefix">QC/LAB/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

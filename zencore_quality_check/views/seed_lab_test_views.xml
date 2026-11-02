@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="view_zencore_seed_lab_test_form" model="ir.ui.view">
+        <field name="name">zencore.seed.lab.test.form</field>
+        <field name="model">zencore.seed.lab.test</field>
+        <field name="arch" type="xml">
+            <form string="Seed Quality Testing">
+                <header>
+                    <button name="action_submit" 
+                            string="Submit for Verification" 
+                            type="object" 
+                            class="oe_highlight" 
+                            invisible="state != 'draft'"
+                            groups="zencore_quality_check.group_zencore_quality_technician"/>
+                    <button name="action_verify" 
+                            string="Verify" 
+                            type="object" 
+                            class="oe_highlight" 
+                            invisible="state != 'to_verify'"
+                            groups="zencore_quality_check.group_zencore_quality_checker"/>
+                    <button name="action_return_to_draft" 
+                            string="Return to Draft" 
+                            type="object" 
+                            invisible="state not in ['to_verify', 'to_approve']"
+                            groups="zencore_quality_check.group_zencore_quality_checker"/>
+                    <button name="action_approve" 
+                            string="Approve" 
+                            type="object" 
+                            class="oe_highlight" 
+                            invisible="state != 'to_approve'"
+                            groups="zencore_quality_check.group_zencore_quality_approver"/>
+                    <button name="action_reject" 
+                            string="Reject" 
+                            type="object" 
+                            class="btn-danger" 
+                            invisible="state not in ['to_verify', 'to_approve']"
+                            groups="zencore_quality_check.group_zencore_quality_checker"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,to_verify,to_approve,approved,rejected"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_form_label" invisible="state != 'draft'">Draft Lab Test</span>
+                        <span class="o_form_label text-warning" invisible="state != 'to_verify'">Under Verification</span>
+                        <span class="o_form_label text-info" invisible="state != 'to_approve'">Pending Executive Approval</span>
+                        <span class="o_form_label text-success" invisible="state != 'approved'">Test Approved &amp; Passed</span>
+                        <span class="o_form_label text-danger" invisible="state != 'rejected'">Test Rejected</span>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Seed Receipt Linkage">
+                            <field name="receipt_id" 
+                                   readonly="state != 'draft'" 
+                                   domain="[('state', '=', 'passed')]" 
+                                   options="{'no_create': True, 'no_open': False}"/>
+                            <field name="partner_id"/>
+                            <field name="product_id"/>
+                            <field name="variety"/>
+                        </group>
+                        <group string="Receipt Logistics">
+                            <field name="challan_no"/>
+                            <field name="date_receipt"/>
+                            <field name="received_weight"/>
+                            <field name="bag_count"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="Laboratory Test Metadata">
+                        <group>
+                            <field name="date_test" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="sample_id" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Test Parameters" name="test_parameters">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="parameter_name"/>
+                                    <field name="unit"/>
+                                    <field name="standard_value"/>
+                                    <field name="measured_value"/>
+                                    <field name="result"/>
+                                    <field name="remarks"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Laboratory Notes" name="lab_notes">
+                            <field name="overall_notes" placeholder="Enter general notes or observations..." readonly="state != 'draft'"/>
+                        </page>
+                        <page string="Audit &amp; Signatures" name="audit_signatures">
+                            <group>
+                                <group string="Data Entry &amp; Review">
+                                    <field name="submitted_by_id"/>
+                                    <field name="date_submitted"/>
+                                    <field name="verified_by_id"/>
+                                    <field name="date_verified"/>
+                                </group>
+                                <group string="Executive Decision">
+                                    <field name="approved_by_id"/>
+                                    <field name="date_approved"/>
+                                    <field name="rejected_by_id"/>
+                                    <field name="date_rejected"/>
+                                </group>
+                            </group>
+                            <group string="Rejection Details" invisible="state != 'rejected'">
+                                <field name="rejection_reason" readonly="1" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree / List View -->
+    <record id="view_zencore_seed_lab_test_tree" model="ir.ui.view">
+        <field name="name">zencore.seed.lab.test.list</field>
+        <field name="model">zencore.seed.lab.test</field>
+        <field name="arch" type="xml">
+            <list string="Seed Quality Testing"
+                  decoration-info="state == 'draft'" 
+                  decoration-warning="state in ['to_verify', 'to_approve']" 
+                  decoration-success="state == 'approved'" 
+                  decoration-danger="state == 'rejected'">
+                <field name="name"/>
+                <field name="date_test"/>
+                <field name="receipt_id"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="variety"/>
+                <field name="sample_id"/>
+                <field name="state" widget="badge" 
+                       decoration-info="state == 'draft'" 
+                       decoration-warning="state in ['to_verify', 'to_approve']" 
+                       decoration-success="state == 'approved'" 
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_zencore_seed_lab_test_search" model="ir.ui.view">
+        <field name="name">zencore.seed.lab.test.search</field>
+        <field name="model">zencore.seed.lab.test</field>
+        <field name="arch" type="xml">
+            <search string="Search Seed Lab Tests">
+                <field name="name"/>
+                <field name="receipt_id"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="sample_id"/>
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_to_verify" string="To Verify" domain="[('state', '=', 'to_verify')]"/>
+                <filter name="filter_to_approve" string="To Approve" domain="[('state', '=', 'to_approve')]"/>
+                <filter name="filter_approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <filter name="filter_rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                <group>
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_partner" string="Vendor" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_by_product" string="Product" context="{'group_by': 'product_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_zencore_seed_lab_test" model="ir.actions.act_window">
+        <field name="name">Seed Quality Testing</field>
+        <field name="res_model">zencore.seed.lab.test</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_zencore_seed_lab_test_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register a new Seed Quality Laboratory Test
+            </p>
+            <p>
+                Record scientific testing parameters (moisture, purity, germination), review metrics, and execute multi-tier authorization.
+            </p>
+        </field>
+    </record>
+</odoo>
