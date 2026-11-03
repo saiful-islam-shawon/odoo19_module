@@ -3,6 +3,7 @@
     'name': 'QC',
     'version': '19.0.6.0.0',
     'category': 'Quality Management',
+    'icon': '/zencore_quality_check/static/description/icon_qc.png',
     'summary': 'Seed Receiving, QC Lab Testing, Processing, Post-QC, Cold Storage, Retest & Scrap',
     'description': """
 Zencore Quality Check Management
