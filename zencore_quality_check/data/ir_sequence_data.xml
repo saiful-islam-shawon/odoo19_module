@@ -43,5 +43,32 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
+        <!-- Cold Storage Preservation Sequence -->
+        <record id="seq_zencore_seed_cold_storage" model="ir.sequence">
+            <field name="name">Seed Cold Storage Sequence</field>
+            <field name="code">zencore.seed.cold.storage.seq</field>
+            <field name="prefix">CS/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Seed Retest Sequence -->
+        <record id="seq_zencore_seed_retest" model="ir.sequence">
+            <field name="name">Seed Retest Sequence</field>
+            <field name="code">zencore.seed.retest.seq</field>
+            <field name="prefix">RET/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Cold Storage Scrap Sequence -->
+        <record id="seq_zencore_seed_cold_storage_scrap" model="ir.sequence">
+            <field name="name">Cold Storage Seed Scrap Sequence</field>
+            <field name="code">zencore.seed.cold.storage.scrap.seq</field>
+            <field name="prefix">SCRAP/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

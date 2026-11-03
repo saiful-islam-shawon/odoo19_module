@@ -38,6 +38,12 @@ class ZencoreProcessedSeedQc(models.Model):
         default=lambda self: self.env.company,
         required=True
     )
+    is_cold_storage_sent = fields.Boolean(
+        string='Cold Storage Sent',
+        default=False,
+        copy=False,
+        help="Indicates whether this approved lot has been dispatched to Cold Storage."
+    )
 
     # Linkage to Processing Batch & Output Line
     batch_id = fields.Many2one(
@@ -250,7 +256,7 @@ class ZencoreProcessedSeedQc(models.Model):
 
     def write(self, vals):
         if not self.env.context.get('bypass_state_lock'):
-            system_fields = {'message_follower_ids', 'activity_ids', 'message_ids'}
+            system_fields = {'message_follower_ids', 'activity_ids', 'message_ids', 'is_cold_storage_sent'}
             for record in self:
                 if record.state in ['approved', 'rejected']:
                     restricted_fields = set(vals.keys()) - system_fields
@@ -316,3 +322,36 @@ class ZencoreProcessedSeedQc(models.Model):
                 subtype_xmlid='mail.mt_note'
             )
         return True
+
+    def action_send_to_cold_storage(self):
+        self.ensure_one()
+        if self.state != 'approved':
+            raise UserError(_("Only approved processed seed lots can be sent to Cold Storage."))
+        if self.is_cold_storage_sent:
+            raise UserError(_("This seed lot has already been dispatched to Cold Storage."))
+        storage = self.env['zencore.seed.cold.storage'].create({
+            'qc_id': self.id,
+            'batch_id': self.batch_id.id,
+            'batch_output_line_id': self.batch_output_line_id.id if self.batch_output_line_id else False,
+            'product_id': self.product_id.id,
+            'lot_name': self.lot_name,
+            'lot_id': self.lot_id.id if self.lot_id else False,
+            'category': self.category,
+            'pack_size': self.pack_size,
+            'bag_count': self.bag_count,
+            'quantity': self.quantity,
+            'company_id': self.company_id.id,
+            'storage_date': fields.Date.context_today(self),
+        })
+        self.with_context(bypass_state_lock=True).write({'is_cold_storage_sent': True})
+        self.message_post(
+            body=_("Dispatched seed lot to <b>Cold Storage</b> (%s) by %s.") % (storage.name, self.env.user.name),
+            subtype_xmlid='mail.mt_note'
+        )
+        return {
+            'name': _("Seed Cold Storage Record"),
+            'type': 'ir.actions.act_window',
+            'res_model': 'zencore.seed.cold.storage',
+            'view_mode': 'form',
+            'res_id': storage.id,
+        }

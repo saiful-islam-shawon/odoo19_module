@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_zencore_seed_cold_storage_scrap_list" model="ir.ui.view">
+        <field name="name">zencore.seed.cold.storage.scrap.list</field>
+        <field name="model">zencore.seed.cold.storage.scrap</field>
+        <field name="arch" type="xml">
+            <list string="Cold Storage Scrapped Seeds" create="false" sample="1">
+                <field name="name"/>
+                <field name="scrap_date"/>
+                <field name="product_id"/>
+                <field name="lot_name"/>
+                <field name="bag_count"/>
+                <field name="quantity" string="Scrapped Weight (kg)"/>
+                <field name="storage_date"/>
+                <field name="validity_date"/>
+                <field name="storage_id"/>
+                <field name="retest_id"/>
+                <field name="scrapped_by_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_zencore_seed_cold_storage_scrap_form" model="ir.ui.view">
+        <field name="name">zencore.seed.cold.storage.scrap.form</field>
+        <field name="model">zencore.seed.cold.storage.scrap</field>
+        <field name="arch" type="xml">
+            <form string="Scrapped Seed Audit Record" create="false" edit="false">
+                <sheet>
+                    <widget name="web_ribbon" title="Condemned / Scrapped" bg_color="text-bg-danger"/>
+
+                    <div class="alert alert-danger" role="alert">
+                        <strong>Scrap Justification:</strong> <field name="scrap_reason" readonly="1"/>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="Scrap Reference"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Scrapped Seed Logistics">
+                            <field name="product_id" readonly="1"/>
+                            <field name="lot_name" readonly="1"/>
+                            <field name="lot_id" optional="show" readonly="1"/>
+                            <field name="category" readonly="1"/>
+                            <field name="pack_size" readonly="1"/>
+                            <field name="bag_count" readonly="1"/>
+                            <field name="quantity" readonly="1"/>
+                        </group>
+                        <group string="Origin &amp; Timeline">
+                            <field name="storage_id" readonly="1"/>
+                            <field name="retest_id" readonly="1"/>
+                            <field name="storage_date" readonly="1"/>
+                            <field name="validity_date" readonly="1"/>
+                            <field name="scrap_date" readonly="1"/>
+                            <field name="scrapped_by_id" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <chatter>
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </chatter>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_zencore_seed_cold_storage_scrap_search" model="ir.ui.view">
+        <field name="name">zencore.seed.cold.storage.scrap.search</field>
+        <field name="model">zencore.seed.cold.storage.scrap</field>
+        <field name="arch" type="xml">
+            <search string="Search Scrapped Seed Records">
+                <field name="name" string="Reference"/>
+                <field name="product_id" string="Product"/>
+                <field name="lot_name" string="Lot Number"/>
+                <field name="storage_id" string="Cold Storage Ref"/>
+                <field name="retest_id" string="Retest Ref"/>
+
+                <filter string="Today's Scrap" name="filter_today" domain="[('scrap_date', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00')), ('scrap_date', '&lt;=', context_today().strftime('%Y-%m-%d 23:59:59'))]"/>
+
+                <group>
+                    <filter string="Product" name="group_product" context="{'group_by': 'product_id'}"/>
+                    <filter string="Storage Origin" name="group_storage" context="{'group_by': 'storage_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_zencore_seed_cold_storage_scrap" model="ir.actions.act_window">
+        <field name="name">Scrap</field>
+        <field name="res_model">zencore.seed.cold.storage.scrap</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_zencore_seed_cold_storage_scrap_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Scrapped Seed records found!
+            </p>
+            <p>
+                Only seed lots condemned during cold storage retesting will be archived here.
+            </p>
+        </field>
+    </record>
+</odoo>
+

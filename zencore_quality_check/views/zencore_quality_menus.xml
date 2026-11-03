@@ -57,4 +57,31 @@
               parent="menu_zencore_quality_processed_qc"
               action="action_zencore_processed_seed_qc"
               sequence="10"/>
+
+    <!-- Category 5: Cold Storage -->
+    <menuitem id="menu_zencore_quality_cold_storage"
+              name="Cold Storage"
+              parent="menu_zencore_quality_root"
+              sequence="50"/>
+
+    <!-- Submenu 1: Cold Storage Records -->
+    <menuitem id="menu_zencore_seed_cold_storage_records"
+              name="Cold Storage"
+              parent="menu_zencore_quality_cold_storage"
+              action="action_zencore_seed_cold_storage"
+              sequence="10"/>
+
+    <!-- Submenu 2: Retest -->
+    <menuitem id="menu_zencore_seed_retest_records"
+              name="Retest"
+              parent="menu_zencore_quality_cold_storage"
+              action="action_zencore_seed_retest"
+              sequence="20"/>
+
+    <!-- Submenu 3: Scrap -->
+    <menuitem id="menu_zencore_seed_cold_storage_scrap_records"
+              name="Scrap"
+              parent="menu_zencore_quality_cold_storage"
+              action="action_zencore_seed_cold_storage_scrap"
+              sequence="30"/>
 </odoo>

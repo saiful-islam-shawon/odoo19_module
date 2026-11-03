@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_zencore_seed_cold_storage_list" model="ir.ui.view">
+        <field name="name">zencore.seed.cold.storage.list</field>
+        <field name="model">zencore.seed.cold.storage</field>
+        <field name="arch" type="xml">
+            <list string="Cold Storage Seed Inventory" sample="1">
+                <field name="name"/>
+                <field name="storage_date"/>
+                <field name="validity_date"/>
+                <field name="validity_status" widget="badge"
+                       decoration-success="validity_status == 'valid'"
+                       decoration-danger="validity_status == 'expired'"
+                       decoration-warning="validity_status == 'undefined'"/>
+                <field name="product_id"/>
+                <field name="lot_name"/>
+                <field name="category"/>
+                <field name="bag_count"/>
+                <field name="quantity" string="Net Weight (kg)"/>
+                <field name="qc_id"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'stored'"
+                       decoration-warning="state == 'under_retest'"
+                       decoration-success="state == 'released'"
+                       decoration-danger="state == 'scrapped'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_zencore_seed_cold_storage_form" model="ir.ui.view">
+        <field name="name">zencore.seed.cold.storage.form</field>
+        <field name="model">zencore.seed.cold.storage</field>
+        <field name="arch" type="xml">
+            <form string="Seed Cold Storage Lot">
+                <header>
+                    <button name="action_release"
+                            string="Release"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'stored'"/>
+                    <button name="action_send_for_retest"
+                            string="Send for Retest"
+                            type="object"
+                            class="btn-warning"
+                            invisible="state != 'stored' or validity_status != 'expired'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="stored,released"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Released" bg_color="text-bg-success" invisible="state != 'released'"/>
+                    <widget name="web_ribbon" title="Under Retest" bg_color="text-bg-warning" invisible="state != 'under_retest'"/>
+                    <widget name="web_ribbon" title="Scrapped" bg_color="text-bg-danger" invisible="state != 'scrapped'"/>
+
+                    <div class="alert alert-danger" role="alert" invisible="state != 'stored' or validity_status != 'expired'">
+                        <strong>Quality Warning:</strong> The validity date for this seed lot has expired! Direct release is blocked. Please dispatch this lot for retesting using <strong>Send for Retest</strong>.
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="Storage Reference"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Storage &amp; Validity Dates">
+                            <field name="storage_date" readonly="state in ['released', 'scrapped']"/>
+                            <field name="validity_date" readonly="state in ['released', 'scrapped']"/>
+                            <field name="validity_status" widget="badge"
+                                   decoration-success="validity_status == 'valid'"
+                                   decoration-danger="validity_status == 'expired'"
+                                   decoration-warning="validity_status == 'undefined'"/>
+                            <field name="storage_user_id" readonly="state in ['released', 'scrapped']"/>
+                            <field name="released_date" invisible="not released_date"/>
+                            <field name="released_by_id" invisible="not released_by_id"/>
+                            <field name="retest_id" invisible="not retest_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Product &amp; Packaging Logistics">
+                            <field name="product_id"/>
+                            <field name="lot_name"/>
+                            <field name="lot_id" optional="show"/>
+                            <field name="category"/>
+                            <field name="pack_size"/>
+                            <field name="bag_count"/>
+                            <field name="quantity"/>
+                        </group>
+                    </group>
+
+                    <group string="Traceability &amp; Origin References">
+                        <group>
+                            <field name="qc_id"/>
+                            <field name="batch_id"/>
+                            <field name="source_lab_test_ref"/>
+                        </group>
+                        <group>
+                            <field name="source_receipt_ref"/>
+                            <field name="partner_id"/>
+                            <field name="raw_product_id"/>
+                            <field name="variety"/>
+                        </group>
+                    </group>
+
+                    <group string="Chamber Location &amp; Operational Notes">
+                        <field name="notes" placeholder="Enter cold chamber number, rack/bay placement, temperature readings..." readonly="state in ['released', 'scrapped']"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <chatter>
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </chatter>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_zencore_seed_cold_storage_search" model="ir.ui.view">
+        <field name="name">zencore.seed.cold.storage.search</field>
+        <field name="model">zencore.seed.cold.storage</field>
+        <field name="arch" type="xml">
+            <search string="Search Cold Storage Inventory">
+                <field name="name" string="Reference"/>
+                <field name="product_id" string="Product"/>
+                <field name="lot_name" string="Lot Number"/>
+                <field name="qc_id" string="QC Reference"/>
+                <field name="batch_id" string="Processing Batch"/>
+
+                <filter string="In Storage" name="filter_stored" domain="[('state', '=', 'stored')]"/>
+                <filter string="Valid / Safe" name="filter_valid" domain="[('validity_status', '=', 'valid')]"/>
+                <filter string="Expired / Needs Retest" name="filter_expired" domain="[('validity_status', '=', 'expired')]"/>
+                <filter string="Under Retest" name="filter_retest" domain="[('state', '=', 'under_retest')]"/>
+                <filter string="Released" name="filter_released" domain="[('state', '=', 'released')]"/>
+                <filter string="Scrapped" name="filter_scrapped" domain="[('state', '=', 'scrapped')]"/>
+
+                <group>
+                    <filter string="Product" name="group_product" context="{'group_by': 'product_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Validity Status" name="group_validity" context="{'group_by': 'validity_status'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_zencore_seed_cold_storage" model="ir.actions.act_window">
+        <field name="name">Cold Storage</field>
+        <field name="res_model">zencore.seed.cold.storage</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_zencore_seed_cold_storage_search"/>
+        <field name="context">{'search_default_filter_stored': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Cold Storage records found!
+            </p>
+            <p>
+                Approved seed lots from Processed Seed QC can be dispatched here for long-term preservation and validity control.
+            </p>
+        </field>
+    </record>
+</odoo>
+

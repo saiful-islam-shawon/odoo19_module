@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Zencore Quality Check',
-    'version': '19.0.5.0.0',
+    'version': '19.0.6.0.0',
     'category': 'Quality Management',
-    'summary': 'Seed Physical Arrival, Gate Receiving, Physical & Laboratory Quality Testing, Processing & Grading, Processed Seed QC',
+    'summary': 'Seed Receiving, QC Lab Testing, Processing, Post-QC, Cold Storage, Retest & Scrap',
     'description': """
 Zencore Quality Check Management
 ================================
@@ -18,7 +18,11 @@ Zencore Quality Check Management
 - Dynamic Multi-Product Grading with Format 1 Auto-Lot Numbering (LOT/YYYY/00001).
 - Processing Summary Smart Buttons (Produced Lots, Good Yield, Waste).
 - Processed Seed QC (Post-Processing Quality Assurance) with 1-to-1 non-waste lot testing.
-- Dedicated Menus: Quality Check -> Seed Receiving, Lab Testing, Seed Processing & Processed Seed QC.
+- Cold Storage Preservation with Storage & Validity Date Tracking.
+- Validity Expiration Control & Mandatory Retesting before Release.
+- Retest Workflow with Lab Parameters (Pass & Release vs Fail & Scrap).
+- Isolated Cold Storage Scrap Registry.
+- Dedicated Menus: Quality Check -> Seed Receiving, Lab Testing, Seed Processing, Processed Seed QC, Cold Storage, Retest & Scrap.
     """,
     'author': 'Antigravity / Zencore',
     'license': 'LGPL-3',
@@ -36,10 +40,14 @@ Zencore Quality Check Management
         'wizard/seed_receipt_reject_wizard_views.xml',
         'wizard/seed_lab_test_reject_wizard_views.xml',
         'wizard/processed_seed_qc_reject_wizard_views.xml',
+        'wizard/seed_retest_scrap_wizard_views.xml',
         'views/seed_receipt_views.xml',
         'views/seed_lab_test_views.xml',
         'views/seed_processing_batch_views.xml',
         'views/processed_seed_qc_views.xml',
+        'views/seed_cold_storage_views.xml',
+        'views/seed_retest_views.xml',
+        'views/seed_cold_storage_scrap_views.xml',
         'views/zencore_quality_menus.xml',
     ],
     'installable': True,

@@ -43,6 +43,12 @@
                             string="Return to Draft"
                             type="object"
                             invisible="state == 'draft'"/>
+                    <field name="is_cold_storage_sent" invisible="1"/>
+                    <button name="action_send_to_cold_storage"
+                            string="Send to Cold Storage"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="state != 'approved' or is_cold_storage_sent"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,approved,rejected"/>
                 </header>
                 <sheet>
@@ -103,10 +109,7 @@
                                     <field name="unit"/>
                                     <field name="standard_value"/>
                                     <field name="measured_value"/>
-                                    <field name="result" widget="badge"
-                                           decoration-info="result == 'pending'"
-                                           decoration-success="result == 'pass'"
-                                           decoration-danger="result == 'fail'"/>
+                                    <field name="result"/>
                                     <field name="remarks"/>
                                 </list>
                             </field>

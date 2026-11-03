@@ -29,4 +29,22 @@
         <field name="model_id" ref="model_zencore_processed_seed_qc"/>
         <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
     </record>
+
+    <record id="rule_zencore_seed_cold_storage_multi_company" model="ir.rule">
+        <field name="name">Seed Cold Storage Multi-Company</field>
+        <field name="model_id" ref="model_zencore_seed_cold_storage"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_zencore_seed_retest_multi_company" model="ir.rule">
+        <field name="name">Seed Retest Multi-Company</field>
+        <field name="model_id" ref="model_zencore_seed_retest"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_zencore_seed_cold_storage_scrap_multi_company" model="ir.rule">
+        <field name="name">Cold Storage Seed Scrap Multi-Company</field>
+        <field name="model_id" ref="model_zencore_seed_cold_storage_scrap"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
 </odoo>
