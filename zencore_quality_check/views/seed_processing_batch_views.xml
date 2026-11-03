@@ -11,7 +11,7 @@
                 <field name="product_id"/>
                 <field name="category" widget="badge" 
                        decoration-success="category == 'good'" 
-                       decoration-warning="category == 'by_product'" 
+                       decoration-warning="category in ['bad', 'by_product']" 
                        decoration-danger="category == 'waste'"/>
                 <field name="pack_size"/>
                 <field name="bag_count"/>
@@ -85,6 +85,13 @@
                             class="oe_highlight" 
                             invisible="state != 'packing'"
                             groups="zencore_quality_check.group_zencore_quality_checker,zencore_quality_check.group_zencore_quality_approver,zencore_quality_check.group_zencore_quality_manager"/>
+                    <field name="is_qc_sent" invisible="1"/>
+                    <button name="action_send_to_qc"
+                            string="Send for Quality Check"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="state != 'done' or is_qc_sent"
+                            groups="zencore_quality_check.group_zencore_quality_checker,zencore_quality_check.group_zencore_quality_approver,zencore_quality_check.group_zencore_quality_manager"/>
                     <button name="action_cancel" 
                             string="Cancel Batch" 
                             type="object" 
@@ -102,7 +109,7 @@
                             <field name="output_lot_count" widget="statinfo" string="Produced Lots"/>
                         </button>
                         <button type="object" 
-                                name="action_view_lots" 
+                                name="action_view_good_yield" 
                                 class="oe_stat_button" 
                                 icon="fa-cubes">
                             <div class="o_stat_info">
@@ -115,7 +122,7 @@
                             </div>
                         </button>
                         <button type="object" 
-                                name="action_view_lots" 
+                                name="action_view_waste" 
                                 class="oe_stat_button" 
                                 icon="fa-trash">
                             <div class="o_stat_info">
@@ -181,10 +188,7 @@
                             <field name="output_line_ids" readonly="state == 'done'">
                                 <list editable="bottom" string="Produced Seed Grades &amp; Waste">
                                     <field name="product_id" options="{'no_create': True}"/>
-                                    <field name="category" widget="badge" 
-                                           decoration-success="category == 'good'" 
-                                           decoration-warning="category == 'by_product'" 
-                                           decoration-danger="category == 'waste'"/>
+                                    <field name="category"/>
                                     <field name="pack_size" placeholder="e.g. 10 Kg, 20 Kg"/>
                                     <field name="bag_count"/>
                                     <field name="quantity" string="Weight (kg)"/>

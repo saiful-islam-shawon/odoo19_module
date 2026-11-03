@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List / Tree View -->
+    <record id="view_zencore_processed_seed_qc_list" model="ir.ui.view">
+        <field name="name">zencore.processed.seed.qc.list</field>
+        <field name="model">zencore.processed.seed.qc</field>
+        <field name="arch" type="xml">
+            <list string="Processed Seed QC Records" sample="1">
+                <field name="name"/>
+                <field name="date_qc"/>
+                <field name="product_id"/>
+                <field name="lot_name"/>
+                <field name="category"/>
+                <field name="bag_count"/>
+                <field name="quantity" string="Net Weight (kg)"/>
+                <field name="batch_id"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'approved'"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_zencore_processed_seed_qc_form" model="ir.ui.view">
+        <field name="name">zencore.processed.seed.qc.form</field>
+        <field name="model">zencore.processed.seed.qc</field>
+        <field name="arch" type="xml">
+            <form string="Processed Seed Quality Check">
+                <header>
+                    <button name="action_approve"
+                            string="Approve / Pass"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_reject"
+                            string="Reject"
+                            type="object"
+                            class="btn-danger"
+                            invisible="state != 'draft'"/>
+                    <button name="action_return_to_draft"
+                            string="Return to Draft"
+                            type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,rejected"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Approved" bg_color="text-bg-success" invisible="state != 'approved'"/>
+                    <widget name="web_ribbon" title="Rejected" bg_color="text-bg-danger" invisible="state != 'rejected'"/>
+
+                    <div class="alert alert-danger" role="alert" invisible="state != 'rejected'">
+                        <strong>Rejection Reason:</strong> <field name="rejection_reason" readonly="1"/>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="QC Test Reference"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Finished Seed &amp; Lot Logistics">
+                            <field name="product_id"/>
+                            <field name="lot_name"/>
+                            <field name="lot_id" optional="show"/>
+                            <field name="category"/>
+                            <field name="pack_size"/>
+                            <field name="bag_count"/>
+                            <field name="quantity"/>
+                        </group>
+                        <group string="Source Batch &amp; Traceability">
+                            <field name="batch_id"/>
+                            <field name="source_lab_test_ref"/>
+                            <field name="source_receipt_ref"/>
+                            <field name="partner_id"/>
+                            <field name="raw_product_id"/>
+                            <field name="variety"/>
+                        </group>
+                    </group>
+
+                    <group string="QC Test Details &amp; Audit">
+                        <group>
+                            <field name="date_qc" readonly="state != 'draft'"/>
+                            <field name="tested_by_id" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="approved_by_id" invisible="not approved_by_id"/>
+                            <field name="date_approved" invisible="not date_approved"/>
+                            <field name="rejected_by_id" invisible="not rejected_by_id"/>
+                            <field name="date_rejected" invisible="not date_rejected"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Test Parameters" name="qc_parameters">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom" string="Seed Quality Evaluation Metrics">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="parameter_name"/>
+                                    <field name="unit"/>
+                                    <field name="standard_value"/>
+                                    <field name="measured_value"/>
+                                    <field name="result" widget="badge"
+                                           decoration-info="result == 'pending'"
+                                           decoration-success="result == 'pass'"
+                                           decoration-danger="result == 'fail'"/>
+                                    <field name="remarks"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="QC Notes &amp; Observations" name="qc_notes">
+                            <field name="notes" placeholder="Enter operational remarks, laboratory observations, seed health notes..." readonly="state != 'draft'"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <chatter>
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </chatter>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_zencore_processed_seed_qc_search" model="ir.ui.view">
+        <field name="name">zencore.processed.seed.qc.search</field>
+        <field name="model">zencore.processed.seed.qc</field>
+        <field name="arch" type="xml">
+            <search string="Search Processed Seed QC">
+                <field name="name" string="Reference"/>
+                <field name="product_id" string="Product"/>
+                <field name="lot_name" string="Lot Number"/>
+                <field name="batch_id" string="Processing Batch"/>
+                <field name="partner_id" string="Supplier"/>
+
+                <filter string="Draft / In Progress" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Approved / Passed" name="filter_approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Rejected" name="filter_rejected" domain="[('state', '=', 'rejected')]"/>
+                <separator/>
+                <filter string="Today's QC" name="filter_today" domain="[('date_qc', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00')), ('date_qc', '&lt;=', context_today().strftime('%Y-%m-%d 23:59:59'))]"/>
+
+                <group>
+                    <filter string="Finished Product" name="group_product" context="{'group_by': 'product_id'}"/>
+                    <filter string="Processing Batch" name="group_batch" context="{'group_by': 'batch_id'}"/>
+                    <filter string="Category" name="group_category" context="{'group_by': 'category'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_zencore_processed_seed_qc" model="ir.actions.act_window">
+        <field name="name">Processed Seed QC</field>
+        <field name="res_model">zencore.processed.seed.qc</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_zencore_processed_seed_qc_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Processed Seed QC records found!
+            </p>
+            <p>
+                When a Seed Processing Batch is completed, click "Send for Quality Check" to generate QC tests for all produced non-waste seed lots.
+            </p>
+        </field>
+    </record>
+</odoo>

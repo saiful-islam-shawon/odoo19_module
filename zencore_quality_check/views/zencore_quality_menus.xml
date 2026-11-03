@@ -44,4 +44,17 @@
               parent="menu_zencore_quality_processing"
               action="action_zencore_seed_processing_batch"
               sequence="10"/>
+
+    <!-- Category 4: Processed Seed QC -->
+    <menuitem id="menu_zencore_quality_processed_qc"
+              name="Processed Seed QC"
+              parent="menu_zencore_quality_root"
+              sequence="40"/>
+
+    <!-- Submenu: Processed Seed QC Records -->
+    <menuitem id="menu_zencore_processed_seed_qc_records"
+              name="Processed Seed QC"
+              parent="menu_zencore_quality_processed_qc"
+              action="action_zencore_processed_seed_qc"
+              sequence="10"/>
 </odoo>

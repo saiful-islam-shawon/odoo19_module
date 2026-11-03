@@ -4,3 +4,5 @@ from . import seed_lab_test_line
 from . import seed_lab_test
 from . import seed_processing_output_line
 from . import seed_processing_batch
+from . import processed_seed_qc_line
+from . import processed_seed_qc

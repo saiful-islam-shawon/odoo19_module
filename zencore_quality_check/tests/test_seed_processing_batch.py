@@ -181,15 +181,23 @@ class TestSeedProcessingBatch(TransactionCase):
 
         # Verify Header Aggregates & Smart Buttons
         batch.invalidate_recordset()
-        self.assertEqual(batch.output_lot_count, 3, "Output lot count must be 3.")
-        self.assertEqual(batch.total_good_weight, 1600.0, "Good yield weight must match.")
-        self.assertEqual(batch.total_good_bags, 80, "Good yield bag count must match.")
+        self.assertEqual(batch.output_lot_count, 2, "Produced lots count must be 2 (excluding waste).")
+        self.assertEqual(batch.total_good_weight, 2000.0, "Good yield weight must match.")
+        self.assertEqual(batch.total_good_bags, 100, "Good yield bag count must match.")
         self.assertEqual(batch.total_waste_weight, 50.0, "Waste weight must match.")
 
-        # Test drill-down action
-        drilldown_action = batch.action_view_lots()
-        self.assertEqual(drilldown_action['res_model'], 'zencore.seed.processing.output.line')
-        self.assertEqual(drilldown_action['domain'], [('batch_id', '=', batch.id)])
+        # Test drill-down actions
+        lots_action = batch.action_view_lots()
+        self.assertEqual(lots_action['res_model'], 'zencore.seed.processing.output.line')
+        self.assertEqual(lots_action['domain'], [('batch_id', '=', batch.id), ('category', '!=', 'waste')])
+
+        waste_action = batch.action_view_waste()
+        self.assertEqual(waste_action['res_model'], 'zencore.seed.processing.output.line')
+        self.assertEqual(waste_action['domain'], [('batch_id', '=', batch.id), ('category', '=', 'waste')])
+
+        good_action = batch.action_view_good_yield()
+        self.assertEqual(good_action['res_model'], 'zencore.seed.processing.output.line')
+        self.assertEqual(good_action['domain'], [('batch_id', '=', batch.id), ('category', 'in', ['good', 'bad', 'by_product'])])
 
     def test_05_immutability_on_done(self):
         """Test that once marked as Done, batch and lines cannot be modified or deleted."""

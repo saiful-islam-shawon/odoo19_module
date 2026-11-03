@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Zencore Quality Check',
-    'version': '19.0.4.0.0',
+    'version': '19.0.5.0.0',
     'category': 'Quality Management',
-    'summary': 'Seed Physical Arrival, Gate Receiving, Physical & Laboratory Quality Testing, Processing & Grading',
+    'summary': 'Seed Physical Arrival, Gate Receiving, Physical & Laboratory Quality Testing, Processing & Grading, Processed Seed QC',
     'description': """
 Zencore Quality Check Management
 ================================
@@ -17,7 +17,8 @@ Zencore Quality Check Management
 - Seed Processing Batch Lifecycle: Draft -> Drying -> Grading -> Packing -> Done.
 - Dynamic Multi-Product Grading with Format 1 Auto-Lot Numbering (LOT/YYYY/00001).
 - Processing Summary Smart Buttons (Produced Lots, Good Yield, Waste).
-- Dedicated Menus: Quality Check -> Seed Receiving, Lab Testing & Seed Processing.
+- Processed Seed QC (Post-Processing Quality Assurance) with 1-to-1 non-waste lot testing.
+- Dedicated Menus: Quality Check -> Seed Receiving, Lab Testing, Seed Processing & Processed Seed QC.
     """,
     'author': 'Antigravity / Zencore',
     'license': 'LGPL-3',
@@ -34,9 +35,11 @@ Zencore Quality Check Management
         'data/ir_sequence_data.xml',
         'wizard/seed_receipt_reject_wizard_views.xml',
         'wizard/seed_lab_test_reject_wizard_views.xml',
+        'wizard/processed_seed_qc_reject_wizard_views.xml',
         'views/seed_receipt_views.xml',
         'views/seed_lab_test_views.xml',
         'views/seed_processing_batch_views.xml',
+        'views/processed_seed_qc_views.xml',
         'views/zencore_quality_menus.xml',
     ],
     'installable': True,

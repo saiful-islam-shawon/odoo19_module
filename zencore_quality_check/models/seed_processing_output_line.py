@@ -30,14 +30,15 @@ class ZencoreSeedProcessingOutputLine(models.Model):
     )
     category = fields.Selection(
         [
-            ('good', 'Good / Commercial Seed'),
+            ('good', 'Good'),
+            ('bad', 'Bad'),
+            ('waste', 'Waste'),
             ('by_product', 'Substandard / By-Product'),
-            ('waste', 'Waste / Scrap / Dirt'),
         ],
         string='Category',
         default='good',
         required=True,
-        help="Classification of the processed output."
+        help="Classification of the processed output: Good, Bad, or Waste."
     )
     pack_size = fields.Char(
         string='Pack Size',

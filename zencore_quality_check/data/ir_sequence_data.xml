@@ -34,5 +34,14 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
+        <!-- Processed Seed QC Sequence -->
+        <record id="seq_zencore_processed_seed_qc" model="ir.sequence">
+            <field name="name">Processed Seed QC Sequence</field>
+            <field name="code">zencore.processed.seed.qc.seq</field>
+            <field name="prefix">QC/PS/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

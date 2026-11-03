@@ -55,6 +55,12 @@ class ZencoreSeedProcessingBatch(models.Model):
         tracking=True,
         help="Operator or supervisor responsible for this processing batch."
     )
+    is_qc_sent = fields.Boolean(
+        string='QC Sent',
+        default=False,
+        copy=False,
+        help="Indicates whether output lots have been dispatched to Processed Seed QC."
+    )
 
     # Source Linkage (Strictly 1-to-1 Approved Lab Test)
     lab_test_id = fields.Many2one(
@@ -214,16 +220,16 @@ class ZencoreSeedProcessingBatch(models.Model):
     @api.depends('output_line_ids.quantity', 'output_line_ids.bag_count', 'output_line_ids.category')
     def _compute_totals(self):
         for batch in self:
-            good_lines = batch.output_line_ids.filtered(lambda l: l.category == 'good')
+            good_lines = batch.output_line_ids.filtered(lambda l: l.category in ['good', 'bad', 'by_product'])
             waste_lines = batch.output_line_ids.filtered(lambda l: l.category == 'waste')
             batch.total_good_weight = sum(good_lines.mapped('quantity'))
             batch.total_good_bags = sum(good_lines.mapped('bag_count'))
             batch.total_waste_weight = sum(waste_lines.mapped('quantity'))
 
-    @api.depends('output_line_ids')
+    @api.depends('output_line_ids.category')
     def _compute_output_lot_count(self):
         for batch in self:
-            batch.output_lot_count = len(batch.output_line_ids)
+            batch.output_lot_count = len(batch.output_line_ids.filtered(lambda l: l.category != 'waste'))
 
     @api.onchange('lab_test_id')
     def _onchange_lab_test_id(self):
@@ -279,7 +285,7 @@ class ZencoreSeedProcessingBatch(models.Model):
 
     def write(self, vals):
         if not self.env.context.get('bypass_state_lock'):
-            system_fields = {'message_follower_ids', 'activity_ids', 'message_ids'}
+            system_fields = {'message_follower_ids', 'activity_ids', 'message_ids', 'is_qc_sent'}
             for batch in self:
                 if batch.state == 'done':
                     restricted_fields = set(vals.keys()) - system_fields
@@ -338,6 +344,47 @@ class ZencoreSeedProcessingBatch(models.Model):
             body=_("Seed processing batch <b>Completed &amp; Locked</b>. Graded outputs and lots finalized.")
         )
 
+    def action_send_to_qc(self):
+        self.ensure_one()
+        if self.state != 'done':
+            raise UserError(_("Only batches in 'Done' stage can be sent for Quality Check."))
+        if self.is_qc_sent:
+            raise UserError(_("This processing batch has already been sent for Quality Check."))
+        eligible_lines = self.output_line_ids.filtered(lambda l: l.category != 'waste')
+        if not eligible_lines:
+            raise ValidationError(_("No non-waste graded seed outputs found to send for Quality Check."))
+
+        qc_vals_list = []
+        for line in eligible_lines:
+            qc_vals_list.append({
+                'batch_id': self.id,
+                'batch_output_line_id': line.id,
+                'product_id': line.product_id.id,
+                'lot_name': line.lot_name,
+                'lot_id': line.lot_id.id if line.lot_id else False,
+                'category': line.category,
+                'pack_size': line.pack_size,
+                'bag_count': line.bag_count,
+                'quantity': line.quantity,
+                'company_id': self.company_id.id,
+            })
+        created_qcs = self.env['zencore.processed.seed.qc'].create(qc_vals_list)
+        self.with_context(bypass_state_lock=True).write({'is_qc_sent': True})
+        self.message_post(
+            body=_("Dispatched %d non-waste seed lots to <b>Processed Seed QC</b> by %s.") % (
+                len(created_qcs),
+                self.env.user.name
+            )
+        )
+        return {
+            'name': _("Processed Seed QC Records (%s)") % self.name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'zencore.processed.seed.qc',
+            'view_mode': 'list,form',
+            'domain': [('batch_id', '=', self.id)],
+            'context': {'default_batch_id': self.id},
+        }
+
     def action_cancel(self):
         self.ensure_one()
         if self.state == 'done':
@@ -352,10 +399,32 @@ class ZencoreSeedProcessingBatch(models.Model):
     def action_view_lots(self):
         self.ensure_one()
         return {
-            'name': _("Produced Lots / Output Products (%s)") % self.name,
+            'name': _("Produced Lots (%s)") % self.name,
             'type': 'ir.actions.act_window',
             'res_model': 'zencore.seed.processing.output.line',
             'view_mode': 'list,form',
-            'domain': [('batch_id', '=', self.id)],
+            'domain': [('batch_id', '=', self.id), ('category', '!=', 'waste')],
             'context': {'default_batch_id': self.id},
+        }
+
+    def action_view_good_yield(self):
+        self.ensure_one()
+        return {
+            'name': _("Good Yield Products (%s)") % self.name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'zencore.seed.processing.output.line',
+            'view_mode': 'list,form',
+            'domain': [('batch_id', '=', self.id), ('category', 'in', ['good', 'bad', 'by_product'])],
+            'context': {'default_batch_id': self.id, 'default_category': 'good'},
+        }
+
+    def action_view_waste(self):
+        self.ensure_one()
+        return {
+            'name': _("Waste & Scrap Products (%s)") % self.name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'zencore.seed.processing.output.line',
+            'view_mode': 'list,form',
+            'domain': [('batch_id', '=', self.id), ('category', '=', 'waste')],
+            'context': {'default_batch_id': self.id, 'default_category': 'waste'},
         }

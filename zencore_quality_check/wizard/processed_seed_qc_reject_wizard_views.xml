@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_processed_seed_qc_reject_wizard_form" model="ir.ui.view">
+        <field name="name">zencore.processed.seed.qc.reject.wizard.form</field>
+        <field name="model">zencore.processed.seed.qc.reject.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reject Processed Seed QC">
+                <group>
+                    <field name="qc_id" invisible="1"/>
+                    <field name="rejection_reason" placeholder="Specify failure reasons, out-of-spec test parameters, or seed lot defects..."/>
+                </group>
+                <footer>
+                    <button name="action_confirm_reject" string="Confirm Reject" type="object" class="btn-danger"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
+
