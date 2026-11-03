@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Zencore Quality Check',
+    'name': 'QC',
     'version': '19.0.6.0.0',
     'category': 'Quality Management',
     'summary': 'Seed Receiving, QC Lab Testing, Processing, Post-QC, Cold Storage, Retest & Scrap',
