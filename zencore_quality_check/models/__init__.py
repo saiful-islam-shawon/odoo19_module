@@ -2,3 +2,5 @@
 from . import seed_receipt
 from . import seed_lab_test_line
 from . import seed_lab_test
+from . import seed_processing_output_line
+from . import seed_processing_batch

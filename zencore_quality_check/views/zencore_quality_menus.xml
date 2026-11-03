@@ -31,4 +31,17 @@
               parent="menu_zencore_quality_lab_testing"
               action="action_zencore_seed_lab_test"
               sequence="10"/>
+
+    <!-- Category 3: Seed Processing -->
+    <menuitem id="menu_zencore_quality_processing"
+              name="Seed Processing"
+              parent="menu_zencore_quality_root"
+              sequence="30"/>
+
+    <!-- Submenu: Processing Batches -->
+    <menuitem id="menu_zencore_seed_processing_batch"
+              name="Processing Batches"
+              parent="menu_zencore_quality_processing"
+              action="action_zencore_seed_processing_batch"
+              sequence="10"/>
 </odoo>

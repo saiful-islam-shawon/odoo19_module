@@ -39,6 +39,27 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,to_verify,to_approve,approved,rejected"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_processing_batch" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-cogs"
+                                invisible="state != 'approved'">
+                            <field name="processing_batch_id" invisible="1"/>
+                            <field name="is_processed" invisible="1"/>
+                            <div class="o_stat_info">
+                                <span class="o_stat_text" invisible="is_processed">
+                                    Create Processing
+                                </span>
+                                <span class="o_stat_value" invisible="not is_processed">
+                                    Batch Created
+                                </span>
+                                <span class="o_stat_text" invisible="not is_processed">
+                                    View Batch
+                                </span>
+                            </div>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <span class="o_form_label" invisible="state != 'draft'">Draft Lab Test</span>
                         <span class="o_form_label text-warning" invisible="state != 'to_verify'">Under Verification</span>

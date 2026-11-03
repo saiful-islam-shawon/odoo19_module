@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Zencore Quality Check',
-    'version': '19.0.3.0.0',
+    'version': '19.0.4.0.0',
     'category': 'Quality Management',
-    'summary': 'Seed Physical Arrival, Gate Receiving, Physical & Laboratory Quality Testing',
+    'summary': 'Seed Physical Arrival, Gate Receiving, Physical & Laboratory Quality Testing, Processing & Grading',
     'description': """
 Zencore Quality Check Management
 ================================
@@ -14,7 +14,10 @@ Zencore Quality Check Management
 - Strict Segregation of Duties and permanent terminal state locking.
 - Mandatory rejection reason wizards.
 - Strict 1-to-1 Seed Receipt Linkage & Duplicate Prevention.
-- Dedicated Menu: Quality Check -> Seed Receiving & Lab Testing.
+- Seed Processing Batch Lifecycle: Draft -> Drying -> Grading -> Packing -> Done.
+- Dynamic Multi-Product Grading with Format 1 Auto-Lot Numbering (LOT/YYYY/00001).
+- Processing Summary Smart Buttons (Produced Lots, Good Yield, Waste).
+- Dedicated Menus: Quality Check -> Seed Receiving, Lab Testing & Seed Processing.
     """,
     'author': 'Antigravity / Zencore',
     'license': 'LGPL-3',
@@ -22,6 +25,7 @@ Zencore Quality Check Management
         'base',
         'mail',
         'product',
+        'stock',
     ],
     'data': [
         'security/zencore_quality_groups.xml',
@@ -32,6 +36,7 @@ Zencore Quality Check Management
         'wizard/seed_lab_test_reject_wizard_views.xml',
         'views/seed_receipt_views.xml',
         'views/seed_lab_test_views.xml',
+        'views/seed_processing_batch_views.xml',
         'views/zencore_quality_menus.xml',
     ],
     'installable': True,

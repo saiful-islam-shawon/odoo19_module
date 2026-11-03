@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Output Lines Tree View (For Smart Button Drilldown) -->
+    <record id="view_zencore_seed_processing_output_line_tree" model="ir.ui.view">
+        <field name="name">zencore.seed.processing.output.line.tree</field>
+        <field name="model">zencore.seed.processing.output.line</field>
+        <field name="arch" type="xml">
+            <list string="Produced Lots &amp; Graded Products" create="false" edit="false">
+                <field name="lot_name" string="Lot Number"/>
+                <field name="batch_id"/>
+                <field name="product_id"/>
+                <field name="category" widget="badge" 
+                       decoration-success="category == 'good'" 
+                       decoration-warning="category == 'by_product'" 
+                       decoration-danger="category == 'waste'"/>
+                <field name="pack_size"/>
+                <field name="bag_count"/>
+                <field name="quantity" sum="Total Output kg"/>
+                <field name="lot_id" optional="show"/>
+                <field name="remarks" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Output Lines Form View -->
+    <record id="view_zencore_seed_processing_output_line_form" model="ir.ui.view">
+        <field name="name">zencore.seed.processing.output.line.form</field>
+        <field name="model">zencore.seed.processing.output.line</field>
+        <field name="arch" type="xml">
+            <form string="Produced Lot Detail">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="lot_name" string="Unique Lot Number"/>
+                        <h1>
+                            <field name="lot_name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Product &amp; Classification">
+                            <field name="batch_id" readonly="1"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="category" readonly="1"/>
+                            <field name="lot_id" readonly="1"/>
+                        </group>
+                        <group string="Quantity &amp; Packaging">
+                            <field name="pack_size" readonly="1"/>
+                            <field name="bag_count" readonly="1"/>
+                            <field name="quantity" readonly="1"/>
+                            <field name="remarks" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Processing Batch Form View -->
+    <record id="view_zencore_seed_processing_batch_form" model="ir.ui.view">
+        <field name="name">zencore.seed.processing.batch.form</field>
+        <field name="model">zencore.seed.processing.batch</field>
+        <field name="arch" type="xml">
+            <form string="Seed Processing Batch">
+                <header>
+                    <button name="action_start_drying" 
+                            string="Start Drying" 
+                            type="object" 
+                            class="oe_highlight" 
+                            invisible="state != 'draft'"
+                            groups="zencore_quality_check.group_zencore_quality_technician,zencore_quality_check.group_zencore_quality_checker"/>
+                    <button name="action_proceed_grading" 
+                            string="Proceed to Grading" 
+                            type="object" 
+                            class="oe_highlight" 
+                            invisible="state != 'drying'"
+                            groups="zencore_quality_check.group_zencore_quality_technician,zencore_quality_check.group_zencore_quality_checker"/>
+                    <button name="action_proceed_packing" 
+                            string="Proceed to Packing" 
+                            type="object" 
+                            class="oe_highlight" 
+                            invisible="state != 'grading'"
+                            groups="zencore_quality_check.group_zencore_quality_technician,zencore_quality_check.group_zencore_quality_checker"/>
+                    <button name="action_mark_done" 
+                            string="Mark as Done" 
+                            type="object" 
+                            class="oe_highlight" 
+                            invisible="state != 'packing'"
+                            groups="zencore_quality_check.group_zencore_quality_checker,zencore_quality_check.group_zencore_quality_approver,zencore_quality_check.group_zencore_quality_manager"/>
+                    <button name="action_cancel" 
+                            string="Cancel Batch" 
+                            type="object" 
+                            invisible="state not in ['draft', 'drying', 'grading', 'packing']"
+                            confirm="Are you sure you want to cancel this processing batch? The associated Lab Test will be released."
+                            groups="zencore_quality_check.group_zencore_quality_checker,zencore_quality_check.group_zencore_quality_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,drying,grading,packing,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_lots" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-tags">
+                            <field name="output_lot_count" widget="statinfo" string="Produced Lots"/>
+                        </button>
+                        <button type="object" 
+                                name="action_view_lots" 
+                                class="oe_stat_button" 
+                                icon="fa-cubes">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="total_good_bags" readonly="1"/> Bags
+                                </span>
+                                <span class="o_stat_text">
+                                    <field name="total_good_weight" readonly="1"/> kg Yield
+                                </span>
+                            </div>
+                        </button>
+                        <button type="object" 
+                                name="action_view_lots" 
+                                class="oe_stat_button" 
+                                icon="fa-trash">
+                            <div class="o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="total_waste_weight" readonly="1"/> kg
+                                </span>
+                                <span class="o_stat_text">Waste / Scrap</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <span class="o_form_label" invisible="state != 'draft'">Draft Processing Batch</span>
+                        <span class="o_form_label text-warning" invisible="state != 'drying'">Drying in Progress</span>
+                        <span class="o_form_label text-info" invisible="state != 'grading'">Grading &amp; Sorting in Progress</span>
+                        <span class="o_form_label text-primary" invisible="state != 'packing'">Commercial Packing in Progress</span>
+                        <span class="o_form_label text-success" invisible="state != 'done'">Processing Completed &amp; Locked</span>
+                        <span class="o_form_label text-danger" invisible="state != 'cancelled'">Batch Cancelled</span>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Intake Lab Test Linkage">
+                            <field name="lab_test_id" 
+                                   readonly="state != 'draft'"
+                                   domain="[('state', '=', 'approved'), '|', ('is_processed', '=', False), ('id', '=', lab_test_id)]"
+                                   options="{'no_create': True, 'no_open': False}"/>
+                            <field name="receipt_id"/>
+                            <field name="partner_id"/>
+                            <field name="raw_product_id"/>
+                            <field name="variety"/>
+                        </group>
+                        <group string="Batch Logistics &amp; Weight">
+                            <field name="date" readonly="state == 'done'"/>
+                            <field name="user_id" readonly="state == 'done'"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state == 'done'"/>
+                            <field name="input_weight"/>
+                            <field name="input_bags"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Drying Parameters" name="drying_parameters">
+                            <group>
+                                <group string="Moisture &amp; Temperature">
+                                    <field name="initial_moisture" readonly="state in ['done', 'cancelled']"/>
+                                    <field name="final_moisture" readonly="state in ['done', 'cancelled']"/>
+                                    <field name="drying_temp" readonly="state in ['done', 'cancelled']"/>
+                                    <field name="drying_method" readonly="state in ['done', 'cancelled']"/>
+                                </group>
+                                <group string="Weight &amp; Timestamps">
+                                    <field name="weight_after_drying" readonly="state in ['done', 'cancelled']"/>
+                                    <field name="moisture_loss" readonly="1"/>
+                                    <field name="drying_start" readonly="state in ['done', 'cancelled']"/>
+                                    <field name="drying_end" readonly="state in ['done', 'cancelled']"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Graded Outputs (Lots)" name="graded_outputs">
+                            <field name="output_line_ids" readonly="state == 'done'">
+                                <list editable="bottom" string="Produced Seed Grades &amp; Waste">
+                                    <field name="product_id" options="{'no_create': True}"/>
+                                    <field name="category" widget="badge" 
+                                           decoration-success="category == 'good'" 
+                                           decoration-warning="category == 'by_product'" 
+                                           decoration-danger="category == 'waste'"/>
+                                    <field name="pack_size" placeholder="e.g. 10 Kg, 20 Kg"/>
+                                    <field name="bag_count"/>
+                                    <field name="quantity" string="Weight (kg)"/>
+                                    <field name="lot_name" string="Lot Number (Format 1)" readonly="1"/>
+                                    <field name="lot_id" string="Stock Lot" optional="show" readonly="1"/>
+                                    <field name="remarks" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Internal Notes" name="processing_notes">
+                            <field name="notes" placeholder="Enter operational remarks, machine calibration or supervisor notes..." readonly="state == 'done'"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <chatter>
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </chatter>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Processing Batch Tree View -->
+    <record id="view_zencore_seed_processing_batch_tree" model="ir.ui.view">
+        <field name="name">zencore.seed.processing.batch.tree</field>
+        <field name="model">zencore.seed.processing.batch</field>
+        <field name="arch" type="xml">
+            <list string="Seed Processing Batches">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="lab_test_id"/>
+                <field name="raw_product_id"/>
+                <field name="variety"/>
+                <field name="input_weight" sum="Total Input Weight"/>
+                <field name="total_good_weight" sum="Total Good Yield"/>
+                <field name="total_good_bags" sum="Total Good Bags"/>
+                <field name="total_waste_weight" sum="Total Waste"/>
+                <field name="output_lot_count"/>
+                <field name="state" widget="badge" 
+                       decoration-info="state == 'draft'" 
+                       decoration-warning="state in ['drying', 'grading', 'packing']" 
+                       decoration-success="state == 'done'" 
+                       decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Processing Batch Search View -->
+    <record id="view_zencore_seed_processing_batch_search" model="ir.ui.view">
+        <field name="name">zencore.seed.processing.batch.search</field>
+        <field name="model">zencore.seed.processing.batch</field>
+        <field name="arch" type="xml">
+            <search string="Search Processing Batches">
+                <field name="name"/>
+                <field name="lab_test_id"/>
+                <field name="raw_product_id"/>
+                <field name="partner_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Drying" name="filter_drying" domain="[('state', '=', 'drying')]"/>
+                <filter string="Grading" name="filter_grading" domain="[('state', '=', 'grading')]"/>
+                <filter string="Packing" name="filter_packing" domain="[('state', '=', 'packing')]"/>
+                <filter string="Completed" name="filter_done" domain="[('state', '=', 'done')]"/>
+                <group>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Raw Product" name="group_product" context="{'group_by': 'raw_product_id'}"/>
+                    <filter string="Vendor" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Batch Date" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action Window for Processing Batch -->
+    <record id="action_zencore_seed_processing_batch" model="ir.actions.act_window">
+        <field name="name">Seed Processing Batches</field>
+        <field name="res_model">zencore.seed.processing.batch</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_zencore_seed_processing_batch_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Seed Processing Batch!
+            </p>
+            <p>
+                Select an approved laboratory quality test to initiate drying, multi-product grading, and unique lot generation.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action Window for Output Lines (Drilldown) -->
+    <record id="action_zencore_seed_processing_output_line" model="ir.actions.act_window">
+        <field name="name">Produced Lots &amp; Output Products</field>
+        <field name="res_model">zencore.seed.processing.output.line</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_zencore_seed_processing_output_line_tree"/>
+    </record>
+</odoo>

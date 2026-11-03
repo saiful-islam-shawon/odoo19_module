@@ -100,6 +100,26 @@ class ZencoreSeedLabTest(models.Model):
         readonly=True
     )
 
+    # Processing Batch Linkage
+    processing_batch_id = fields.Many2one(
+        'zencore.seed.processing.batch',
+        string='Processing Batch',
+        copy=False,
+        readonly=True,
+        help="Seed processing batch generated from this approved lab test."
+    )
+    is_processed = fields.Boolean(
+        string='Is Processed',
+        compute='_compute_is_processed',
+        store=True,
+        help="Flag indicating whether this lab test is already linked to an active processing batch."
+    )
+
+    @api.depends('processing_batch_id', 'processing_batch_id.state')
+    def _compute_is_processed(self):
+        for record in self:
+            record.is_processed = bool(record.processing_batch_id and record.processing_batch_id.state != 'cancelled')
+
     # Test Logistics
     date_test = fields.Datetime(
         string='Test Date',
@@ -230,7 +250,8 @@ class ZencoreSeedLabTest(models.Model):
         if not self.env.context.get('bypass_state_lock'):
             system_fields = {
                 'message_follower_ids', 'activity_ids', 'message_ids',
-                'message_main_attachment_id', 'access_token', 'website_message_ids'
+                'message_main_attachment_id', 'access_token', 'website_message_ids',
+                'processing_batch_id'
             }
             for rec in self:
                 # Terminal lock: Approved or Rejected records cannot be altered
@@ -327,3 +348,24 @@ class ZencoreSeedLabTest(models.Model):
                 'default_test_id': self.id,
             },
         }
+
+    def action_view_processing_batch(self):
+        self.ensure_one()
+        if self.processing_batch_id:
+            return {
+                'name': _("Processing Batch"),
+                'type': 'ir.actions.act_window',
+                'res_model': 'zencore.seed.processing.batch',
+                'view_mode': 'form',
+                'res_id': self.processing_batch_id.id,
+            }
+        else:
+            return {
+                'name': _("Create Processing Batch"),
+                'type': 'ir.actions.act_window',
+                'res_model': 'zencore.seed.processing.batch',
+                'view_mode': 'form',
+                'context': {
+                    'default_lab_test_id': self.id,
+                },
+            }
