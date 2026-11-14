@@ -29,6 +29,7 @@ Features:
         'purchase',
         'sale',
         'stock',
+        'sale_stock',
     ],
     'data': [
         'views/purchase_order_views.xml',
