@@ -1,0 +1,31 @@
+// Ensure list table footers render as a proper table row and never truncate values
+.o_list_table tfoot {
+    border-top: 1px solid var(--border-color, #dee2e6) !important;
+    border-bottom: 1px solid var(--border-color, #dee2e6) !important;
+    background-color: #f8f9fa !important;
+
+    > tr {
+        height: 38px !important;
+
+        > td {
+            overflow: visible !important;
+            text-overflow: unset !important;
+            white-space: nowrap !important;
+            max-width: none !important;
+            vertical-align: middle !important;
+            padding-top: 6px !important;
+            padding-bottom: 6px !important;
+
+            span {
+                overflow: visible !important;
+                text-overflow: unset !important;
+                white-space: nowrap !important;
+                max-width: none !important;
+                font-weight: 700 !important;
+                font-size: 13px !important;
+                color: #212529 !important;
+                display: inline-block !important;
+            }
+        }
+    }
+}

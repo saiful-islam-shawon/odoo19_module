@@ -7,7 +7,8 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/list//field[@name='product_uom_qty']" position="attributes">
-                <attribute name="sum">Total Qty = </attribute>
+                <attribute name="sum">total qty = </attribute>
+                <attribute name="width">150px</attribute>
             </xpath>
         </field>
     </record>

@@ -35,6 +35,12 @@ Features:
         'views/sale_order_views.xml',
         'views/stock_picking_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'khatan_supply_distribution/static/src/views/list_renderer.js',
+            'khatan_supply_distribution/static/src/views/list_renderer.scss',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,
