@@ -18,7 +18,6 @@ class SaleOrder(models.Model):
     has_done_delivery = fields.Boolean(
         string='Has Done Delivery',
         compute='_compute_has_done_delivery',
-        store=True,
         help="Technical field indicating if at least one delivery picking is validated (done).",
     )
 
