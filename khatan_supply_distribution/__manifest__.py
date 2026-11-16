@@ -30,6 +30,7 @@ Features:
         'sale',
         'stock',
         'sale_stock',
+        'account',
     ],
     'data': [
         'views/purchase_order_views.xml',
@@ -38,6 +39,7 @@ Features:
     ],
     'assets': {
         'web.assets_backend': [
+            'khatan_supply_distribution/static/src/views/list_renderer.xml',
             'khatan_supply_distribution/static/src/views/list_renderer.js',
             'khatan_supply_distribution/static/src/views/list_renderer.scss',
         ],

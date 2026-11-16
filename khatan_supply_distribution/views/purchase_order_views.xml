@@ -6,10 +6,18 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
-            <!-- Add dynamic footer sum on order lines table -->
+            <!-- Add dynamic footer sums on order lines table -->
             <xpath expr="//field[@name='order_line']/list//field[@name='product_qty']" position="attributes">
-                <attribute name="sum">total qty = </attribute>
-                <attribute name="width">150px</attribute>
+                <attribute name="sum">Quantity</attribute>
+                <attribute name="width">120px</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list//field[@name='qty_received']" position="attributes">
+                <attribute name="sum">Received</attribute>
+                <attribute name="width">120px</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list//field[@name='qty_invoiced']" position="attributes">
+                <attribute name="sum">Billed</attribute>
+                <attribute name="width">120px</attribute>
             </xpath>
             <!-- Add Purchase Agent field after Fiscal Position in Other Information tab -->
             <xpath expr="//field[@name='fiscal_position_id']" position="after">

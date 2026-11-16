@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Web List Renderer (Stock Picking Operations, default one2many lists) -->
+    <t t-name="khatan_supply_distribution.ListRenderer" t-inherit="web.ListRenderer" t-inherit-mode="extension">
+        <xpath expr="//tfoot//td[@t-if='groupNameCellColspan > 0']" position="inside">
+            <span t-if="!props.list.isGrouped and hasTotalLabel" class="fw-bold ps-2">Total</span>
+        </xpath>
+    </t>
+
+    <!-- Account Section And Note List Renderer (Sales Order Lines and Purchase Order Lines) -->
+    <t t-name="khatan_supply_distribution.SectionAndNoteListRenderer" t-inherit="account.SectionAndNoteListRenderer" t-inherit-mode="extension">
+        <xpath expr="//tfoot//td[@t-if='groupNameCellColspan > 0']" position="inside">
+            <span t-if="!props.list.isGrouped and hasTotalLabel" class="fw-bold ps-2">Total</span>
+        </xpath>
+    </t>
+</templates>

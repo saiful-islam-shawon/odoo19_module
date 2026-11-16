@@ -2,23 +2,22 @@
 
 import { patch } from "@web/core/utils/patch";
 import { ListRenderer } from "@web/views/list/list_renderer";
+import { SectionAndNoteListRenderer } from "@account/components/section_and_note_fields_backend/section_and_note_fields_backend";
+import { ProductLabelSectionAndNoteListRender } from "@account/components/product_label_section_and_note_field/product_label_section_and_note_field_o2m";
 
-patch(ListRenderer.prototype, {
-    computeAggregates() {
-        const aggregates = super.computeAggregates(...arguments);
-        if (!aggregates) {
-            return aggregates;
+const totalLabelPatch = {
+    get hasTotalLabel() {
+        if (this.aggregates && Object.keys(this.aggregates).length > 0) {
+            return true;
         }
-        for (const [fieldName, agg] of Object.entries(aggregates)) {
-            if (agg && agg.help && typeof agg.help === "string" && agg.help.includes("=")) {
-                let prefix = agg.help.trim();
-                prefix = prefix.replace(/\s*=\s*$/, " =");
-                const currentVal = String(agg.value || "").trim();
-                if (!currentVal.startsWith(prefix)) {
-                    agg.value = `${prefix} ${currentVal}`;
-                }
-            }
+        if (typeof this.getFirstAggregateIndex === "function" && this.getFirstAggregateIndex() > -1) {
+            return true;
         }
-        return aggregates;
+        return false;
     },
-});
+};
+
+patch(ListRenderer.prototype, totalLabelPatch);
+patch(SectionAndNoteListRenderer.prototype, totalLabelPatch);
+patch(ProductLabelSectionAndNoteListRender.prototype, totalLabelPatch);
+
