@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Sales Order Form View Inherit: Total Qty Footer Sum on Order Lines & Post-Delivery Restrictions -->
+    <!-- Sales Order Form View Inherit: Total Qty Footer Sum on Order Lines -->
     <record id="view_order_form_inherit_total_qty" model="ir.ui.view">
         <field name="name">sale.order.form.inherit.total.qty</field>
         <field name="model">sale.order</field>
@@ -17,23 +17,6 @@
             <xpath expr="//field[@name='order_line']/list//field[@name='qty_invoiced']" position="attributes">
                 <attribute name="sum">Invoiced</attribute>
                 <attribute name="width">120px</attribute>
-            </xpath>
-            <xpath expr="//field[@name='order_line']" position="before">
-                <field name="has_done_delivery" invisible="1"/>
-            </xpath>
-            <!-- List View Control -->
-            <xpath expr="//field[@name='order_line']/list/control/create[@name='add_product_control']" position="attributes">
-                <attribute name="invisible">parent.has_done_delivery</attribute>
-            </xpath>
-            <xpath expr="//field[@name='order_line']/list/control/button[@name='action_add_from_catalog']" position="attributes">
-                <attribute name="invisible">parent.has_done_delivery</attribute>
-            </xpath>
-            <!-- Mobile Kanban Control -->
-            <xpath expr="//field[@name='order_line']/kanban/control/create[@name='add_product_control']" position="attributes">
-                <attribute name="invisible">parent.has_done_delivery</attribute>
-            </xpath>
-            <xpath expr="//field[@name='order_line']/kanban/control/button[@name='action_add_from_catalog']" position="attributes">
-                <attribute name="invisible">parent.has_done_delivery</attribute>
             </xpath>
         </field>
     </record>
