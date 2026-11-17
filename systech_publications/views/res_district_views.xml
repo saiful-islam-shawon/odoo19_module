@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_res_district_list" model="ir.ui.view">
+        <field name="name">res.district.list</field>
+        <field name="model">res.district</field>
+        <field name="arch" type="xml">
+            <list string="Districts">
+                <field name="name"/>
+                <field name="state_id"/>
+                <field name="country_id"/>
+            </list>
+        </field>
+    </record>
+
+
+
+    <record id="view_res_district_form" model="ir.ui.view">
+        <field name="name">res.district.form</field>
+        <field name="model">res.district</field>
+        <field name="arch" type="xml">
+            <form string="District">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="state_id"/>
+                        <field name="country_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+
+    <!-- <record id="view_res_district_search" model="ir.ui.view">
+        <field name="name">res.district.search</field>
+        <field name="model">res.district</field>
+        <field name="arch" type="xml">
+            <search string="Search District">
+                <field name="name"/>
+                <field name="state_id"/>
+                <field name="country_id"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="State"
+                            name="group_by_state"
+                            context="{'group_by':'state_id'}"/>
+                    <filter string="Country"
+                            name="group_by_country"
+                            context="{'group_by':'country_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record> -->
+
+
+
+    <record id="action_res_district" model="ir.actions.act_window">
+        <field name="name">Districts</field>
+        <field name="res_model">res.district</field>
+        <field name="view_mode">list,form</field>
+        <!-- <field name="search_view_id" ref="view_res_district_search"/> -->
+    </record>
+
+    <menuitem 
+        id="menu_res_partner_district"
+        name="District"
+        parent="contacts.menu_localisation"
+        action="action_res_district"
+        sequence="20"
+    />
+
+</odoo>

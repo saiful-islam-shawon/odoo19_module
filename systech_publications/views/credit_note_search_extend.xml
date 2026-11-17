@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Add Product and Product Category group-by options. -->
+    <record id="view_account_move_credit_note_search_extend" model="ir.ui.view">
+        <field name="name">account.move.search.credit.note.product.extend</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/group" position="inside">
+                <filter string="Product"
+                        name="groupby_product"
+                        context="{'group_by': 'product_group_ids'}"/>
+                <filter string="Product Category"
+                        name="groupby_product_category"
+                        context="{'group_by': 'product_categ_group_ids'}"/>
+            </xpath>
+
+            <!-- Rename the active Credit Notes search filter/chip. -->
+            <xpath expr="//filter[@name='out_refund']" position="attributes">
+                <attribute name="string">Return Bills</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Rename the Odoo 19 customer credit-note menu and page title. -->
+    <record id="account.menu_action_move_out_refund_type" model="ir.ui.menu">
+        <field name="name">Return Bills</field>
+    </record>
+
+    <record id="account.action_move_out_refund_type_non_legacy" model="ir.actions.act_window">
+        <field name="name">Return Bills</field>
+    </record>
+
+    <!-- Keep the legacy bookmarked action consistent as well. -->
+    <record id="account.action_move_out_refund_type" model="ir.actions.act_window">
+        <field name="name">Return Bills</field>
+    </record>
+
+    <!-- Existing module action kept for databases where it was already created. -->
+    <record id="action_move_out_refund_type" model="ir.actions.act_window">
+        <field name="name">Return Bills</field>
+        <field name="res_model">account.move</field>
+        <field name="domain">[('move_type', '=', 'out_refund')]</field>
+        <field name="context">{
+            'default_move_type': 'out_refund',
+            'search_default_out_refund': 1
+        }</field>
+    </record>
+
+</odoo>

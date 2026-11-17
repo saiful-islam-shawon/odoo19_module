@@ -1,0 +1,29 @@
+<odoo>
+
+    <!-- Credit Note -->
+    <record id="view_move_tree_quantity_credit_note" model="ir.ui.view">
+        <field name="name">account.move.tree.quantity.credit.note</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_out_credit_note_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='invoice_date_due']" position="after">
+                <field name="rinv_qty" string="RINV QTY" sum="RINV QTY"/>
+                <field name="rinv_qty_amount" string="RINV QTY BAL" sum="RINV QTY Amount"/>
+                <field name="total_quantity"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Invoice -->
+    <record id="view_move_tree_quantity_invoice" model="ir.ui.view">
+        <field name="name">account.move.tree.quantity.invoice</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_out_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='invoice_date_due']" position="after">
+                <field name="total_quantity"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

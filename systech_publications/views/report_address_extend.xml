@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="contact_address_inherit_bd_geo" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@class='row']" position="replace">
+            <div class="row">
+                <t t-if="o.partner_shipping_id and (o.partner_shipping_id != o.partner_id)">
+
+                    <div class="col-6" name="address_not_same_as_shipping">
+                        <t t-set="address">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div t-if="o.partner_id.name">
+                                        <span t-field="o.partner_id.name"/>
+                                    </div>
+                                    <div t-if="o.partner_id.street">
+                                        <span t-field="o.partner_id.street"/>
+                                    </div>
+                                    <div t-if="o.partner_id.street2">
+                                        <span t-field="o.partner_id.street2"/>
+                                    </div>
+                                    <div t-if="o.partner_id.city or o.partner_id.zip">
+                                        <span t-field="o.partner_id.zip"/>
+                                        <span t-field="o.partner_id.city"/>
+                                    </div>
+                                    <div t-if="o.partner_id.state_id">
+                                        <span t-field="o.partner_id.state_id"/>
+                                    </div>
+                                    <!-- <div t-if="o.partner_id.country_id">
+                                        <span t-field="o.partner_id.country_id"/>
+                                    </div> -->
+
+                                    <div t-if="o.partner_id.phone">
+                                        <span style="font-weight:600;">Phone: </span>
+                                        <span t-field="o.partner_id.phone"/>
+                                    </div>
+                                    <t t-if="o.partner_id.thana_id">
+                                        <div>
+                                            <span style="font-weight:600;">Thana: </span>
+                                            <span t-field="o.partner_id.thana_id"/>
+                                        </div>
+                                    </t>
+                                    <t t-if="o.partner_id.district_id">
+                                        <div>
+                                            <span style="font-weight:600;">District: </span>
+                                            <span t-field="o.partner_id.district_id"/>
+                                        </div>
+                                    </t>
+                                    <div t-if="o.partner_id.country_id">
+                                        <span t-field="o.partner_id.country_id"/>
+                                    </div>
+
+                                    <!-- <div t-if="o.partner_id.phone">
+                                        <span style="font-weight:600;">Phone: </span>
+                                        <span t-field="o.partner_id.phone"/>
+                                    </div> -->
+                                </div>
+
+                                <div t-if="o.partner_id.customer_id" class="text-end">
+                                    <strong>Customer ID: </strong>
+                                    <span t-field="o.partner_id.customer_id"/>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+                <t t-elif="o.partner_shipping_id and (o.partner_shipping_id == o.partner_id)">
+                    <div class="offset-col-6 col-6" name="address_same_as_shipping">
+                        <t t-set="address">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div t-if="o.partner_id.name">
+                                        <span t-field="o.partner_id.name"/>
+                                    </div>
+                                    <div t-if="o.partner_id.street">
+                                        <span t-field="o.partner_id.street"/>
+                                    </div>
+                                    <div t-if="o.partner_id.street2">
+                                        <span t-field="o.partner_id.street2"/>
+                                    </div>
+                                    <div t-if="o.partner_id.city or o.partner_id.zip">
+                                        <span t-field="o.partner_id.zip"/>
+                                        <span t-field="o.partner_id.city"/>
+                                    </div>
+                                    <div t-if="o.partner_id.state_id">
+                                        <span t-field="o.partner_id.state_id"/>
+                                    </div>
+                                    <!-- <div t-if="o.partner_id.country_id">
+                                        <span t-field="o.partner_id.country_id"/>
+                                    </div> -->
+                                    <div t-if="o.partner_id.phone">
+                                        <span style="font-weight:600;">Phone: </span>
+                                        <span t-field="o.partner_id.phone"/>
+                                    </div>
+                                    <t t-if="o.partner_id.thana_id">
+                                        <div>
+                                            <span style="font-weight:600;">Thana: </span>
+                                            <span t-field="o.partner_id.thana_id"/>
+                                        </div>
+                                    </t>
+                                    <t t-if="o.partner_id.district_id">
+                                        <div>
+                                            <span style="font-weight:600;">District: </span>
+                                            <span t-field="o.partner_id.district_id"/>
+                                        </div>
+                                    </t>
+                                    <div t-if="o.partner_id.country_id">
+                                        <span t-field="o.partner_id.country_id"/>
+                                    </div>
+                                    <!-- <div t-if="o.partner_id.phone">
+                                        <span style="font-weight:600;">Phone: </span>
+                                        <span t-field="o.partner_id.phone"/>
+                                    </div> -->
+                                </div>
+                                <div t-if="o.partner_id.customer_id" class="text-end">
+                                    <strong>Customer ID: </strong>
+                                    <span t-field="o.partner_id.customer_id"/>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+
+                    <div class="col-6">
+                        <div style="display:flex; justify-content:space-between; width:100%;">
+                            <div>
+                                <div t-if="o.partner_id.name">
+                                    <span t-field="o.partner_id.name"/>
+                                </div>
+                                <div t-if="o.partner_id.street">
+                                    <span t-field="o.partner_id.street"/>
+                                </div>
+                                <div t-if="o.partner_id.street2">
+                                    <span t-field="o.partner_id.street2"/>
+                                </div>
+                                <div t-if="o.partner_id.city or o.partner_id.zip">
+                                    <span t-field="o.partner_id.zip"/>
+                                    <span t-field="o.partner_id.city"/>
+                                </div>
+                                <div t-if="o.partner_id.state_id">
+                                    <span t-field="o.partner_id.state_id"/>
+                                </div>
+
+                                <!-- <div t-if="o.partner_id.country_id">
+                                    <span t-field="o.partner_id.country_id"/>
+                                </div> -->
+                                <div t-if="o.partner_id.phone">
+                                    <span style="font-weight:600;">Phone: </span>
+                                    <span t-field="o.partner_id.phone"/>
+                                </div>
+                                <div t-if="o.partner_id.thana_id or o.partner_id.district_id">
+                                    <t t-if="o.partner_id.thana_id">
+                                        <span style="font-weight:600;">Thana: </span>
+                                        <span t-field="o.partner_id.thana_id"/>
+                                    </t>
+                                    <t t-if="o.partner_id.thana_id and o.partner_id.district_id">
+                                        <span>, </span>
+                                    </t>
+                                    <t t-if="o.partner_id.district_id">
+                                        <span style="font-weight:600;">District: </span>
+                                        <span t-field="o.partner_id.district_id"/>
+                                    </t>
+                                </div>
+                                <div t-if="o.partner_id.country_id">
+                                    <span t-field="o.partner_id.country_id"/>
+                                </div>
+                                <!-- <div t-if="o.partner_id.phone">
+                                    <span style="font-weight:600;">Phone: </span>
+                                    <span t-field="o.partner_id.phone"/>
+                                </div> -->
+                            </div>
+                            <div style="text-align:right; white-space:nowrap; padding-left:8px;">
+                                <t t-if="o.partner_id.customer_id">
+                                    <div><strong>Customer ID: </strong><span t-field="o.partner_id.customer_id"/></div>
+                                </t>
+                                <t t-if="o.invoice_user_id">
+                                    <div><strong>Salesperson: </strong><span t-field="o.invoice_user_id.name"/></div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                </t>
+                <t t-elif="o.partner_shipping_id and (o.partner_shipping_id == o.partner_id)">
+
+                    <div class="col-6" name="address_same_as_shipping">
+                        <div t-if="o.partner_id.name">
+                            <span t-field="o.partner_id.name"/>
+                        </div>
+                        <div t-if="o.partner_id.street">
+                            <span t-field="o.partner_id.street"/>
+                        </div>
+                        <div t-if="o.partner_id.street2">
+                            <span t-field="o.partner_id.street2"/>
+                        </div>
+                        <div t-if="o.partner_id.city or o.partner_id.zip">
+                            <span t-field="o.partner_id.zip"/>
+                            <span t-field="o.partner_id.city"/>
+                        </div>
+                        <div t-if="o.partner_id.state_id">
+                            <span t-field="o.partner_id.state_id"/>
+                        </div>
+                        <div t-if="o.partner_id.phone">
+                            <span style="font-weight:600;">Phone: </span>
+                            <span t-field="o.partner_id.phone"/>
+                        </div>
+                        <div t-if="o.partner_id.thana_id or o.partner_id.district_id">
+                            <t t-if="o.partner_id.thana_id">
+                                <span style="font-weight:600;">Thana: </span>
+                                <span t-field="o.partner_id.thana_id"/>
+                            </t>
+                            <t t-if="o.partner_id.thana_id and o.partner_id.district_id">
+                                <span>, </span>
+                            </t>
+                            <t t-if="o.partner_id.district_id">
+                                <span style="font-weight:600;">District: </span>
+                                <span t-field="o.partner_id.district_id"/>
+                            </t>
+                        </div>
+                        <div t-if="o.partner_id.country_id">
+                            <span t-field="o.partner_id.country_id"/>
+                        </div>
+                    </div>
+
+                    <div class="col-6" style="text-align:right; white-space:nowrap;">
+                        <t t-if="o.partner_id.customer_id">
+                            <div><strong>Customer ID: </strong><span t-field="o.partner_id.customer_id"/></div>
+                        </t>
+                        <t t-if="o.invoice_user_id">
+                            <div><strong>Salesperson: </strong><span t-field="o.invoice_user_id.name"/></div>
+                        </t>
+                    </div>
+
+                </t>
+                <t t-else="">
+
+                    <div class="col-6" name="no_shipping">
+                        <div t-if="o.partner_id.name">
+                            <span t-field="o.partner_id.name"/>
+                        </div>
+                        <div t-if="o.partner_id.street">
+                            <span t-field="o.partner_id.street"/>
+                        </div>
+                        <div t-if="o.partner_id.street2">
+                            <span t-field="o.partner_id.street2"/>
+                        </div>
+                        <div t-if="o.partner_id.city or o.partner_id.zip">
+                            <span t-field="o.partner_id.zip"/>
+                            <span t-field="o.partner_id.city"/>
+                        </div>
+                        <div t-if="o.partner_id.state_id">
+                            <span t-field="o.partner_id.state_id"/>
+                        </div>
+                        <div t-if="o.partner_id.phone">
+                            <span style="font-weight:600;">Phone: </span>
+                            <span t-field="o.partner_id.phone"/>
+                        </div>
+                        <div t-if="o.partner_id.thana_id or o.partner_id.district_id">
+                            <t t-if="o.partner_id.thana_id">
+                                <span style="font-weight:600;">Thana: </span>
+                                <span t-field="o.partner_id.thana_id"/>
+                            </t>
+                            <t t-if="o.partner_id.thana_id and o.partner_id.district_id">
+                                <span>, </span>
+                            </t>
+                            <t t-if="o.partner_id.district_id">
+                                <span style="font-weight:600;">District: </span>
+                                <span t-field="o.partner_id.district_id"/>
+                            </t>
+                        </div>
+                        <div t-if="o.partner_id.country_id">
+                            <span t-field="o.partner_id.country_id"/>
+                        </div>
+                    </div>
+
+                    <div class="col-6" style="text-align:right; white-space:nowrap;">
+                        <t t-if="o.partner_id.customer_id">
+                            <div><strong>Customer ID: </strong><span t-field="o.partner_id.customer_id"/></div>
+                        </t>
+                        <t t-if="o.invoice_user_id">
+                            <div><strong>Salesperson: </strong><span t-field="o.invoice_user_id.name"/></div>
+                        </t>
+                    </div>
+
+                </t>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="remove_credit_note_title" inherit_id="account.report_invoice_document">
+        <xpath expr="//*[text()='Credit Note']" position="replace">
+        </xpath>
+    </template>
+
+    <template id="custom_credit_note_date" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@name='invoice_date']" position="replace">
+            <div class="col" t-if="o.invoice_date" name="invoice_date">
+                <t t-if="o.move_type == 'out_refund'">
+                    <div style="font-weight:600;">Return List</div>
+                    <div>
+                        <span style="font-weight:600;">Date: </span>
+                        <span t-esc="o.invoice_date.strftime('%m/%d/%Y')"/>
+                    </div>
+                </t>
+                <t t-else="">
+                    <t t-if="o.move_type == 'out_invoice'">
+                        <strong>Invoice Date</strong>
+                    </t>
+                    <t t-elif="o.move_type == 'out_receipt'">
+                        <strong>Receipt Date</strong>
+                    </t>
+                    <t t-else="">
+                        <strong>Date</strong>
+                    </t>
+                    <div t-field="o.invoice_date"/>
+                </t>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_sale_order_form_inherit_geo" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.geography</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//page[@name='other_information']//group[@name='sale_reporting']" position="inside">
+                <field name="thana_id" readonly="1"/>
+                <field name="district_id" readonly="1"/>
+                <field name="state_id" readonly="1"/>
+                <field name="country_id" readonly="1"/>                
+            </xpath>
+
+        </field>
+    </record>
+
+
+    <record id="view_sale_order_search_inherit_geo" model="ir.ui.view">
+        <field name="name">sale.order.search.inherit.geography</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//search/field[last()]" position="after">
+                <!-- <field name="cmr" string="Customer ID"/> -->
+                <field name="thana_id"/>
+                <field name="district_id"/>
+                <field name="state_id"/>
+                <field name="country_id"/>
+            </xpath>
+
+            <xpath expr="//filter[@name='customer']" position="after">
+                <filter string="Thana" name="group_by_thana"    context="{'group_by': 'thana_id'}"/>
+                <filter string="District" name="group_by_district" context="{'group_by': 'district_id'}"/>
+                <filter string="Division" name="group_by_state" context="{'group_by': 'state_id'}"/>
+                <filter string="Country" name="group_by_country" context="{'group_by': 'country_id'}"/>
+            </xpath>
+
+
+        </field>
+    </record>
+
+    <record id="view_sale_order_search_inherit_geo" model="ir.ui.view">
+        <field name="name">sale.order.search.inherit.geography</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//search/field[last()]" position="after">
+                <!-- <field name="cmr" string="Customer ID"/> -->
+                <field name="thana_id"/>
+                <field name="district_id"/>
+                <field name="state_id"/>
+                <field name="country_id"/>
+            </xpath>
+
+            <xpath expr="//filter[@name='customer']" position="after">
+                <separator string="Geographical Grouping"/>
+                <filter string="Thana" name="group_by_thana"    context="{'group_by': 'thana_id'}"/>
+                <filter string="District" name="group_by_district" context="{'group_by': 'district_id'}"/>
+                <filter string="Division" name="group_by_state" context="{'group_by': 'state_id'}"/>
+                <filter string="Country" name="group_by_country" context="{'group_by': 'country_id'}"/>
+                <separator string="Geographical Grouping"/>
+            </xpath>
+
+
+        </field>
+    </record>
+
+
+</odoo>

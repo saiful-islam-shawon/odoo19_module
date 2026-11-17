@@ -1,0 +1,31 @@
+<odoo>
+    <record id="view_account_payment_search_bd_geo" model="ir.ui.view">
+        <field name="name">account.payment.search.bd.geo</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_search"/>
+        <field name="arch" type="xml">
+
+            <!-- Add searchable fields -->
+            <xpath expr="//search/field[@name='journal_id']" position="after">
+                <field name="thana_id"/>
+                <field name="district_id"/>
+                <field name="partner_state_id"/>
+                <field name="partner_country_id"/>
+            </xpath>
+
+            <!-- Add group by filters -->
+            <xpath expr="//filter[@name='company']" position="after">
+                <group>
+                    <filter string="Thana" name="group_by_thana" context="{'group_by':'thana_id'}"/>
+
+                    <filter string="District" name="group_by_district" context="{'group_by':'district_id'}"/>
+
+                    <filter string="Division" name="group_by_division" context="{'group_by':'partner_state_id'}"/>
+
+                    <filter string="Country" name="group_by_country" context="{'group_by':'partner_country_id'}"/>
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

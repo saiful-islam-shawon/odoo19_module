@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_picking_form_inherit_geo" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.geography</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//page[@name='extra']/group" position="inside">
+
+                <group string="Tracking" name="geo_tracking_group">
+                    <field name="thana_id" readonly="1"/>
+                    <field name="district_id" readonly="1"/>
+                    <field name="state_id" readonly="1"/>
+                    <field name="country_id" readonly="1"/>    
+                </group>
+
+            </xpath>
+
+        </field>
+    </record>
+
+
+    <record id="view_stock_picking_search_inherit_geo" model="ir.ui.view">
+        <field name="name">stock.picking.search.inherit.geography</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//search/field[last()]" position="after">
+                <!-- <field name="cmr" string="Customer ID"/> -->
+                <field name="thana_id"/>
+                <field name="district_id"/>
+                <field name="state_id"/>
+                <field name="country_id"/>
+            </xpath>
+
+            <xpath expr="//filter[@name='status']" position="after">
+                <separator string="Geographical Grouping"/>
+                <filter string="Thana" name="group_by_thana"    context="{'group_by': 'thana_id'}"/>
+                <filter string="District" name="group_by_district" context="{'group_by': 'district_id'}"/>
+                <filter string="Division" name="group_by_state" context="{'group_by': 'state_id'}"/>
+                <filter string="Country" name="group_by_country" context="{'group_by': 'country_id'}"/>
+                <separator string="Geographical Grouping"/>
+            </xpath>
+
+
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_res_thana_list" model="ir.ui.view">
+        <field name="name">res.thana.list</field>
+        <field name="model">res.thana</field>
+        <field name="arch" type="xml">
+            <list string="Thanas">
+                <field name="name"/>
+                <field name="district_id"/>
+                <field name="state_id"/>
+                <field name="country_id"/>
+            </list>
+        </field>
+    </record>
+
+
+
+    <record id="view_res_thana_form" model="ir.ui.view">
+        <field name="name">res.thana.form</field>
+        <field name="model">res.thana</field>
+        <field name="arch" type="xml">
+            <form string="Thana">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="district_id"/>
+                        <field name="state_id"/>
+                        <field name="country_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+
+    <!-- <record id="view_res_thana_search" model="ir.ui.view">
+        <field name="name">res.thana.search</field>
+        <field name="model">res.thana</field>
+        <field name="arch" type="xml">
+            <search string="Search Thana">
+                <field name="name"/>
+                <field name="district_id"/>
+                <field name="state_id"/>
+                <field name="country_id"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="District"
+                            name="group_by_district"
+                            context="{'group_by':'district_id'}"/>
+                    <filter string="State"
+                            name="group_by_state"
+                            context="{'group_by':'state_id'}"/>
+                    <filter string="Country"
+                            name="group_by_country"
+                            context="{'group_by':'country_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record> -->
+
+
+
+    <record id="action_res_thana" model="ir.actions.act_window">
+        <field name="name">Thanas</field>
+        <field name="res_model">res.thana</field>
+        <field name="view_mode">list,form</field>
+        <!-- <field name="search_view_id" ref="view_res_thana_search"/> -->
+    </record>
+
+    <menuitem 
+        id="menu_res_partner_thana"
+        name="Thana"
+        parent="contacts.menu_localisation"
+        action="action_res_thana"
+        sequence="30"
+    />
+
+</odoo>
