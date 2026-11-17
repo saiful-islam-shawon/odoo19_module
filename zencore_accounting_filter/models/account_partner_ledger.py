@@ -87,6 +87,7 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
 
             # PDF export customization for single partner view
             options['custom_display_config']['pdf_export'] = {
+                'company_information': 'zencore_accounting_filter.company_information',
                 'pdf_export_main_table_header': 'zencore_accounting_filter.pdf_export_main_table_header',
                 'pdf_export_main_table_body': 'zencore_accounting_filter.pdf_export_main_table_body',
                 'pdf_export_filters': 'zencore_accounting_filter.pdf_export_filters',

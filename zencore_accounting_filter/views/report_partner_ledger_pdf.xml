@@ -1,5 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Custom PDF Company Information (Tax ID removed as per user request) -->
+    <template id="company_information">
+        <img t-if="env.company.logo" class="o_company_logo" t-att-src="image_data_uri(env.company.logo)" alt="Logo"/>
+        <t t-set="company_names" t-value="[company['name'] for company in options['companies']]"/>
+        <div class="row">
+            <div class="col-10" t-out="', '.join(company_names)"/>
+        </div>
+
+        <address class="mb-0 o_text_muted" t-field="env.company.partner_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
+        <!-- Tax ID removed as requested -->
+    </template>
+
+    <!-- Custom PDF Filters (Displays Partners, Date, and Category on the right side) -->
+    <template id="pdf_export_filters">
+        <t t-call="account_reports.pdf_export_filters"/>
+        <div class="row" t-if="options.get('formatted_date_range')">
+            <div>Date: <span t-out="options['formatted_date_range']" class="o_text_muted"/></div>
+        </div>
+        <div class="row">
+            <div>Category: <span t-out="options.get('selected_category_name') or 'All Categories'" class="o_text_muted"/></div>
+        </div>
+    </template>
+
+    <!-- Custom PDF Table Header -->
     <template id="pdf_export_main_table_header">
         <style>
             .o_table {
@@ -59,6 +83,7 @@
         </thead>
     </template>
 
+    <!-- Custom PDF Table Body with Borders and Clean Values -->
     <template id="pdf_export_main_table_body">
         <t t-foreach="lines" t-as="line">
             <t t-if="'total' in str(line.get('id', ''))">
@@ -105,18 +130,6 @@
                     </td>
                 </tr>
             </t>
-        </t>
-    </template>
-
-    <template id="pdf_export_filters">
-        <t t-call="account_reports.pdf_export_filters"/>
-        <div class="row" t-if="options.get('formatted_date_range')">
-            <div>Date: <span t-out="options['formatted_date_range']" class="o_text_muted"/></div>
-        </div>
-        <t t-if="options.get('product_category_id') and options.get('selected_category_name')">
-            <div class="row">
-                <div>Category: <span t-out="options['selected_category_name']" class="o_text_muted"/></div>
-            </div>
         </t>
     </template>
 </odoo>
