@@ -1,0 +1,59 @@
+.zencore_single_partner_ledger {
+    .zencore_header_boxes_row {
+        th {
+            background-color: #ffffff !important;
+            border: none !important;
+            padding-bottom: 1.25rem !important;
+        }
+
+        .border {
+            border: 1px solid #1a1a1a !important;
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            background-color: #ffffff !important;
+        }
+
+        select.form-select {
+            border: 1px solid #ced4da;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+    }
+
+    .zencore_single_partner_header {
+        /* Center the date range header in the middle of the row */
+        tr[data-id="column_headers_row"] {
+            th.column_header {
+                text-align: center !important;
+                vertical-align: middle !important;
+                font-weight: 600;
+                color: #111827;
+            }
+        }
+
+        /* Bold & Black "Customer Name" in the subheaders row */
+        tr[data-id="column_subheaders_row"] {
+            th.zencore_customer_name_header {
+                color: #000000 !important;
+                font-weight: 700 !important;
+
+                span {
+                    color: #000000 !important;
+                    font-weight: 700 !important;
+                }
+            }
+
+            th {
+                color: #000000;
+                font-weight: 600;
+            }
+        }
+    }
+
+    tr.total {
+        font-weight: 700;
+        background-color: #f9fafb;
+        border-top: 2px solid #111827;
+        border-bottom: 2px solid #111827;
+    }
+}

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <!-- Top Filter Bar Extension: Add Category dropdown button next to Partners -->
+    <t t-name="zencore_accounting_filter.AccountReportFilters" t-inherit="account_reports.AccountReportFiltersCustomizable" t-inherit-mode="extension">
+        <xpath expr="//div[@id='filter_partner']" position="after">
+            <div id="filter_product_category" class="filter_product_category" t-if="controller.cachedFilterOptions.available_product_categories and controller.cachedFilterOptions.available_product_categories.length > 0">
+                <Dropdown menuClass="'account_report_filter product_category'">
+                    <button class="btn btn-secondary">
+                        <i class="fa fa-book me-1"/>
+                        <t t-if="controller.cachedFilterOptions.product_category_id and controller.cachedFilterOptions.selected_category_name">
+                            <span t-out="controller.cachedFilterOptions.selected_category_name"/>
+                        </t>
+                        <t t-else="">Category</t>
+                    </button>
+                    <t t-set-slot="content">
+                        <DropdownItem onSelected="() => this.onTopCategorySelect(false)">
+                            All Categories
+                        </DropdownItem>
+                        <t t-foreach="controller.cachedFilterOptions.available_product_categories" t-as="cat" t-key="cat.id">
+                            <DropdownItem onSelected="() => this.onTopCategorySelect(cat.id)">
+                                <t t-out="cat.display_name"/>
+                            </DropdownItem>
+                        </t>
+                    </t>
+                </Dropdown>
+            </div>
+        </xpath>
+    </t>
+
+    <!-- In-Report Header for Single Partner View -->
+    <t t-name="zencore_accounting_filter.PartnerLedgerHeader" t-inherit="account_reports.AccountReportHeaderCustomizable" t-inherit-mode="primary">
+        <xpath expr="//thead[@id='table_header']" position="attributes">
+            <attribute name="class" add="zencore_single_partner_header" separator=" "/>
+        </xpath>
+
+        <!-- Top 3 Filter Boxes -->
+        <xpath expr="//tr[@data-id='column_headers_row']" position="before">
+            <t t-if="controller.options.is_single_partner">
+                <tr class="zencore_header_boxes_row">
+                    <th t-att-colspan="controller.options.columns.length + 1" class="p-3 bg-white border">
+                        <div class="d-flex justify-content-between align-items-center gap-3">
+                            <div class="border p-2 px-3 bg-white fw-bold shadow-sm rounded">
+                                <span>Date: </span>
+                                <span class="fw-normal" t-out="controller.options.date ? controller.options.date.string : 'Custom Date'"/>
+                            </div>
+                            <div class="border p-2 px-3 bg-white fw-bold shadow-sm rounded">
+                                <span>Customer Name: </span>
+                                <span class="fw-normal" t-out="controller.options.selected_partner_name"/>
+                            </div>
+                            <div class="border p-2 px-3 bg-white fw-bold shadow-sm rounded d-flex align-items-center gap-2">
+                                <span>Category: </span>
+                                <select class="form-select form-select-sm d-inline-block w-auto"
+                                        t-on-change="(ev) => this.onCategoryChange(ev)">
+                                    <option value="" t-att-selected="!controller.options.product_category_id ? 'selected' : undefined">All Categories</option>
+                                    <t t-foreach="controller.options.available_product_categories or []" t-as="cat" t-key="cat.id">
+                                        <option t-att-value="cat.id" t-att-selected="cat.id === controller.options.product_category_id ? 'selected' : undefined" t-out="cat.display_name"/>
+                                    </t>
+                                </select>
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            </t>
+        </xpath>
+
+        <!-- First row (column_headers_row): Keep first th empty; center the date header -->
+        <xpath expr="//tr[@data-id='column_headers_row']/th[1]" position="replace">
+            <th>
+                <t t-if="!controller.options.is_single_partner and columnHeader_first and controller.options.companies.length > 1">
+                    <span class="companies_header" t-out="controller.options.companies.map(company => company.name).join(', ')"/>
+                </t>
+            </th>
+        </xpath>
+
+        <!-- Second row (column_subheaders_row): Set first th to bold black "Customer Name" -->
+        <xpath expr="//tr[@data-id='column_subheaders_row']/th[1]" position="replace">
+            <th class="zencore_customer_name_header">
+                <t t-if="controller.options.is_single_partner">
+                    <span class="fw-bold text-black" style="color: #000000 !important; font-weight: bold !important;">Customer Name</span>
+                </t>
+            </th>
+        </xpath>
+    </t>
+</templates>
