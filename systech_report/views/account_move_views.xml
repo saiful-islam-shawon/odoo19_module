@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_account_move_form_inherit_due" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.due.systech</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//group[hasclass('oe_subtotal_footer')]/field[@name='tax_totals']" position="before">
+                <field name="amount_before_global_discount"
+                       widget="monetary"
+                       options="{'currency_field': 'currency_id'}"
+                       string="Subtotal"
+                       readonly="1"
+                       invisible="move_type not in ['out_invoice', 'out_receipt']"/>
+            </xpath>
+
+            <xpath expr="//group[hasclass('oe_subtotal_footer')]/field[@name='amount_residual']" position="after">
+
+                <field name="previous_due"
+                       widget="monetary"
+                       options="{'currency_field': 'currency_id'}"
+                       string="Previous Due"
+                       readonly="1"
+                       invisible="move_type not in ['out_invoice', 'out_receipt'] or state != 'posted'"/>
+
+                <field name="total_due_with_current"
+                       widget="monetary"
+                       options="{'currency_field': 'currency_id'}"
+                       string="Total Due"
+                       readonly="1"
+                       invisible="move_type not in ['out_invoice', 'out_receipt'] or state != 'posted'"/>
+
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

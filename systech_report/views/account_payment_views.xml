@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_account_payment_form_inherit_money_receipt" model="ir.ui.view">
+        <field name="name">account.payment.form.inherit.money.receipt</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Money Receipt Details" name="money_receipt_details"
+                       invisible="payment_type != 'inbound'">
+                    <group>
+                        <field name="received_by_cheque_no" readonly="1"/>
+                        <field name="drawn_on_bank" placeholder="Bank Name"/>
+                        <field name="bank_branch" placeholder="Branch Name"/>
+                        <field name="book_category_id"/>
+                    </group>
+                    <group>
+                        <field name="due_cash_pay" readonly="1"/>
+                        <field name="collection_deposit" readonly="1"/>
+                        <field name="authorized_by"/>
+                    </group>
+                    <group colspan="2">
+                        <field name="payment_notes" placeholder="Additional notes..." colspan="2"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_payment_form_money_receipt_button" model="ir.ui.view">
+        <field name="name">account.payment.form.money.receipt.button</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_print_money_receipt"
+                        string="🖨 Print Money Receipt"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-print"
+                        invisible="state not in ['posted']"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

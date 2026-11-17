@@ -1,0 +1,1046 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Older releases built the invoice through several extensions of
+        account.report_invoice_document.  Apart from being difficult to
+        maintain, those extensions also changed vendor bills, credit notes,
+        and localized invoice templates.  Keep their XML IDs inactive so an
+        upgrade is safe for databases on those releases.
+    -->
+    <record id="invoice_document_renderer_fix_v4" model="ir.ui.view">
+        <field name="name">Disabled legacy invoice document renderer</field>
+        <field name="type">qweb</field>
+        <field name="active" eval="False"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <t/>
+        </field>
+    </record>
+    <record id="invoice_external_layout_v4" model="ir.ui.view">
+        <field name="name">Disabled legacy invoice external layout</field>
+        <field name="type">qweb</field>
+        <field name="active" eval="False"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <t/>
+        </field>
+    </record>
+    <record id="invoice_external_layout_clean" model="ir.ui.view">
+        <field name="name">Disabled superseded clean invoice layout</field>
+        <field name="type">qweb</field>
+        <field name="active" eval="False"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <t/>
+        </field>
+    </record>
+    <record id="report_invoice_restore_standard_address" model="ir.ui.view">
+        <field name="name">Disabled superseded invoice address override</field>
+        <field name="type">qweb</field>
+        <field name="active" eval="False"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <t/>
+        </field>
+    </record>
+    <record id="report_invoice_use_clean_layout" model="ir.ui.view">
+        <field name="name">Disabled superseded primary invoice view</field>
+        <field name="type">qweb</field>
+        <field name="active" eval="False"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <t/>
+        </field>
+    </record>
+    <record id="invoice_white_table_header_color" model="ir.ui.view">
+        <field name="name">Disabled superseded invoice style override</field>
+        <field name="type">qweb</field>
+        <field name="active" eval="False"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <t/>
+        </field>
+    </record>
+    <record id="report_invoice_document_inherit_due" model="ir.ui.view">
+        <field name="name">Disabled superseded invoice totals override</field>
+        <field name="type">qweb</field>
+        <field name="active" eval="False"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <t/>
+        </field>
+    </record>
+    <record id="report_invoice_document_inherit_signature" model="ir.ui.view">
+        <field name="name">Disabled superseded invoice signature override</field>
+        <field name="type">qweb</field>
+        <field name="active" eval="False"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <t/>
+        </field>
+    </record>
+
+    <template id="invoice_partner_address_lines" name="Systech invoice partner address">
+        <div class="systech_partner_address">
+            <div t-if="partner.name">
+                <span t-field="partner.name"/>
+            </div>
+            <div t-if="partner.street">
+                <span t-field="partner.street"/>
+            </div>
+            <div t-if="partner.street2">
+                <span t-field="partner.street2"/>
+            </div>
+            <div t-if="partner.zip or partner.city">
+                <span t-if="partner.zip" t-field="partner.zip"/>
+                <span t-if="partner.zip and partner.city"></span>
+                <span t-if="partner.city" t-field="partner.city"/>
+            </div>
+            <div t-if="partner.phone">
+                <strong>Phone:</strong>
+                <span t-field="partner.phone"/>
+            </div>
+            <div t-if="partner.thana_id or partner.district_id"
+                class="systech_location_line">
+
+                <t t-if="partner.thana_id">
+                    <strong>Thana:</strong>
+                    <span t-field="partner.thana_id"/>
+                </t>
+
+                <t t-if="partner.thana_id and partner.district_id">, </t>
+
+                <t t-if="partner.district_id">
+                    <strong>District:</strong>
+                    <span t-field="partner.district_id"/>
+                </t>
+
+            </div>
+        </div>
+    </template>
+
+    <!-- Keep customer invoices and credit notes on the same Systech layout. -->
+    <template id="report_invoice_router" name="Systech invoice report router">
+        <t t-if="o.move_type in ('out_invoice', 'out_refund')">
+            <t t-call="systech_report.report_invoice_document_reference"/>
+        </t>
+        <t t-else="">
+            <t t-call="account.report_invoice_document"/>
+        </t>
+    </template>
+    <template id="report_invoice_document_top" name="Systech Invoice/Credit Note (top-level)">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="lang" t-value="o.partner_id.lang"/>
+                <t t-call="systech_report.report_invoice_router" t-lang="lang"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_invoice_call_clean_layout" inherit_id="account.report_invoice" priority="100">
+        <xpath expr="//t[@t-call='account.report_invoice_document']" position="attributes">
+            <attribute name="t-call">systech_report.report_invoice_router</attribute>
+        </xpath>
+    </template>
+
+    <template id="report_invoice_document_reference" name="Systech customer invoice and credit note">
+        <t t-set="o" t-value="o.with_context(lang=lang)"/>
+        <!-- Always include reconciled payment details in this custom invoice. -->
+        <t t-set="print_with_payments" t-value="True"/>
+        <div t-attf-class="article systech_invoice_article o_company_#{o.company_id.id}_layout" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id" t-att-data-oe-lang="o.env.context.get('lang')">
+            <style type="text/css">
+
+                /* 
+                GLOBAL REPORT STYLE
+                 */
+
+                .systech_invoice_article,
+                .systech_invoice_article * {
+                    box-sizing: border-box;
+                }
+
+                .systech_invoice_article {
+                    color: #000000;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 14pt;
+                    line-height: 1.15;
+                }
+
+                .systech_invoice_page {
+                    position: relative;
+                    width: 100%;
+
+                    /*
+                     * Never use a fixed/minimum printable height here. The report
+                     * paperformat owns the top and bottom safe areas, while the
+                     * page content must be free to continue onto the next page.
+                     */
+                    min-height: 0 !important;
+                    height: auto !important;
+                    margin: 0 !important;
+                    padding: 0 2mm 0 2mm !important;
+                    overflow: visible !important;
+                }
+
+
+                /* =========================================================
+                THANA AND DISTRICT
+                ========================================================= */
+
+                .systech_location_line {
+                    display: block;
+                    width: 100%;
+                    margin-top: 0.5mm;
+                    margin-bottom: 1mm;
+
+                    font-size: 12pt !important;
+                    line-height: 1.2 !important;
+
+                    white-space: nowrap !important;
+                    word-break: keep-all !important;
+                    overflow-wrap: normal !important;
+                }
+
+                .systech_location_line strong,
+                .systech_location_line span {
+                    font-size: 12pt !important;
+                    line-height: 1.2 !important;
+
+                    white-space: nowrap !important;
+                    word-break: keep-all !important;
+                    overflow-wrap: normal !important;
+                }
+
+
+                /* =========================================================
+                INVOICE HEADER
+                ========================================================= */
+
+                .systech_invoice_header {
+                    width: 100%;
+                    margin: 0 0 1mm 0;
+                    border: none !important;
+                    border-collapse: collapse !important;
+                    border-spacing: 0 !important;
+                    table-layout: fixed;
+                    outline: none !important;
+                    box-shadow: none !important;
+                    background: transparent !important;
+                }
+
+                .systech_invoice_header &gt; tbody,
+                .systech_invoice_header &gt; tbody &gt; tr,
+                .systech_invoice_header &gt; tbody &gt; tr &gt; td {
+                    border: none !important;
+                    outline: none !important;
+                    box-shadow: none !important;
+                    background: transparent !important;
+                }
+
+                .systech_invoice_header td {
+                    padding: 0 !important;
+                    border: none !important;
+                    color: #000000;
+                    vertical-align: top;
+                    background: transparent !important;
+                }
+
+                .systech_invoice_address {
+                    width: 55%;
+
+                    /*
+                    * আগের 9mm থেকে 6mm করা হয়েছে।
+                    * এতে address এবং নিচের content একটু উপরে উঠবে।
+                    */
+                    padding-top: 6mm !important;
+                    padding-right: 2mm !important;
+
+                    font-size: 16pt;
+                    line-height: 1.5;
+                    text-align: left;
+                }
+
+                .systech_partner_address,
+                .systech_partner_address div,
+                .systech_partner_address span {
+                    border: 0 !important;
+                    border-radius: 0 !important;
+                    outline: 0 !important;
+                    box-shadow: none !important;
+                    background: transparent !important;
+                }
+
+                .systech_invoice_meta {
+                    width: 45%;
+                    font-size: 16pt;
+                    line-height: 1.5;
+                    text-align: right;
+                }
+
+                .systech_invoice_title {
+                    display: block;
+                    width: 100%;
+
+                    /*
+                    * আগের 7.5mm থেকে 5mm করা হয়েছে।
+                    * এতে date section একটু উপরে থাকবে।
+                    */
+                    margin: 0 0 5mm 0;
+
+                    font-size: 16pt;
+                    font-weight: 400;
+                    line-height: 1.2;
+                    text-align: right;
+
+                    white-space: nowrap !important;
+                    word-break: keep-all !important;
+                    overflow-wrap: normal !important;
+                }
+
+                .systech_invoice_shipping {
+                    padding-top: 2mm;
+                    font-size: 14pt;
+                    line-height: 1.2;
+                    text-align: left;
+                }
+
+
+                /* =========================================================
+                INVOICE AND DUE DATES
+                ========================================================= */
+
+                .systech_invoice_dates {
+                    width: 100%;
+                    margin: 0 0 5mm 0;
+                    overflow: hidden;
+
+                    border: 1.5px solid #000000 !important;
+                    border-radius: 7px;
+                    background: #f1f1f1;
+                }
+
+                .systech_invoice_dates table {
+                    width: 100%;
+                    margin: 0;
+                    border: 0;
+                    border-collapse: collapse;
+                    table-layout: fixed;
+                    background: #f1f1f1;
+                }
+
+                .systech_invoice_dates td {
+                    width: 50%;
+                    padding: 2.8mm 1.8mm;
+                    border: 0;
+
+                    background: #f1f1f1;
+                    color: #000000;
+
+                    font-size: 14pt;
+                    line-height: 1.05;
+                    text-align: left;
+                }
+
+
+                /* =========================================================
+                INVOICE LINE TABLE
+                ========================================================= */
+
+                /* Invoice line table outer box */
+                .systech_invoice_lines {
+                    width: 100%;
+                    margin: 0;
+
+                    border: 2px solid #000000 !important;
+                    border-collapse: collapse !important;
+                    border-spacing: 0 !important;
+                    table-layout: fixed;
+
+                    page-break-before: auto !important;
+                    page-break-after: auto !important;
+                    page-break-inside: auto !important;
+                    overflow: visible !important;
+                }
+
+                /* Repeat the column header on every continuation page. */
+                .systech_invoice_lines thead {
+                    display: table-header-group !important;
+                }
+
+                /*
+                 * One tbody is rendered for every product/section/note line.
+                 * wkhtmltopdf respects an unbreakable tbody more reliably than
+                 * page-break-inside on a plain tr inside one large tbody.
+                 */
+                .systech_invoice_lines tbody.systech_invoice_line_group {
+                    display: table-row-group !important;
+                    page-break-before: auto !important;
+                    page-break-after: auto !important;
+                    page-break-inside: avoid !important;
+                    break-inside: avoid-page !important;
+                    -webkit-column-break-inside: avoid !important;
+                }
+
+                /*
+                 * A complete product row must stay on one page. When the
+                 * remaining printable area is too small, wkhtmltopdf moves
+                 * the whole row to the next page.
+                 */
+                .systech_invoice_lines tbody.systech_invoice_line_group,
+                .systech_invoice_lines tbody.systech_invoice_line_group > tr,
+                .systech_invoice_lines tbody.systech_invoice_line_group > tr > td,
+                .systech_invoice_lines .systech_line_cell_content {
+                    page-break-before: auto !important;
+                    page-break-after: auto !important;
+                    page-break-inside: avoid !important;
+                    break-inside: avoid-page !important;
+                    -webkit-column-break-inside: avoid !important;
+                    overflow: visible !important;
+                }
+
+                .systech_line_cell_content {
+                    display: block !important;
+                    width: 100% !important;
+                    page-break-inside: avoid !important;
+                    break-inside: avoid-page !important;
+                    overflow: visible !important;
+                }
+
+                /*
+                 * Keep product rows away from the pre-printed footer while
+                 * preserving the original paper format margins.
+                 * wkhtmltopdf repeats this table footer on continuation pages.
+                 */
+                .systech_invoice_lines tfoot.systech_invoice_page_guard {
+                    display: table-footer-group !important;
+                }
+
+                .systech_invoice_lines tfoot.systech_invoice_page_guard tr,
+                .systech_invoice_lines tfoot.systech_invoice_page_guard td {
+                    height: 12mm !important;
+                    min-height: 12mm !important;
+                    padding: 0 !important;
+                    border: none !important;
+                    background: transparent !important;
+                    color: transparent !important;
+                    font-size: 0 !important;
+                    line-height: 0 !important;
+                    page-break-inside: avoid !important;
+                }
+
+                .systech_invoice_lines th,
+                .systech_invoice_lines td {
+                    border: 1.5px solid #000000 !important;
+                    background: #ffffff;
+                    color: #000000;
+
+                    font-size: 14pt;
+                    line-height: 1.08;
+                    vertical-align: top;
+                    overflow: visible !important;
+                    white-space: normal;
+                    word-break: normal;
+                    overflow-wrap: break-word;
+                }
+
+
+
+                .systech_invoice_lines th {
+                    padding: 0.45mm 0.5mm;
+                    font-size: 12pt !important;
+                    line-height: 1.05 !important;
+                    font-weight: 700 !important;
+                    text-decoration: underline;
+                    text-transform: uppercase;
+                    white-space: nowrap;
+                }
+
+                .systech_invoice_lines td {
+                    padding: 0.35mm 0.5mm;
+                }
+
+                .systech_invoice_lines .text-start {
+                    text-align: left;
+                }
+
+                .systech_invoice_lines .text-end {
+                    text-align: right;
+                }
+
+                .systech_invoice_lines .section-line {
+                    width: auto;
+                    font-weight: 700;
+                    text-align: left;
+                }
+
+                .systech_invoice_lines .note-line {
+                    width: auto;
+                    font-style: italic;
+                    text-align: left;
+                }
+
+
+                /* =========================================================
+                PAYMENT COMMUNICATION AND TOTALS
+                ========================================================= */
+
+                .systech_invoice_settlement {
+                    width: 100%;
+                    margin: 8mm 0 0 0;
+                    border: none !important;
+                    border-collapse: collapse !important;
+                    border-spacing: 0 !important;
+                    table-layout: fixed;
+                    outline: none !important;
+                    box-shadow: none !important;
+                    background: transparent !important;
+                    page-break-inside: avoid;
+                }
+
+                .systech_invoice_settlement &gt; tbody,
+                .systech_invoice_settlement &gt; tbody &gt; tr,
+                .systech_invoice_settlement &gt; tbody &gt; tr &gt; td {
+                    border: none !important;
+                    outline: none !important;
+                    box-shadow: none !important;
+                    background: transparent !important;
+                }
+
+                .systech_invoice_settlement &gt; tbody &gt; tr &gt; td {
+                    padding: 0 !important;
+                    vertical-align: top;
+                }
+
+                .systech_payment_communication {
+                    padding-right: 4mm !important;
+                    font-size: 14pt;
+                    line-height: 1.15;
+                    text-align: left;
+                }
+
+                .systech_invoice_totals_cell {
+                    width: 42%;
+                }
+
+                .systech_invoice_totals {
+                    width: 100%;
+                    margin: 0 0 0 auto;
+                    border: 2px solid #000000 !important;
+                    border-collapse: collapse !important;
+                    border-spacing: 0 !important;
+                    table-layout: fixed;
+                    page-break-inside: avoid;
+                }
+
+                .systech_invoice_totals td {
+                    width: 50%;
+                    padding: 0.7mm 0.5mm;
+                    border: 1.5px solid #000000 !important;
+                    background: #ffffff !important;
+                    color: #000000;
+                    font-size: 14pt;
+                    font-weight: 700;
+                    line-height: 1.08;
+                }
+
+                .systech_invoice_totals td:last-child {
+                    text-align: right;
+                    white-space: nowrap;
+                }
+
+                /* Odoo native payment information */
+                .systech_invoice_totals tr.systech_payment_row td {
+                    font-weight: 400 !important;
+                    font-style: italic;
+                }
+
+                .systech_invoice_totals tr.systech_amount_due_row td,
+                .systech_invoice_totals tr.systech_due_summary_row td {
+                    font-weight: 700 !important;
+                }
+
+                .systech_invoice_totals tr.systech_amount_due_row td {
+                    border-top: 2px solid #000000 !important;
+                }
+
+                /* Credit Note has no payment-information cell. */
+                .systech_credit_note_totals_wrapper {
+                    width: 100%;
+                    margin: 8mm 0 0 0;
+                    text-align: right;
+                    page-break-inside: avoid;
+                }
+
+                .systech_credit_note_totals_wrapper .systech_invoice_totals {
+                    width: 42%;
+                    margin: 0 0 0 auto;
+                }
+
+
+                /* =========================================================
+                DYNAMIC SIGNATURE SECTION
+                ========================================================= */
+
+                .systech_invoice_signatures {
+                    position: static !important;
+                    width: 100% !important;
+                    margin: 80mm 0 0 0 !important;
+                    padding: 0 !important;
+
+                    border: none !important;
+                    border-collapse: separate !important;
+                    border-spacing: 0 !important;
+                    table-layout: fixed;
+
+                    page-break-inside: avoid !important;
+                    break-inside: avoid-page !important;
+                }
+
+                .systech_invoice_signatures > tbody,
+                .systech_invoice_signatures > tbody > tr {
+                    border: none !important;
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    outline: none !important;
+                }
+
+                /* Do not remove the top border from signature cells */
+                .systech_invoice_signatures > tbody > tr > td {
+                    padding: 0 !important;
+                    vertical-align: top;
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    outline: none !important;
+                }
+
+                .systech_payment_row td,
+                .systech_payment_row td *,
+                .systech_payment_row strong {
+                    font-weight: 700 !important;
+                    font-style: normal !important;
+                }
+
+                /* Customer and Authorized signature lines */
+                .systech_invoice_signatures > tbody > tr > td.systech_invoice_signature {
+                    width: 40% !important;
+
+                    padding-top: 2mm !important;
+
+                    border-top: 1.5px solid #000000 !important;
+                    border-right: none !important;
+                    border-bottom: none !important;
+                    border-left: none !important;
+
+                    font-size: 14pt;
+                    font-weight: 700;
+                    line-height: 1.15;
+                    text-align: center;
+                    white-space: nowrap;
+                }
+
+                /* Middle empty space */
+                .systech_invoice_signatures > tbody > tr > td.systech_signature_spacer {
+                    width: 20% !important;
+                    border: none !important;
+                }
+            </style>
+
+            <div class="page systech_invoice_page">
+                <table class="systech_invoice_header o_ignore_layout_styling">
+                    <tbody>
+                        <tr>
+                            <td class="systech_invoice_address">
+                                <t t-set="partner" t-value="o.partner_id"/>
+                                <t t-call="systech_report.invoice_partner_address_lines"/>
+                            </td>
+                            <td class="systech_invoice_meta">
+                                <div class="systech_invoice_title">
+                                    <t t-if="o.move_type == 'out_refund'">
+                                        <t t-if="o.state == 'draft'">Draft Credit Note</t>
+                                        <t t-elif="o.state == 'cancel'">Cancelled Credit Note</t>
+                                        <t t-else="">Return Bill</t>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-if="o.state == 'draft'">Draft Invoice</t>
+                                        <t t-elif="o.state == 'cancel'">Cancelled Invoice</t>
+                                        <t t-else="">Invoice</t>
+                                    </t>
+                                    <t t-if="o.name and o.name != '/'">
+                                        <span t-field="o.name"/>
+                                    </t>
+                                </div>
+                                <div t-if="o.partner_id.customer_id">
+                                    <strong>Customer ID:</strong>
+                                    <span t-field="o.partner_id.customer_id"/>
+                                </div>
+                                <div t-if="o.invoice_user_id">
+                                    <strong>Salesperson:</strong>
+                                    <span t-field="o.invoice_user_id.name"/>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr t-if="o.partner_shipping_id and o.partner_shipping_id != o.partner_id">
+                            <td colspan="2" class="systech_invoice_shipping">
+                                <strong>Shipping Address</strong>
+                                <t t-set="partner" t-value="o.partner_shipping_id"/>
+                                <t t-call="systech_report.invoice_partner_address_lines"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="systech_invoice_dates">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td t-if="o.move_type == 'out_refund'" colspan="2">
+                                    <strong>Return Bill Date</strong>
+                                    <div t-if="o.invoice_date" t-field="o.invoice_date"/>
+                                </td>
+                                <td t-else="">
+                                    <strong>Invoice Date</strong>
+                                    <div t-if="o.invoice_date" t-field="o.invoice_date"/>
+                                </td>
+                                <!-- <td t-if="o.move_type == 'out_invoice'">
+                                    <strong>Due Date</strong>
+                                    <div t-if="o.invoice_date_due" t-field="o.invoice_date_due"/>
+                                </td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <table class="systech_invoice_lines">
+                    <colgroup>
+                        <col style="width: 42%;"/>
+                        <col style="width: 10%;"/>
+                        <col style="width: 16%;"/>
+                        <col style="width: 12%;"/>
+                        <col style="width: 18%;"/>
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="text-start">Description</th>
+                            <th class="text-center">QTY</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Disc.%</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+
+                    <!--
+                        Invisible repeated safe zone above the stationery footer.
+                        It does not alter the report.paperformat values.
+                    -->
+                    <tfoot class="systech_invoice_page_guard">
+                        <tr>
+                            <td colspan="5">&#160;</td>
+                        </tr>
+                    </tfoot>
+
+                    <t t-foreach="o._get_invoice_report_lines_without_global_discount()" t-as="line">
+                        <tbody class="systech_invoice_line_group">
+                            <tr t-if="line.display_type == 'product'"
+                                class="systech_invoice_product_row" style="page-break-inside: avoid !important;">
+                                <td class="text-start">
+                                    <div class="systech_line_cell_content">
+                                        <span t-if="line.name"
+                                              t-field="line.name"
+                                              t-options="{'widget': 'text'}"
+                                              dir="auto"/>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="systech_line_cell_content">
+                                        <span t-field="line.quantity" t-options="{'widget':'float', 'precision':0}"/>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <div class="systech_line_cell_content">
+                                        <span t-field="line.price_unit"/>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <div class="systech_line_cell_content">
+                                        <span t-field="line.discount"/>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <div class="systech_line_cell_content">
+                                        <span t-field="line.price_subtotal"
+                                              t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr t-elif="line.display_type in ('line_section', 'line_subsection')">
+                                <td colspan="5" class="section-line">
+                                    <div class="systech_line_cell_content">
+                                        <span t-field="line.name"/>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr t-elif="line.display_type == 'line_note'">
+                                <td colspan="5" class="note-line">
+                                    <div class="systech_line_cell_content">
+                                        <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </t>
+
+                    <tbody t-if="o._get_global_discount_invoice_report_lines()"
+                           class="systech_invoice_line_group">
+                        <tr class="systech_invoice_product_row">
+                            <td colspan="4" class="text-start"><strong>Subtotal</strong></td>
+                            <td class="text-end">
+                                <strong>
+                                    <span t-field="o.amount_before_global_discount"
+                                          t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </strong>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <t t-foreach="o._get_global_discount_invoice_report_lines()" t-as="line">
+                        <tbody class="systech_invoice_line_group">
+                            <tr t-if="line.display_type == 'product'"
+                                class="systech_invoice_product_row" style="page-break-inside: avoid !important;">
+                                <td class="text-start">
+                                    <div class="systech_line_cell_content">
+                                        <span t-if="line.name"
+                                              t-field="line.name"
+                                              t-options="{'widget': 'text'}"
+                                              dir="auto"/>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="systech_line_cell_content">
+                                        <span t-field="line.quantity" t-options="{'widget':'float', 'precision':0}"/>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <div class="systech_line_cell_content">
+                                        <span t-field="line.price_unit"/>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <div class="systech_line_cell_content">
+                                        <span t-field="line.discount"/>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <div class="systech_line_cell_content">
+                                        <span t-field="line.price_subtotal"
+                                              t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </t>
+                </table>
+
+                <!-- Customer Invoice: payment communication and complete totals -->
+                <t t-if="o.move_type == 'out_invoice'">
+                    <table class="systech_invoice_settlement o_ignore_layout_styling">
+                        <tbody>
+                            <tr>
+                                <td class="systech_payment_communication"
+                                    style="padding-right: 4mm !important; vertical-align: top;">
+
+                                    <div t-if="o.narration"
+                                        t-field="o.narration"
+                                        style="
+                                            margin: 0;
+                                            padding: 0;
+                                            font-size: 12pt;
+                                            line-height: 1.35;
+                                            color: #000000;
+                                            white-space: normal;
+                                            word-break: break-word;
+                                        "/>
+
+                                </td>
+
+                                <td class="systech_invoice_totals_cell">
+                                    <table class="systech_invoice_totals o_ignore_layout_styling">
+                                        <tbody>
+                                            <!-- Invoice total -->
+                                            <tr>
+                                                <td>Total</td>
+                                                <td>
+                                                    <span t-field="o.amount_total"
+                                                          t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                                </td>
+                                            </tr>
+
+                                            <!--
+                                                Read the same reconciled-payment widget used by
+                                                Odoo 19's standard invoice report. Do not depend
+                                                on the outer report action to provide
+                                                print_with_payments, because upgraded databases
+                                                may still call this custom template directly.
+                                            -->
+                                            <t t-if="o.payment_state != 'invoicing_legacy'">
+                                                <t t-set="payments_widget"
+                                                   t-value="o.sudo().invoice_payments_widget"/>
+                                                <t t-set="payments_vals"
+                                                   t-value="payments_widget.get('content', []) if payments_widget else []"/>
+
+                                                <t t-foreach="payments_vals" t-as="payment_vals">
+                                                    <tr t-if="not payment_vals.get('is_exchange')"
+                                                        class="systech_payment_row">
+
+                                                        <td style="font-weight: 700 !important; font-style: normal !important;">
+                                                            <strong>
+                                                                <t t-if="payment_vals.get('is_refund')">
+                                                                    Reversed on
+                                                                </t>
+                                                                <t t-else="">
+                                                                    Paid on
+                                                                </t>
+
+                                                                <t t-out="payment_vals.get('date')"
+                                                                t-options="{'widget': 'date'}"/>
+                                                            </strong>
+                                                        </td>
+
+                                                        <td style="
+                                                            text-align: right;
+                                                            font-weight: 700 !important;
+                                                            font-style: normal !important;
+                                                            white-space: nowrap;
+                                                        ">
+                                                            <strong>
+                                                                <span t-out="payment_vals.get('amount', 0.0)"
+                                                                    t-options="{
+                                                                        'widget': 'monetary',
+                                                                        'display_currency': o.currency_id
+                                                                    }"/>
+                                                            </strong>
+                                                        </td>
+
+                                                    </tr>
+                                                </t>
+
+                                                <tr t-if="payments_vals"
+                                                    class="systech_amount_due_row">
+                                                    <td>Amount Due</td>
+                                                    <td>
+                                                        <span t-field="o.amount_residual"
+                                                              t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+
+                                            <!--
+                                                Show customer ledger due even when this invoice
+                                                is fully paid.  The old condition checked only
+                                                amount_residual, which hid these rows on paid invoices.
+                                            -->
+                                            <t t-if="o.state == 'posted' and (o.previous_due or o.amount_residual)">
+                                                <tr class="systech_due_summary_row">
+                                                    <td>Previous Due</td>
+                                                    <td>
+                                                        <span t-field="o.previous_due"
+                                                              t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                                    </td>
+                                                </tr>
+                                                <tr class="systech_due_summary_row">
+                                                    <td>Total Due</td>
+                                                    <td>
+                                                        <span t-field="o.total_due_with_current"
+                                                              t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+
+                <!-- Credit Note / Return Invoice: terms and conditions on the left, total on the right -->
+                <t t-if="o.move_type == 'out_refund'">
+                    <table class="systech_invoice_settlement o_ignore_layout_styling">
+                        <tbody>
+                            <tr>
+                                <td class="systech_payment_communication"
+                                    style="
+                                        padding-right: 4mm !important;
+                                        vertical-align: top;
+                                        text-align: left;
+                                    ">
+
+                                    <div t-if="o.narration"
+                                         t-field="o.narration"
+                                         style="
+                                            margin: 0;
+                                            padding: 0;
+                                            font-size: 12pt;
+                                            line-height: 1.35;
+                                            color: #000000;
+                                            white-space: normal;
+                                            word-break: break-word;
+                                            overflow-wrap: break-word;
+                                         "/>
+
+                                </td>
+
+                                <td class="systech_invoice_totals_cell">
+                                    <table class="systech_invoice_totals o_ignore_layout_styling">
+                                        <tbody>
+                                            <tr>
+                                                <td>Total</td>
+                                                <td>
+                                                    <span t-field="o.amount_total"
+                                                          t-options="{
+                                                              'widget': 'monetary',
+                                                              'display_currency': o.currency_id
+                                                          }"/>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+
+                <!--
+                    Normal-flow signature table:
+                    it stays after totals and moves to the next page automatically
+                    when the current page has insufficient space.
+                -->
+                <table class="systech_invoice_signatures o_ignore_layout_styling">
+                    <tbody>
+                        <tr>
+                            <td class="systech_invoice_signature">
+                                Customer Signature
+                            </td>
+                            <td class="systech_signature_spacer"></td>
+                            <td class="systech_invoice_signature">
+                                Authorized Signature
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+
+</odoo>

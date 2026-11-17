@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="pdf_preview_direct_print.PdfPreviewDialog">
+        <Dialog size="'xl'" title="props.title" contentClass="'o_pdf_preview_dialog'">
+            <div class="o_pdf_preview_container">
+                <iframe t-ref="pdfFrame"
+                        class="o_pdf_preview_frame"
+                        t-att-src="frameSrc"
+                        t-att-title="props.fileName"/>
+            </div>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="print">
+                    <i class="fa fa-print me-1"/>Print
+                </button>
+                <button class="btn btn-secondary" t-on-click="download">
+                    <i class="fa fa-download me-1"/>Download
+                </button>
+                <button class="btn btn-secondary" t-on-click="() => props.close()">Close</button>
+            </t>
+        </Dialog>
+    </t>
+
+</templates>

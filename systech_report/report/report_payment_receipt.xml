@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_money_receipt_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="article o_standard_font" style="
+                    padding: 20px 30px;
+                    font-family: Arial, sans-serif;
+                    font-size: 12pt;
+                    line-height: 1.42;
+                    min-height: 227mm;
+                    box-sizing: border-box;
+                    position: relative;
+                ">
+
+                    <!-- ══ OUTER BOLD BOX ══ -->
+                    <table width="100%" cellspacing="0" cellpadding="0" style="
+                        border-collapse: collapse;
+                        border: 3px solid #060606;
+                        font-size: 12pt;
+                        table-layout: fixed;
+                    ">
+
+                        <!-- ══ TITLE ══ -->
+                        <tr>
+                            <td colspan="2" style="
+                                text-align: center;
+                                padding: 10px 0;
+                                border-bottom: 3px solid #060606;
+                            ">
+                                <h2 style="margin: 0; color: #060606; font-size: 22pt; font-weight: bold; letter-spacing: 2px;">
+                                    MONEY RECEIPT
+                                </h2>
+                            </td>
+                        </tr>
+
+                        <!-- ══ SERIAL / DATE ══ -->
+                        <tr>
+                            <td width="50%" style="
+                                padding: 6px 10px;
+                                font-size: 12pt;
+                                border-bottom: 3px solid #060606;
+                                border-right: 2px solid #060606;
+                            ">
+                                <strong style="font-size: 12pt;">Serial No. : </strong>
+                                <span style="font-weight: bold; color: #060606; font-size: 12pt;">
+                                    <t t-esc="o.name"/>
+                                </span>
+                            </td>
+                            <td width="50%" style="
+                                padding: 6px 10px;
+                                text-align: left;
+                                font-size: 12pt;
+                                border-bottom: 3px solid #060606;
+                            ">
+                                <strong style="font-size: 12pt;">Date : </strong>
+                                <span style="font-weight: bold; font-size: 12pt;">
+                                    <t t-esc="o.date" t-options='{"widget": "date", "format": "dd-MMMM-yyyy"}'/>
+                                </span>
+                                <span style="margin-left: 6px; color: #060606; font-size: 12pt; font-weight: bold;">
+                                    <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%I:%M:%S %p')"/>
+                                </span>
+                            </td>
+                        </tr>
+
+                        <!-- ══ SECTION HEADERS ══ -->
+                        <tr>
+                            <td width="50%" style="
+                                padding: 4px 7px;
+                                font-size: 12pt;
+                                font-weight: bold;
+                                color: #060606;
+                                background: rgb(240, 248, 255);
+                                border-bottom: 2px solid #060606;
+                                border-right: 2px solid #060606;
+                            ">
+                                Payment Information
+                            </td>
+                            <td width="50%" style="
+                                padding: 4px 7px;
+                                font-size: 12pt;
+                                font-weight: bold;
+                                color: #060606;
+                                background: rgb(240, 248, 255);
+                                border-bottom: 2px solid #060606;
+                            ">
+                                Financial Details
+                            </td>
+                        </tr>
+
+                        <!-- ══ ROW 1 : Received from  /  Collection & Deposit ══ -->
+                        <tr>
+                            <td style="padding: 5px 10px; border-right: 2px solid #060606; border-bottom: 1px solid #060606;">
+                                <table style="width:100%; border-collapse: collapse;"><tr>
+                                    <td style="padding:0; width:46%; border:none;"><strong>Received from:</strong></td>
+                                    <td style="padding:0; border:none; font-weight: bold; color: #060606;"><t t-esc="o.partner_id.name"/></td>
+                                </tr></table>
+                            </td>
+                            <td style="padding: 5px 10px; border-bottom: 1px solid #060606;">
+                                <table style="width:100%; border-collapse: collapse;"><tr>
+                                    <td style="padding:0; width:58%; border:none;"><strong>Collection&amp;Deposit:</strong></td>
+                                    <td style="padding:0; border:none; text-align:right; font-weight: bold; color: #060606;"><t t-esc="'{:,.2f}'.format(o.collection_deposit)"/></td>
+                                </tr></table>
+                            </td>
+                        </tr>
+
+                        <!-- ══ ROW 2 : Phone  /  Taka in words ══ -->
+                        <tr>
+                            <td style="padding: 5px 10px; border-right: 2px solid #060606; border-bottom: 1px solid #060606;">
+                                <table style="width:100%; border-collapse: collapse;"><tr>
+                                    <td style="padding:0; width:46%; border:none;"><strong>Phone:</strong></td>
+                                    <td style="padding:0; border:none; font-weight: bold;">
+                                        <t t-if="o.partner_id.phone"><t t-esc="o.partner_id.phone"/></t>
+                                        <t t-else="">-</t>
+                                    </td>
+                                </tr></table>
+                            </td>
+                            <td style="padding: 5px 10px; border-bottom: 1px solid #060606;">
+                                <table style="width:100%; border-collapse: collapse;"><tr>
+                                    <!-- <td style="padding:0; width:58%; border:none;"><strong>Taka in words:</strong></td> -->
+                                    <td style="padding:0; border:none; text-align:right; font-weight: bold; color: #060606;"><t t-esc="o.amount_in_words"/></td>
+                                </tr></table>
+                            </td>
+                        </tr>
+
+                        <!-- ══ ROW 3 : By Cash/Cheque/TT  /  Total Due ══ -->
+                        <tr>
+                            <td style="padding: 5px 10px; border-right: 2px solid #060606; border-bottom: 1px solid #060606;">
+                                <table style="width:100%; border-collapse: collapse;"><tr>
+                                    <td style="padding:0; width:46%; border:none;"><strong>Cash/Cheque:</strong></td>
+                                    <td style="padding:0; border:none; font-weight: bold;"><t t-esc="o.received_by_cheque_no or '-'"/></td>
+                                </tr></table>
+                            </td>
+                            <td style="padding: 5px 10px; border-bottom: 1px solid #060606;">
+                                <table style="width:100%; border-collapse: collapse;"><tr>
+                                    <td style="padding:0; width:58%; border:none;"><strong>Total Due:</strong></td>
+                                    <td style="padding:0; border:none; text-align:right; font-weight: bold; color: #060606;"><t t-esc="'{:,.2f}'.format(o.due_cash_pay)"/></td>
+                                </tr></table>
+                            </td>
+                        </tr>
+
+                        <!-- ══ ROW 4 : Drawn on Bank  /  (blank) ══ -->
+                        <tr>
+                            <td style="padding: 5px 10px; border-right: 2px solid #060606; border-bottom: 1px solid #060606;">
+                                <table style="width:100%; border-collapse: collapse;"><tr>
+                                    <td style="padding:0; width:46%; border:none;"><strong>Drawn Bank:</strong></td>
+                                    <td style="padding:0; border:none; font-weight: bold;"><t t-esc="o.drawn_on_bank or '-'"/></td>
+                                </tr></table>
+                            </td>
+                            <td style="padding: 5px 10px; border-bottom: 1px solid #060606;">&#160;</td>
+                        </tr>
+
+                        <!-- ══ ROW 5 : Branch  /  (blank) ══ -->
+                        <tr>
+                            <td style="padding: 5px 10px; border-right: 2px solid #060606; border-bottom: 1px solid #060606;">
+                                <table style="width:100%; border-collapse: collapse;"><tr>
+                                    <td style="padding:0; width:46%; border:none;"><strong>Branch:</strong></td>
+                                    <td style="padding:0; border:none; font-weight: bold;"><t t-esc="o.bank_branch or '-'"/></td>
+                                </tr></table>
+                            </td>
+                            <td style="padding: 5px 10px; border-bottom: 1px solid #060606;">&#160;</td>
+                        </tr>
+
+                        <!-- ══ OPTIONAL ROWS (Customer ID / Address / Category) ══ -->
+                        <t t-if="o.partner_id.customer_id">
+                            <tr>
+                                <td style="padding: 5px 10px; border-right: 2px solid #060606; border-bottom: 1px solid #060606;">
+                                    <table style="width:100%; border-collapse: collapse;"><tr>
+                                        <td style="padding:0; width:46%; border:none;"><strong>Customer ID:</strong></td>
+                                        <td style="padding:0; border:none; font-weight: bold; color: #060606;"><t t-esc="o.partner_id.customer_id"/></td>
+                                    </tr></table>
+                                </td>
+                                <td style="padding: 5px 10px; border-bottom: 1px solid #060606;">&#160;</td>
+                            </tr>
+                        </t>
+
+                        <t t-if="o.partner_id.thana_id or o.partner_id.district_id">
+                            <tr>
+                                <td style="padding: 5px 10px; border-right: 2px solid #060606; border-bottom: 1px solid #060606;">
+                                    <table style="width:100%; border-collapse: collapse;"><tr>
+                                        <td style="padding:0; width:46%; border:none;"><strong>Address:</strong></td>
+                                        <td style="padding:0; border:none; font-weight: bold;">
+                                            <t t-if="o.partner_id.thana_id"><t t-esc="o.partner_id.thana_id.name"/></t>
+                                            <t t-if="o.partner_id.thana_id and o.partner_id.district_id">, </t>
+                                            <t t-if="o.partner_id.district_id"><t t-esc="o.partner_id.district_id.name"/></t>
+                                        </td>
+                                    </tr></table>
+                                </td>
+                                <td style="padding: 5px 10px; border-bottom: 1px solid #060606;">&#160;</td>
+                            </tr>
+                        </t>
+
+                        <t t-if="o.book_category_id">
+                            <tr>
+                                <td style="padding: 5px 10px; border-right: 2px solid #060606; border-bottom: 1px solid #060606;">
+                                    <table style="width:100%; border-collapse: collapse;"><tr>
+                                        <td style="padding:0; width:46%; border:none;"><strong>Category:</strong></td>
+                                        <td style="padding:0; border:none; font-weight: bold;"><t t-esc="o.book_category_id.name"/></td>
+                                    </tr></table>
+                                </td>
+                                <td style="padding: 5px 10px; border-bottom: 1px solid #060606;">&#160;</td>
+                            </tr>
+                        </t>
+
+                        <!-- ══ NOTES ══ -->
+                        <t t-if="o.payment_notes">
+                            <tr style="page-break-inside: avoid;">
+                                <td colspan="2" style="
+                                    padding: 0;
+                                    border-bottom: 1px solid #060606;
+                                    vertical-align: top;
+                                ">
+                                    <table style="
+                                        width: 100%;
+                                        border-collapse: collapse;
+                                        table-layout: fixed;
+                                    ">
+                                        <tr>
+                                            <td style="
+                                                width: 20%;
+                                                padding: 6px 8px;
+                                                border: none;
+                                                vertical-align: top;
+                                                font-size: 12pt;
+                                                font-weight: bold;
+                                                white-space: nowrap;
+                                            ">
+                                                Notes:
+                                            </td>
+
+                                            <td style="
+                                                width: 80%;
+                                                padding: 6px 8px;
+                                                border: none;
+                                                vertical-align: top;
+                                                font-size: 12pt;
+                                                font-weight: bold;
+                                                color: #060606;
+                                                white-space: normal;
+                                                word-break: break-word;
+                                                overflow-wrap: anywhere;
+                                                line-height: 1.35;
+                                            ">
+                                                <span t-field="o.payment_notes"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </t>
+
+                        <!-- ══ SPACER ROW ══ -->
+                        <tr style="page-break-inside: avoid;">
+                            <td colspan="2" style="
+                                height: 100mm;
+                                padding: 0;
+                                border: none;
+                            ">
+                                &#160;
+                            </td>
+                        </tr>
+
+                        <!-- ══ SIGNATURE ROW ══ -->
+                        <tr style="page-break-inside: avoid;">
+
+                            <td width="50%" style="
+                                text-align: center;
+                                padding: 10px;
+                                border: none;
+                            ">
+                                <div style="
+                                    border-top: 1px solid #000000;
+                                    padding-top: 5px;
+                                    font-size: 12pt;
+                                    font-weight: bold;
+                                    color: #060606;
+                                    display: inline-block;
+                                    min-width: 60%;
+                                ">
+                                    Customer Signature
+                                </div>
+                            </td>
+
+                            <td width="50%" style="
+                                text-align: center;
+                                padding: 10px;
+                                border: none;
+                            ">
+                                <div style="
+                                    border-top: 1px solid #000000;
+                                    padding-top: 5px;
+                                    font-size: 12pt;
+                                    font-weight: bold;
+                                    color: #060606;
+                                    display: inline-block;
+                                    min-width: 60%;
+                                ">
+                                    Authorized Signature
+                                </div>
+                            </td>
+
+                        </tr>
+
+                    </table>
+                    <!-- end main content -->
+
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
