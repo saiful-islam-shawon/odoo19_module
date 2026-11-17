@@ -20,7 +20,9 @@
         'product',
         'systech_publications',
     ],
-    'data': [],
+    'data': [
+        'views/report_partner_ledger_pdf.xml',
+    ],
     'assets': {
         'web.assets_backend': [
             'zencore_accounting_filter/static/src/components/partner_ledger/header.xml',

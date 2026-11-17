@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Custom PDF Table Header for Single Partner Ledger View -->
+    <template id="pdf_export_main_table_header">
+        <thead id="table_header">
+            <!-- Row 1: Full-width Date Range spanning all 6 columns and centered -->
+            <tr>
+                <t t-set="date_str" t-value="options.get('formatted_date_range') or (options.get('column_headers') and options['column_headers'][0] and options['column_headers'][0][0].get('name')) or (options.get('date', {}).get('string', ''))"/>
+                <th t-att-colspan="len(options['columns']) + 1" style="background-color: #e7e9ed; text-align: center; font-weight: bold; padding: 6px; border: 0.5px solid #d1d5db; color: #111827;">
+                    <t t-out="date_str"/>
+                </th>
+            </tr>
+            <!-- Row 2: Column Headers with Customer Name first -->
+            <tr>
+                <th style="font-weight: bold; color: #000000; text-align: left; padding: 6px; border-bottom: 1.5px solid #374151;">
+                    Customer Name
+                </th>
+                <t t-foreach="options['columns']" t-as="col">
+                    <th t-attf-style="font-weight: bold; color: #000000; padding: 6px; border-bottom: 1.5px solid #374151; #{'text-align: right;' if col.get('figure_type') in ['monetary', 'float', 'integer'] else 'text-align: left;'}">
+                        <t t-out="col.get('name')"/>
+                    </th>
+                </t>
+            </tr>
+        </thead>
+    </template>
+
+    <!-- Custom PDF Filters to show selected Category in header -->
+    <template id="pdf_export_filters">
+        <t t-call="account_reports.pdf_export_filters"/>
+        <t t-if="options.get('product_category_id') and options.get('selected_category_name')">
+            <div class="row">
+                <div>Category: <span t-out="options['selected_category_name']" class="o_text_muted"/></div>
+            </div>
+        </t>
+    </template>
+</odoo>
+

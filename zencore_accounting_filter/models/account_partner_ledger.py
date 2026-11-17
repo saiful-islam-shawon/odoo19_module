@@ -27,6 +27,16 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
         else:
             options['selected_category_name'] = ''
 
+        # Date string formatting for single partner custom header (both web and PDF)
+        date_opt = options.get('date', {})
+        if date_opt.get('filter') == 'custom' and date_opt.get('date_from') and date_opt.get('date_to'):
+            from_d = fields.Date.from_string(date_opt['date_from']).strftime('%m/%d/%Y')
+            to_d = fields.Date.from_string(date_opt['date_to']).strftime('%m/%d/%Y')
+            options['formatted_date_range'] = f"From {from_d} to {to_d}"
+        else:
+            raw_date = date_opt.get('string', '')
+            options['formatted_date_range'] = raw_date.replace('\n', ' ') if raw_date else ''
+
         partner_ids = options.get('partner_ids') or []
         if len(partner_ids) == 1:
             partner = self.env['res.partner'].browse(partner_ids[0])
@@ -73,6 +83,12 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
             # In-report header template and styling
             options['custom_display_config']['css_custom_class'] += ' zencore_single_partner_ledger'
             options['custom_display_config']['templates']['AccountReportHeader'] = 'zencore_accounting_filter.PartnerLedgerHeader'
+
+            # PDF export customization for single partner view
+            options['custom_display_config']['pdf_export'] = {
+                'pdf_export_main_table_header': 'zencore_accounting_filter.pdf_export_main_table_header',
+                'pdf_export_filters': 'zencore_accounting_filter.pdf_export_filters',
+            }
         else:
             options['is_single_partner'] = False
 
