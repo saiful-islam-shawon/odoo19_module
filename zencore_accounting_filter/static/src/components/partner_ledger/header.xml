@@ -63,20 +63,41 @@
             </t>
         </xpath>
 
-        <!-- First row (column_headers_row): Keep first th empty; center the date header -->
-        <xpath expr="//tr[@data-id='column_headers_row']/th[1]" position="replace">
-            <th>
-                <t t-if="!controller.options.is_single_partner and columnHeader_first and controller.options.companies.length > 1">
-                    <span class="companies_header" t-out="controller.options.companies.map(company => company.name).join(', ')"/>
+        <!-- First Header Row: When single partner, takes the FULL row (colspan across all columns) and centers the date text -->
+        <xpath expr="//tr[@data-id='column_headers_row']" position="replace">
+            <tr data-id="column_headers_row">
+                <t t-if="controller.options.is_single_partner">
+                    <th t-att-colspan="controller.options.columns.length + 1" class="column_header text-center py-2 bg-light border-bottom">
+                        <span class="fw-bold" style="color: #111827; font-size: 0.95rem;" t-out="(columnHeader and columnHeader.length) ? columnHeader[0].name : (controller.options.date ? controller.options.date.string : '')"/>
+                    </th>
                 </t>
-            </th>
+                <t t-else="">
+                    <!-- First empty column -->
+                    <th>
+                        <t t-if="columnHeader_first and controller.options.companies.length > 1">
+                            <span class="companies_header" t-out="controller.options.companies.map(company => company.name).join(', ')"/>
+                        </t>
+                    </th>
+
+                    <!-- Other columns -->
+                    <t t-foreach="columnHeader" t-as="header" t-key="header_index">
+                        <th
+                            class="column_header"
+                            t-att-colspan="this.columnHeadersColspan(columnHeader_index, header)"
+                            t-att-rowspan="this.columnHeadersRowspan(header)"
+                        >
+                            <t t-out="header.name"/>
+                        </th>
+                    </t>
+                </t>
+            </tr>
         </xpath>
 
-        <!-- Second row (column_subheaders_row): Set first th to bold black "Customer Name" -->
+        <!-- Second row (column_subheaders_row): First th is bold black "Customer Name" -->
         <xpath expr="//tr[@data-id='column_subheaders_row']/th[1]" position="replace">
             <th class="zencore_customer_name_header">
                 <t t-if="controller.options.is_single_partner">
-                    <span class="fw-bold text-black" style="color: #000000 !important; font-weight: bold !important;">Customer Name</span>
+                    <span class="fw-bold text-black" style="color: #000000 !important; font-weight: 700 !important;">Customer Name</span>
                 </t>
             </th>
         </xpath>

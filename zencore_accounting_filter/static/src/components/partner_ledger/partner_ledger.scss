@@ -21,13 +21,16 @@
     }
 
     .zencore_single_partner_header {
-        /* Center the date range header in the middle of the row */
+        /* Full-width, dead-center Date Range Header */
         tr[data-id="column_headers_row"] {
             th.column_header {
                 text-align: center !important;
                 vertical-align: middle !important;
-                font-weight: 600;
-                color: #111827;
+                font-weight: 700 !important;
+                color: #111827 !important;
+                background-color: #f9fafb !important;
+                border-top: 1px solid #dee2e6;
+                border-bottom: 1px solid #dee2e6;
             }
         }
 
@@ -45,7 +48,7 @@
 
             th {
                 color: #000000;
-                font-weight: 600;
+                font-weight: 700;
             }
         }
     }
