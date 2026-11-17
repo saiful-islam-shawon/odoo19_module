@@ -167,12 +167,26 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
 
             matched_category_invoices = set()
             for inv in invoices:
-                cat_lines = inv.invoice_line_ids.filtered(
-                    lambda l: l.display_type == 'product' and l.product_id.categ_id.id in all_category_ids
+                prod_lines = inv.invoice_line_ids.filtered(lambda l: l.display_type == 'product')
+                cat_lines = prod_lines.filtered(
+                    lambda l: l.product_id.categ_id.id in all_category_ids
                 )
                 if not cat_lines:
                     continue
-                cat_amount = sum(cat_lines.mapped('price_total'))
+
+                # Proportion of category products against all positive product lines
+                # to properly allocate invoice-level discounts, roundings, and adjustments
+                pos_lines = prod_lines.filtered(lambda l: l.price_total > 0)
+                cat_pos_lines = cat_lines.filtered(lambda l: l.price_total > 0)
+                pos_total = sum(pos_lines.mapped('price_total'))
+                cat_pos_total = sum(cat_pos_lines.mapped('price_total'))
+
+                if pos_total > 0:
+                    prop = cat_pos_total / pos_total
+                    cat_amount = round(abs(inv.amount_total) * prop, 2)
+                else:
+                    cat_amount = sum(cat_lines.mapped('price_total'))
+
                 if float_is_zero(cat_amount, precision_digits=2):
                     continue
                 matched_category_invoices.add(inv.id)
@@ -210,6 +224,10 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
                     pay_aml = part.credit_move_id
                     pay_move = pay_aml.move_id
 
+                    # Skip credit notes or invoices already present in the report
+                    if pay_move.id in matched_category_invoices or pay_move.move_type in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund'):
+                        continue
+
                     pay_date = pay_move.date
                     if date_from and str(pay_date) < str(date_from):
                         continue
@@ -219,11 +237,18 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
                     inv_move = part.debit_move_id.move_id
                     prop = 1.0
                     if inv_move.amount_total > 0:
-                        inv_cat_lines = inv_move.invoice_line_ids.filtered(
-                            lambda l: l.display_type == 'product' and l.product_id.categ_id.id in all_category_ids
+                        inv_prod_lines = inv_move.invoice_line_ids.filtered(lambda l: l.display_type == 'product')
+                        inv_cat_lines = inv_prod_lines.filtered(
+                            lambda l: l.product_id.categ_id.id in all_category_ids
                         )
-                        inv_cat_amount = sum(inv_cat_lines.mapped('price_total'))
-                        prop = min(1.0, inv_cat_amount / inv_move.amount_total)
+                        inv_pos_lines = inv_prod_lines.filtered(lambda l: l.price_total > 0)
+                        inv_cat_pos_lines = inv_cat_lines.filtered(lambda l: l.price_total > 0)
+                        inv_pos_total = sum(inv_pos_lines.mapped('price_total'))
+                        inv_cat_pos_total = sum(inv_cat_pos_lines.mapped('price_total'))
+                        if inv_pos_total > 0:
+                            prop = min(1.0, inv_cat_pos_total / inv_pos_total)
+                        else:
+                            prop = 1.0
 
                     payments_by_move[pay_move.id]['amount'] += part.amount * prop
                     payments_by_move[pay_move.id]['date'] = pay_date
