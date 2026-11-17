@@ -1,5 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import io
 from collections import defaultdict
 from odoo import api, fields, models, _
 from odoo.tools.float_utils import float_is_zero
@@ -87,6 +88,7 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
             # PDF export customization for single partner view
             options['custom_display_config']['pdf_export'] = {
                 'pdf_export_main_table_header': 'zencore_accounting_filter.pdf_export_main_table_header',
+                'pdf_export_main_table_body': 'zencore_accounting_filter.pdf_export_main_table_body',
                 'pdf_export_filters': 'zencore_accounting_filter.pdf_export_filters',
             }
         else:
@@ -314,3 +316,160 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
         lines.append((0, total_line))
 
         return lines
+
+    def export_to_xlsx(self, options, response=None):
+        report = self.env['account.report'].browse(options['report_id'])
+        if not options.get('is_single_partner'):
+            return report.export_to_xlsx(options, response=response)
+        return self._export_single_partner_to_xlsx(report, options, response=response)
+
+    def _export_single_partner_to_xlsx(self, report, options, response=None):
+        import xlsxwriter
+
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {
+            'in_memory': True,
+            'strings_to_formulas': False,
+        })
+        sheet = workbook.add_worksheet('Partner Ledger')
+        sheet.set_paper(9)  # A4
+        sheet.set_landscape()
+
+        # Format styles
+        company_format = workbook.add_format({
+            'font_name': 'Arial', 'font_size': 12, 'bold': True, 'font_color': '#111827'
+        })
+        report_title_format = workbook.add_format({
+            'font_name': 'Arial', 'font_size': 14, 'bold': True, 'font_color': '#1E3A8A'
+        })
+        meta_label_format = workbook.add_format({
+            'font_name': 'Arial', 'font_size': 10, 'bold': True, 'font_color': '#374151'
+        })
+        meta_val_format = workbook.add_format({
+            'font_name': 'Arial', 'font_size': 10, 'font_color': '#4B5563'
+        })
+
+        # Table header styles
+        th_left_format = workbook.add_format({
+            'font_name': 'Arial', 'font_size': 10, 'bold': True, 'bg_color': '#F1F5F9',
+            'border': 1, 'align': 'left', 'valign': 'vcenter'
+        })
+        th_right_format = workbook.add_format({
+            'font_name': 'Arial', 'font_size': 10, 'bold': True, 'bg_color': '#F1F5F9',
+            'border': 1, 'align': 'right', 'valign': 'vcenter'
+        })
+        date_bar_format = workbook.add_format({
+            'font_name': 'Arial', 'font_size': 11, 'bold': True, 'bg_color': '#E2E8F0',
+            'border': 1, 'align': 'center', 'valign': 'vcenter'
+        })
+
+        # Data cell styles
+        td_left_format = workbook.add_format({
+            'font_name': 'Arial', 'font_size': 10, 'border': 1, 'align': 'left', 'valign': 'vcenter'
+        })
+        td_date_format = workbook.add_format({
+            'font_name': 'Arial', 'font_size': 10, 'border': 1, 'align': 'left', 'valign': 'vcenter'
+        })
+        td_num_format = workbook.add_format({
+            'font_name': 'Arial', 'font_size': 10, 'border': 1, 'align': 'right', 'valign': 'vcenter',
+            'num_format': '#,##0.00'
+        })
+
+        # Total row styles
+        total_label_format = workbook.add_format({
+            'font_name': 'Arial', 'font_size': 11, 'bold': True, 'border': 1,
+            'align': 'center', 'valign': 'vcenter', 'bg_color': '#F8FAFC'
+        })
+        total_num_format = workbook.add_format({
+            'font_name': 'Arial', 'font_size': 11, 'bold': True, 'border': 1,
+            'align': 'right', 'valign': 'vcenter', 'num_format': '#,##0.00', 'bg_color': '#F8FAFC'
+        })
+
+        # Set Column Widths
+        sheet.set_column(0, 0, 26)  # Customer Name
+        sheet.set_column(1, 1, 22)  # Number
+        sheet.set_column(2, 2, 14)  # Date
+        sheet.set_column(3, 3, 16)  # Debit
+        sheet.set_column(4, 4, 16)  # Credit
+        sheet.set_column(5, 5, 18)  # Balance
+
+        # Write Report Info Block
+        company_name = self.env.company.name
+        partner_name = options.get('selected_partner_name', '')
+        date_range_str = options.get('formatted_date_range', '')
+        category_name = options.get('selected_category_name') or 'All Categories'
+
+        curr_row = 0
+        sheet.write(curr_row, 0, company_name, company_format)
+        curr_row += 1
+        sheet.write(curr_row, 0, 'Partner Ledger', report_title_format)
+        curr_row += 1
+        sheet.write(curr_row, 0, 'Customer Name:', meta_label_format)
+        sheet.write(curr_row, 1, partner_name, meta_val_format)
+        curr_row += 1
+        sheet.write(curr_row, 0, 'Date:', meta_label_format)
+        sheet.write(curr_row, 1, date_range_str, meta_val_format)
+        curr_row += 1
+        sheet.write(curr_row, 0, 'Category:', meta_label_format)
+        sheet.write(curr_row, 1, category_name, meta_val_format)
+        curr_row += 2  # Blank line separator
+
+        # Date header row spanning all 6 columns
+        if date_range_str:
+            sheet.merge_range(curr_row, 0, curr_row, 5, date_range_str, date_bar_format)
+            sheet.set_row(curr_row, 24)
+            curr_row += 1
+
+        # Table Column Headers
+        sheet.set_row(curr_row, 22)
+        sheet.write(curr_row, 0, 'Customer Name', th_left_format)
+        sheet.write(curr_row, 1, 'Number', th_left_format)
+        sheet.write(curr_row, 2, 'Date', th_left_format)
+        sheet.write(curr_row, 3, 'Debit', th_right_format)
+        sheet.write(curr_row, 4, 'Credit', th_right_format)
+        sheet.write(curr_row, 5, 'Balance', th_right_format)
+        curr_row += 1
+
+        # Fetch lines
+        lines = report._get_lines(options)
+
+        for line in lines:
+            if 'total' in str(line.get('id', '')):
+                # TOTAL summary row: merge cols 0 to 2
+                sheet.set_row(curr_row, 22)
+                sheet.merge_range(curr_row, 0, curr_row, 2, 'TOTAL', total_label_format)
+                deb_val = line['columns'][2].get('no_format', 0.0)
+                cred_val = line['columns'][3].get('no_format', 0.0)
+                bal_val = line['columns'][4].get('no_format', 0.0)
+                sheet.write(curr_row, 3, float(deb_val) if isinstance(deb_val, (int, float)) else 0.0, total_num_format)
+                sheet.write(curr_row, 4, float(cred_val) if isinstance(cred_val, (int, float)) else 0.0, total_num_format)
+                sheet.write(curr_row, 5, float(bal_val) if isinstance(bal_val, (int, float)) else 0.0, total_num_format)
+                curr_row += 1
+            else:
+                # Regular transaction row
+                sheet.set_row(curr_row, 19)
+                cust_val = line.get('name', '')
+                num_val = line['columns'][0].get('no_format') or line['columns'][0].get('name', '')
+                date_val = line['columns'][1].get('no_format') or line['columns'][1].get('name', '')
+                deb_val = line['columns'][2].get('no_format', 0.0)
+                cred_val = line['columns'][3].get('no_format', 0.0)
+                bal_val = line['columns'][4].get('no_format', 0.0)
+
+                sheet.write(curr_row, 0, cust_val, td_left_format)
+                sheet.write(curr_row, 1, num_val, td_left_format)
+                sheet.write(curr_row, 2, str(date_val) if date_val else '', td_date_format)
+                sheet.write(curr_row, 3, float(deb_val) if isinstance(deb_val, (int, float)) else 0.0, td_num_format)
+                sheet.write(curr_row, 4, float(cred_val) if isinstance(cred_val, (int, float)) else 0.0, td_num_format)
+                sheet.write(curr_row, 5, float(bal_val) if isinstance(bal_val, (int, float)) else 0.0, td_num_format)
+                curr_row += 1
+
+        workbook.close()
+        output.seek(0)
+        generated_file = output.read()
+        output.close()
+
+        return {
+            'file_name': report.get_default_report_filename(options, 'xlsx'),
+            'file_content': generated_file,
+            'file_type': 'xlsx',
+        }

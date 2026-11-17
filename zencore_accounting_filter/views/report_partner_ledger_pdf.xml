@@ -1,32 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Custom PDF Table Header for Single Partner Ledger View -->
     <template id="pdf_export_main_table_header">
+        <style>
+            .o_table {
+                table-layout: fixed !important;
+                border-collapse: collapse !important;
+                width: 100% !important;
+            }
+            .o_table col.largest_column {
+                width: 18% !important;
+            }
+            .zencore_table_cell {
+                border: 1px solid #000000 !important;
+                padding: 5px 6px !important;
+                font-family: Arial, sans-serif !important;
+                font-size: 11px !important;
+                word-wrap: break-word !important;
+            }
+            .zencore_table_header {
+                border: 1px solid #000000 !important;
+                padding: 6px 6px !important;
+                font-family: Arial, sans-serif !important;
+                font-weight: bold !important;
+                font-size: 12px !important;
+                background-color: #ffffff !important;
+                color: #000000 !important;
+            }
+            .zencore_total_cell {
+                border: 1px solid #000000 !important;
+                padding: 6px 6px !important;
+                font-family: Arial, sans-serif !important;
+                font-weight: bold !important;
+                font-size: 12px !important;
+                color: #000000 !important;
+            }
+        </style>
         <thead id="table_header">
-            <!-- Row 1: Full-width Date Range spanning all 6 columns and centered -->
             <tr>
-                <t t-set="date_str" t-value="options.get('formatted_date_range') or (options.get('column_headers') and options['column_headers'][0] and options['column_headers'][0][0].get('name')) or (options.get('date', {}).get('string', ''))"/>
-                <th t-att-colspan="len(options['columns']) + 1" style="background-color: #e7e9ed; text-align: center; font-weight: bold; padding: 6px; border: 0.5px solid #d1d5db; color: #111827;">
-                    <t t-out="date_str"/>
-                </th>
-            </tr>
-            <!-- Row 2: Column Headers with Customer Name first -->
-            <tr>
-                <th style="font-weight: bold; color: #000000; text-align: left; padding: 6px; border-bottom: 1.5px solid #374151;">
+                <th class="zencore_table_header" style="text-align: left !important; width: 18% !important;">
                     Customer Name
                 </th>
-                <t t-foreach="options['columns']" t-as="col">
-                    <th t-attf-style="font-weight: bold; color: #000000; padding: 6px; border-bottom: 1.5px solid #374151; #{'text-align: right;' if col.get('figure_type') in ['monetary', 'float', 'integer'] else 'text-align: left;'}">
-                        <t t-out="col.get('name')"/>
-                    </th>
-                </t>
+                <th class="zencore_table_header" style="text-align: left !important; width: 22% !important;">
+                    Number
+                </th>
+                <th class="zencore_table_header" style="text-align: left !important; width: 16% !important;">
+                    Date
+                </th>
+                <th class="zencore_table_header" style="text-align: right !important; width: 15% !important;">
+                    Debit
+                </th>
+                <th class="zencore_table_header" style="text-align: right !important; width: 14% !important;">
+                    Credit
+                </th>
+                <th class="zencore_table_header" style="text-align: right !important; width: 15% !important;">
+                    Balance
+                </th>
             </tr>
         </thead>
     </template>
 
-    <!-- Custom PDF Filters to show selected Category in header -->
+    <template id="pdf_export_main_table_body">
+        <t t-foreach="lines" t-as="line">
+            <t t-if="'total' in str(line.get('id', ''))">
+                <tr style="font-weight: bold; background-color: #ffffff;">
+                    <td colspan="3" class="zencore_total_cell" style="text-align: center !important; font-weight: bold !important; border: 1px solid #000000 !important; padding: 6px !important;">
+                        TOTAL
+                    </td>
+                    <td class="zencore_total_cell" style="text-align: right !important; font-weight: bold !important; border: 1px solid #000000 !important; padding: 6px !important;">
+                        <t t-set="deb_val" t-value="line['columns'][2].get('no_format', 0.0)"/>
+                        <t t-out="'{:,.2f}'.format(deb_val) if isinstance(deb_val, (int, float)) else line['columns'][2].get('name')"/>
+                    </td>
+                    <td class="zencore_total_cell" style="text-align: right !important; font-weight: bold !important; border: 1px solid #000000 !important; padding: 6px !important;">
+                        <t t-set="cred_val" t-value="line['columns'][3].get('no_format', 0.0)"/>
+                        <t t-out="'{:,.2f}'.format(cred_val) if isinstance(cred_val, (int, float)) else line['columns'][3].get('name')"/>
+                    </td>
+                    <td class="zencore_total_cell" style="text-align: right !important; font-weight: bold !important; border: 1px solid #000000 !important; padding: 6px !important;">
+                        <t t-set="bal_val" t-value="line['columns'][4].get('no_format', 0.0)"/>
+                        <t t-out="'{:,.2f}'.format(bal_val) if isinstance(bal_val, (int, float)) else line['columns'][4].get('name')"/>
+                    </td>
+                </tr>
+            </t>
+            <t t-else="">
+                <tr style="background-color: #ffffff;">
+                    <td class="zencore_table_cell" style="text-align: left !important; vertical-align: middle !important; border: 1px solid #000000 !important; padding: 5px 6px !important;">
+                        <t t-out="line.get('name')"/>
+                    </td>
+                    <td class="zencore_table_cell" style="text-align: left !important; vertical-align: middle !important; border: 1px solid #000000 !important; padding: 5px 6px !important;">
+                        <t t-out="line['columns'][0].get('name')"/>
+                    </td>
+                    <td class="zencore_table_cell" style="text-align: left !important; vertical-align: middle !important; border: 1px solid #000000 !important; padding: 5px 6px !important;">
+                        <t t-out="line['columns'][1].get('name')"/>
+                    </td>
+                    <td class="zencore_table_cell" style="text-align: right !important; vertical-align: middle !important; border: 1px solid #000000 !important; padding: 5px 6px !important;">
+                        <t t-set="deb_val" t-value="line['columns'][2].get('no_format', 0.0)"/>
+                        <t t-out="'{:,.2f}'.format(deb_val) if isinstance(deb_val, (int, float)) else line['columns'][2].get('name')"/>
+                    </td>
+                    <td class="zencore_table_cell" style="text-align: right !important; vertical-align: middle !important; border: 1px solid #000000 !important; padding: 5px 6px !important;">
+                        <t t-set="cred_val" t-value="line['columns'][3].get('no_format', 0.0)"/>
+                        <t t-out="'{:,.2f}'.format(cred_val) if isinstance(cred_val, (int, float)) else line['columns'][3].get('name')"/>
+                    </td>
+                    <td class="zencore_table_cell" style="text-align: right !important; vertical-align: middle !important; border: 1px solid #000000 !important; padding: 5px 6px !important;">
+                        <t t-set="bal_val" t-value="line['columns'][4].get('no_format', 0.0)"/>
+                        <t t-out="'{:,.2f}'.format(bal_val) if isinstance(bal_val, (int, float)) else line['columns'][4].get('name')"/>
+                    </td>
+                </tr>
+            </t>
+        </t>
+    </template>
+
     <template id="pdf_export_filters">
         <t t-call="account_reports.pdf_export_filters"/>
+        <div class="row" t-if="options.get('formatted_date_range')">
+            <div>Date: <span t-out="options['formatted_date_range']" class="o_text_muted"/></div>
+        </div>
         <t t-if="options.get('product_category_id') and options.get('selected_category_name')">
             <div class="row">
                 <div>Category: <span t-out="options['selected_category_name']" class="o_text_muted"/></div>
@@ -34,4 +120,3 @@
         </t>
     </template>
 </odoo>
-
