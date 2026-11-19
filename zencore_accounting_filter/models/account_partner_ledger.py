@@ -209,6 +209,50 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
                     'credit': credit,
                 })
 
+            # Direct category payments (payments explicitly tagged with this category via book_category_id)
+            processed_payment_move_ids = set()
+            if 'book_category_id' in self.env['account.payment']._fields:
+                pay_domain = [
+                    ('partner_id', 'in', partner_domain_ids),
+                    ('company_id', 'in', company_ids),
+                    ('state', 'in', ('posted', 'paid')),
+                    ('book_category_id', 'in', list(all_category_ids)),
+                ]
+                if date_from:
+                    pay_domain.append(('date', '>=', date_from))
+                if date_to:
+                    pay_domain.append(('date', '<=', date_to))
+
+                cat_payments = self.env['account.payment'].search(pay_domain, order='date asc, id asc')
+                for pay in cat_payments:
+                    if not pay.move_id or pay.move_id.state != 'posted':
+                        continue
+                    pay_move = pay.move_id
+                    processed_payment_move_ids.add(pay_move.id)
+
+                    rec_lines = pay_move.line_ids.filtered(
+                        lambda l: l.account_type in ('asset_receivable', 'liability_payable')
+                        and l.partner_id.id in partner_domain_ids
+                    )
+                    if not rec_lines:
+                        continue
+
+                    debit_amt = sum(rec_lines.mapped('debit'))
+                    credit_amt = sum(rec_lines.mapped('credit'))
+                    if float_is_zero(debit_amt, precision_digits=2) and float_is_zero(credit_amt, precision_digits=2):
+                        continue
+
+                    pay_date = pay.date or pay_move.date
+                    pdate_str = fields.Date.to_string(pay_date) if pay_date else ''
+
+                    all_rows.append({
+                        'id': pay_move.id,
+                        'number': pay.name or pay_move.name or '',
+                        'date': pdate_str,
+                        'debit': debit_amt,
+                        'credit': credit_amt,
+                    })
+
             # Reconciled payments against those category invoices
             if matched_category_invoices:
                 rec_lines = self.env['account.move.line'].search([
@@ -225,7 +269,11 @@ class AccountPartnerLedgerReportHandler(models.AbstractModel):
                     pay_move = pay_aml.move_id
 
                     # Skip credit notes or invoices already present in the report
-                    if pay_move.id in matched_category_invoices or pay_move.move_type in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund'):
+                    if (
+                        pay_move.id in matched_category_invoices
+                        or pay_move.id in processed_payment_move_ids
+                        or pay_move.move_type in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')
+                    ):
                         continue
 
                     pay_date = pay_move.date

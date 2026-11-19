@@ -2,24 +2,47 @@
 <odoo>
     <!-- Custom PDF Company Information (Tax ID removed as per user request) -->
     <template id="company_information">
-        <img t-if="env.company.logo" class="o_company_logo" t-att-src="image_data_uri(env.company.logo)" alt="Logo"/>
-        <t t-set="company_names" t-value="[company['name'] for company in options['companies']]"/>
-        <div class="row">
-            <div class="col-10" t-out="', '.join(company_names)"/>
-        </div>
+        <style>
+            .zencore_company_info,
+            .zencore_company_info div,
+            .zencore_company_info span,
+            .zencore_company_info address,
+            .zencore_company_info address *,
+            .zencore_company_info .o_text_muted {
+                color: #000000 !important;
+            }
+        </style>
+        <div class="zencore_company_info">
+            <img t-if="env.company.logo" class="o_company_logo" t-att-src="image_data_uri(env.company.logo)" alt="Logo"/>
+            <t t-set="company_names" t-value="[company['name'] for company in options['companies']]"/>
+            <div class="row">
+                <div class="col-10" style="color: #000000 !important;" t-out="', '.join(company_names)"/>
+            </div>
 
-        <address class="mb-0 o_text_muted" t-field="env.company.partner_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
-        <!-- Tax ID removed as requested -->
+            <address class="mb-0" style="color: #000000 !important;" t-field="env.company.partner_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
+            <!-- Tax ID removed as requested -->
+        </div>
     </template>
 
     <!-- Custom PDF Filters (Displays Partners, Date, and Category on the right side) -->
     <template id="pdf_export_filters">
-        <t t-call="account_reports.pdf_export_filters"/>
-        <div class="row" t-if="options.get('formatted_date_range')">
-            <div>Date: <span t-out="options['formatted_date_range']" class="o_text_muted"/></div>
-        </div>
-        <div class="row">
-            <div>Category: <span t-out="options.get('selected_category_name') or 'All Categories'" class="o_text_muted"/></div>
+        <style>
+            .zencore_pdf_filters,
+            .zencore_pdf_filters div,
+            .zencore_pdf_filters span,
+            .zencore_pdf_filters *,
+            .zencore_pdf_filters .o_text_muted {
+                color: #000000 !important;
+            }
+        </style>
+        <div class="zencore_pdf_filters">
+            <t t-call="account_reports.pdf_export_filters"/>
+            <div class="row" t-if="options.get('formatted_date_range')">
+                <div style="color: #000000 !important;">Date: <span t-out="options['formatted_date_range']" style="color: #000000 !important;"/></div>
+            </div>
+            <div class="row">
+                <div style="color: #000000 !important;">Category: <span t-out="options.get('selected_category_name') or 'All Categories'" style="color: #000000 !important;"/></div>
+            </div>
         </div>
     </template>
 
@@ -39,6 +62,7 @@
                 padding: 5px 6px !important;
                 font-family: Arial, sans-serif !important;
                 font-size: 11px !important;
+                color: #000000 !important;
                 word-wrap: break-word !important;
             }
             .zencore_table_header {
