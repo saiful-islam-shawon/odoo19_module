@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_zencore_hs_code_vat_form" model="ir.ui.view">
+    <field name="name">zencore.hs.code.vat.form</field>
+    <field name="model">zencore.hs.code</field>
+    <field name="inherit_id" ref="zencore_hs_code.view_zencore_hs_code_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//sheet" position="inside">
+        <notebook>
+          <page name="zsl_vat_classification" string="Bangladesh VAT">
+            <group>
+              <group>
+                <field name="code_type"/>
+                <field name="vat_uom_id"/>
+              </group>
+              <group>
+                <field name="treatment"/>
+                <field name="vds_rate"/>
+              </group>
+            </group>
+          </page>
+        </notebook>
+      </xpath>
+    </field>
+  </record>
+</odoo>

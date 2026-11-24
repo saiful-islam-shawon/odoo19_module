@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <record id="view_vds_certificate_list" model="ir.ui.view">
+    <field name="name">vat.vds.certificate.list</field>
+    <field name="model">vat.vds.certificate</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="certificate_date"/>
+        <field name="direction"/>
+        <field name="partner_id"/>
+        <field name="move_id"/>
+        <field name="base_amount"/>
+        <field name="rate"/>
+        <field name="amount"/>
+        <field name="state"/>
+      </list>
+    </field>
+  </record>
+  <record id="view_vds_certificate_form" model="ir.ui.view">
+    <field name="name">vat.vds.certificate.form</field>
+    <field name="model">vat.vds.certificate</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_confirm" type="object" string="Confirm / Issue" invisible="state != 'draft'"/>
+          <button name="action_reconcile" type="object" string="Reconcile Certificate" invisible="direction != 'suffered' or not certificate_received"/>
+          <button name="action_print_mushak_vds" type="object" string="Print Mushak 6.6" invisible="state == 'draft'"/>
+          <field name="state" widget="statusbar"/>
+        </header>
+        <sheet>
+          <group>
+            <group>
+              <field name="name"/>
+              <field name="company_id"/>
+              <field name="unit_id"/>
+              <field name="direction"/>
+              <field name="certificate_date"/>
+            </group>
+            <group>
+              <field name="partner_id"/>
+              <field name="move_id"/>
+              <field name="base_amount"/>
+              <field name="rate"/>
+              <field name="amount" readonly="1"/>
+            </group>
+          </group>
+          <group>
+            <field name="treasury_payment_id"/>
+            <field name="certificate_received"/>
+            <field name="attachment_ids" widget="many2many_binary"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="action_vds_certificate" model="ir.actions.act_window">
+    <field name="name">VDS Certificates (Mushak 6.6)</field>
+    <field name="res_model">vat.vds.certificate</field>
+    <field name="view_mode">list,form</field>
+  </record>
+  <record id="view_vat_treasury_payment_list" model="ir.ui.view">
+    <field name="name">vat.treasury.payment.list</field>
+    <field name="model">vat.treasury.payment</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="challan_number"/>
+        <field name="payment_date"/>
+        <field name="payment_type"/>
+        <field name="return_id"/>
+        <field name="amount"/>
+        <field name="bank"/>
+        <field name="state"/>
+      </list>
+    </field>
+  </record>
+  <record id="view_vat_treasury_payment_form" model="ir.ui.view">
+    <field name="name">vat.treasury.payment.form</field>
+    <field name="model">vat.treasury.payment</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_confirm" type="object" string="Confirm Deposit" invisible="state != 'draft'"/>
+          <button name="action_print_treasury_challan" type="object" string="Print TR-6"/>
+          <field name="state" widget="statusbar"/>
+        </header>
+        <sheet>
+          <group>
+            <group>
+              <field name="name"/>
+              <field name="company_id"/>
+              <field name="unit_id"/>
+              <field name="return_id"/>
+              <field name="payment_type"/>
+            </group>
+            <group>
+              <field name="payment_date"/>
+              <field name="challan_number"/>
+              <field name="bank"/>
+              <field name="economic_code"/>
+              <field name="amount"/>
+            </group>
+          </group>
+          <group>
+            <field name="attachment_ids" widget="many2many_binary"/>
+          </group>
+          <notebook>
+            <page string="VDS Certificates">
+              <field name="vds_certificate_ids">
+                <list>
+                  <field name="name"/>
+                  <field name="partner_id"/>
+                  <field name="amount"/>
+                  <field name="state"/>
+                </list>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="action_vat_treasury_payment" model="ir.actions.act_window">
+    <field name="name">Treasury Challans &amp; Payments</field>
+    <field name="res_model">vat.treasury.payment</field>
+    <field name="view_mode">list,form</field>
+  </record>
+</odoo>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="action_print_official_mushak_62" model="ir.actions.server">
+    <field name="name">Mushak 6.2 — QWeb Print</field>
+    <field name="model_id" ref="zsl_vat.model_vat_book_wizard"/>
+    <field name="state">code</field>
+    <field name="code">action = records.with_context(default_book_type='sales').action_print()</field>
+  </record>
+  <record id="action_report_mushak_62" model="ir.actions.report"><field name="name">Mushak 6.2 — Sales Book</field><field name="model">vat.book.wizard</field><field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_62</field><field name="report_file">zsl_vat.report_mushak_62</field></record>
+  <template id="report_mushak_62"><t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-set="form_code" t-value="'Mushak 6.2'"/><t t-set="form_title" t-value="'Sales Book'"/><t t-set="moves" t-value="o._moves()"/><t t-call="zsl_vat.mushak_qweb_layout"><div class="zsl-mushak-section"><h4>Tax period: <span t-field="o.period_id"/> | VAT unit: <span t-field="o.unit_id"/></h4><table class="zsl-mushak-table"><tr><th>SL</th><th>Date</th><th>Customer / BIN</th><th>Mushak / Invoice no.</th><th>Taxable value</th><th>SD</th><th>VAT</th><th>Supply type</th></tr><tr t-foreach="moves" t-as="move"><td><span t-esc="move_index + 1"/></td><td><span t-field="move.invoice_date"/></td><td><span t-field="move.partner_id"/><br/><span t-field="move.partner_id.vat_bin"/></td><td><span t-field="move.vat_mushak_number"/><br/><span t-field="move.name"/></td><td class="zsl-mushak-number"><span t-field="move.vat_taxable_amount"/></td><td class="zsl-mushak-number"><span t-field="move.vat_sd_amount"/></td><td class="zsl-mushak-number"><span t-field="move.vat_output_amount"/></td><td><span t-field="move.vat_supply_type"/></td></tr></table></div></t></t></t></template>
+</odoo>

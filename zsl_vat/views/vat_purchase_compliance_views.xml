@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_vat_import_declaration_list" model="ir.ui.view">
+    <field name="name">vat.import.declaration.list</field><field name="model">vat.import.declaration</field>
+    <field name="arch" type="xml"><list><field name="name"/><field name="bill_of_entry_number"/><field name="bill_of_entry_date"/><field name="purchase_order_id"/><field name="vendor_bill_id"/><field name="assessable_value"/><field name="vat_amount"/><field name="at_amount"/><field name="state"/></list></field>
+  </record>
+  <record id="view_vat_import_declaration_form" model="ir.ui.view">
+    <field name="name">vat.import.declaration.form</field><field name="model">vat.import.declaration</field>
+    <field name="arch" type="xml"><form><header><button name="action_confirm" type="object" string="Confirm Import / Bill of Entry" class="btn-primary" invisible="state != 'draft'" groups="zsl_vat.group_vat_officer"/><field name="state" widget="statusbar"/></header><sheet><div class="oe_title"><h1><field name="name"/></h1></div><group><group><field name="company_id"/><field name="unit_id"/><field name="purchase_order_id"/><field name="vendor_bill_id"/><field name="landed_cost_id"/></group><group><field name="bill_of_entry_number"/><field name="bill_of_entry_date"/><field name="customs_payment_reference"/><field name="customs_evidence_id"/></group></group><group string="Customs Assessment"><field name="assessable_value"/><field name="cd_amount"/><field name="rd_amount"/><field name="sd_amount"/><field name="vat_amount"/><field name="at_amount"/><field name="ait_amount"/></group><div class="alert alert-info" role="status">On confirmation, the Bill of Entry is linked to the vendor bill and landed cost; import VAT and AT are recorded as separately creditable taxes.</div></sheet><chatter/></form></field>
+  </record>
+  <record id="action_vat_import_declaration" model="ir.actions.act_window"><field name="name">Import &amp; Bill of Entry</field><field name="res_model">vat.import.declaration</field><field name="view_mode">list,form</field></record>
+
+  <record id="view_vat_capital_credit_schedule_list" model="ir.ui.view">
+    <field name="name">vat.capital.credit.schedule.list</field><field name="model">vat.capital.credit.schedule</field>
+    <field name="arch" type="xml"><list><field name="name"/><field name="move_id"/><field name="product_id"/><field name="total_credit_amount"/><field name="deferred_months"/><field name="start_date"/><field name="state"/></list></field>
+  </record>
+  <record id="view_vat_capital_credit_schedule_form" model="ir.ui.view">
+    <field name="name">vat.capital.credit.schedule.form</field><field name="model">vat.capital.credit.schedule</field>
+    <field name="arch" type="xml"><form><header><button name="action_confirm" type="object" string="Confirm Credit Schedule" class="btn-primary" invisible="state != 'draft'" groups="zsl_vat.group_vat_officer"/><field name="state" widget="statusbar"/></header><sheet><group><group><field name="company_id"/><field name="unit_id"/><field name="move_id"/><field name="move_line_id"/><field name="product_id"/></group><group><field name="total_credit_amount"/><field name="deferred_months"/><field name="start_date"/><field name="legal_reference"/></group></group><field name="line_ids" readonly="state != 'draft'"><list><field name="scheduled_date"/><field name="amount"/><field name="return_id"/><field name="state"/></list></field></sheet><chatter/></form></field>
+  </record>
+  <record id="action_vat_capital_credit_schedule" model="ir.actions.act_window"><field name="name">Capital Asset Input Credits</field><field name="res_model">vat.capital.credit.schedule</field><field name="view_mode">list,form</field></record>
+</odoo>

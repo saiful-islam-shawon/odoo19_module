@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="action_print_official_mushak_21" model="ir.actions.server">
+    <field name="name">Mushak 2.1 — QWeb Print</field>
+    <field name="model_id" ref="zsl_vat.model_vat_registration_application"/>
+    <field name="binding_model_id" eval="False"/>
+    <field name="state">code</field>
+    <field name="code">action = records.action_print_application()</field>
+  </record>
+  <record id="action_report_mushak_21" model="ir.actions.report">
+    <field name="name">Mushak 2.1 — Registration Application</field><field name="model">vat.registration.application</field>
+    <field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_21</field><field name="report_file">zsl_vat.report_mushak_21</field>
+    <field name="binding_model_id" ref="model_vat_registration_application"/><field name="binding_type">report</field>
+  </record>
+  <template id="report_mushak_21">
+    <t t-call="web.html_container"><t t-foreach="docs" t-as="o">
+      <t t-set="form_code" t-value="'Mushak 2.1'"/><t t-set="form_title" t-value="'VAT / Turnover Tax Registration Application'"/>
+      <t t-call="zsl_vat.mushak_qweb_layout">
+        <div class="zsl-mushak-section"><h4>করদাতার পরিচিতি / Applicant details</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Application no. / Version</td><td><span t-field="o.name"/> / <span t-field="o.version"/></td><td class="zsl-mushak-label">Registration type</td><td><span t-field="o.registration_type"/></td></tr><tr><td class="zsl-mushak-label">Legal name</td><td><span t-field="o.legal_name"/></td><td class="zsl-mushak-label">Trade name</td><td><span t-field="o.trade_name"/></td></tr><tr><td class="zsl-mushak-label">Applicant type</td><td><span t-field="o.applicant_type"/></td><td class="zsl-mushak-label">e-TIN / NID</td><td><span t-field="o.tin"/> / <span t-field="o.nid_or_passport"/></td></tr><tr><td class="zsl-mushak-label">Trade licence / RJSC</td><td><span t-field="o.trade_license_no"/> / <span t-field="o.rjsc_no"/></td><td class="zsl-mushak-label">BIDA</td><td><span t-field="o.bida_no"/></td></tr></table></div>
+        <div class="zsl-mushak-section"><h4>ঠিকানা, ব্যবসা ও আর্থিক তথ্য / Address, business and finance</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Registered address</td><td><span t-field="o.registered_address"/></td></tr><tr><td class="zsl-mushak-label">Contact address / Phone / Email</td><td><span t-field="o.contact_address"/> | <span t-field="o.phone"/> | <span t-field="o.email"/></td></tr><tr><td class="zsl-mushak-label">Business nature / activity</td><td><span t-field="o.business_nature"/> — <span t-field="o.business_activity"/></td></tr><tr><td class="zsl-mushak-label">Bank details</td><td><span t-field="o.bank_name"/> | <span t-field="o.bank_branch"/> | <span t-field="o.bank_account_no"/></td></tr><tr><td class="zsl-mushak-label">Historical / projected turnover</td><td><span t-field="o.historical_turnover"/> / <span t-field="o.projected_turnover"/></td></tr></table></div>
+        <div class="zsl-mushak-section"><h4>শাখা ও অনুমোদিত ব্যক্তি / Branches and authorised persons</h4><table class="zsl-mushak-table"><tr><th>VAT Unit / Branch</th><th>BIN</th><th>Address</th></tr><tr t-foreach="o.branch_unit_ids" t-as="unit"><td><span t-field="unit.name"/></td><td><span t-field="unit.bin"/></td><td><span t-field="unit.address"/></td></tr><tr t-if="not o.branch_unit_ids"><td colspan="3" class="zsl-mushak-muted">No branch entered</td></tr></table><table class="zsl-mushak-table"><tr><th>Name</th><th>Designation</th><th>NID / Phone</th><th>Address</th></tr><tr t-foreach="o.authorised_person_ids" t-as="person"><td><span t-field="person.name"/></td><td><span t-field="person.designation"/></td><td><span t-field="person.nid_or_passport"/> / <span t-field="person.phone"/></td><td><span t-field="person.address"/></td></tr></table></div>
+        <div class="zsl-mushak-section"><h4>Declaration</h4><table class="zsl-mushak-table"><tr><td>I declare that the information in this application is true and complete.</td></tr><tr><td>Declarant: <strong t-field="o.declaration_name"/>    Date: <strong t-field="o.declaration_date"/></td></tr></table></div>
+      </t>
+    </t></t>
+  </template>
+</odoo>

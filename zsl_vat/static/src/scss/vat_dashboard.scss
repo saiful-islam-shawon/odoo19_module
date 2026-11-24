@@ -1,0 +1,19 @@
+.o_zsl_vat_dashboard {
+    .vat-kpi { border: 0; border-radius: .45rem; min-height: 132px; padding: 1.15rem 1.35rem; color: #fff; background: linear-gradient(135deg, #129eb4, #36c8d5); box-shadow: 0 3px 10px rgba(6, 107, 130, .18); }
+    .vat-kpi:hover { background: linear-gradient(135deg, #0e8599, #25b7c5); }
+    .vat-kpi span, .vat-kpi small { display: block; opacity: .92; }
+    .vat-kpi strong { display: block; overflow: hidden; font-size: 1.8rem; line-height: 1.35; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+    .vat-kpi .vat-kpi-date { font-size: 1.45rem; }
+    .vat-kpi-light { background: linear-gradient(135deg, #0f9dae, #28bfca); }
+    .vat-chart-card { min-height: 320px; overflow: hidden; }
+    .vat-chart-card .card-header { color: #fff; background: #19adba; font-weight: 600; }
+    .vat-chart { position: relative; display: flex; align-items: end; justify-content: space-around; height: 220px; padding: 18px 10px 30px; border-bottom: 1px solid #d9e0e3; background: repeating-linear-gradient(to bottom, transparent 0, transparent 54px, #eef2f3 55px); }
+    .vat-column { display: flex; flex: 1; height: 100%; align-items: center; justify-content: end; flex-direction: column; gap: 8px; }
+    .vat-bar { display: block; min-height: 2px; width: 22px; border-radius: 4px 4px 0 0; }
+    .vat-bar-blue { background: #54aee0; }
+    .vat-bar-yellow { background: #f8ce20; }
+    .vat-pair { display: flex; height: 100%; align-items: end; gap: 4px; }
+    .vat-legend { display: flex; gap: 1rem; justify-content: center; padding-top: .8rem; color: #59656b; }
+    .vat-legend i { display: inline-block; width: 13px; height: 13px; margin-right: .35rem; vertical-align: -1px; }
+    .vat-legend-blue { background: #54aee0; }.vat-legend-yellow { background: #f8ce20; }
+}

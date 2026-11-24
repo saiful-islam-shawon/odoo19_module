@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <!-- Mushak 4.5 work queue: stock shortage and sample adjustment cases. -->
+  <record id="action_mushak_45_stock_adjustment" model="ir.actions.act_window">
+    <field name="name">Mushak 4.5 — Stock Adjustment</field>
+    <field name="res_model">vat.stock.adjustment</field>
+    <field name="view_mode">list,form</field>
+    <field name="domain">[('adjustment_type', 'in', ['shortage', 'sample'])]</field>
+    <field name="context">{'default_adjustment_type': 'shortage'}</field>
+  </record>
+  <record id="action_report_mushak_45" model="ir.actions.report"><field name="name">Mushak 4.5 — Stock Adjustment</field><field name="model">vat.stock.adjustment</field><field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_45</field><field name="report_file">zsl_vat.report_mushak_45</field><field name="binding_model_id" ref="model_vat_stock_adjustment"/><field name="binding_type">report</field></record>
+  <template id="report_mushak_45"><t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-set="form_code" t-value="'Mushak 4.5'"/><t t-set="form_title" t-value="'Stock Adjustment Statement'"/><t t-call="zsl_vat.mushak_qweb_layout"><div class="zsl-mushak-section"><h4>Stock shortage / sample adjustment</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Reference / date</td><td><span t-field="o.name"/> / <span t-field="o.adjustment_date"/></td><td class="zsl-mushak-label">VAT unit</td><td><span t-field="o.unit_id"/></td></tr><tr><td class="zsl-mushak-label">Adjustment type</td><td><span t-field="o.adjustment_type"/></td><td class="zsl-mushak-label">Status</td><td><span t-field="o.state"/></td></tr><tr><td class="zsl-mushak-label">Product / quantity</td><td><span t-field="o.product_id"/> / <span t-field="o.quantity"/></td><td class="zsl-mushak-label">VAT impact</td><td><span t-field="o.input_vat_reversal"/></td></tr><tr><td class="zsl-mushak-label">Reason</td><td colspan="3"><span t-field="o.reason"/></td></tr></table></div></t></t></t></template>
+</odoo>

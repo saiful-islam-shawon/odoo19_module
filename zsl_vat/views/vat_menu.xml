@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <record id="action_vat_dashboard" model="ir.actions.client">
+    <field name="name">VAT Dashboard</field>
+    <field name="tag">zsl_vat.dashboard</field>
+  </record>
+  <record id="action_vat_ledger_books" model="ir.actions.act_window">
+    <field name="name">VAT Ledger Books</field>
+    <field name="res_model">account.account</field>
+    <field name="view_mode">list,form</field>
+  </record>
+  <record id="action_vat_transactions" model="ir.actions.act_window">
+    <field name="name">All VAT Transactions</field>
+    <field name="res_model">account.move.line</field>
+    <field name="view_mode">list,form</field>
+    <field name="domain">[('parent_state', '=', 'posted')]</field>
+  </record>
+  <record id="action_vat_products" model="ir.actions.act_window">
+    <field name="name">Product List</field>
+    <field name="res_model">product.template</field>
+    <field name="view_mode">kanban,list,form</field>
+  </record>
+  <record id="action_vat_services" model="ir.actions.act_window">
+    <field name="name">Service List</field>
+    <field name="res_model">product.template</field>
+    <field name="view_mode">kanban,list,form</field>
+    <field name="domain">[('type', '=', 'service')]</field>
+  </record>
+  <record id="action_vat_customers" model="ir.actions.act_window">
+    <field name="name">Customer List</field>
+    <field name="res_model">res.partner</field>
+    <field name="view_mode">kanban,list,form</field>
+    <field name="domain">[('customer_rank', '&gt;', 0)]</field>
+  </record>
+  <record id="action_vat_suppliers" model="ir.actions.act_window">
+    <field name="name">Vendor List</field>
+    <field name="res_model">res.partner</field>
+    <field name="view_mode">kanban,list,form</field>
+    <field name="domain">[('supplier_rank', '&gt;', 0)]</field>
+  </record>
+  <record id="action_vat_print_purchase_book" model="ir.actions.act_window">
+    <field name="name">Mushak 6.1 Purchase Book</field><field name="res_model">vat.book.wizard</field><field name="view_mode">form</field><field name="target">new</field><field name="context">{'default_book_type': 'purchase'}</field>
+  </record>
+  <record id="action_vat_print_sales_book" model="ir.actions.act_window">
+    <field name="name">Mushak 6.2 Sales Book</field><field name="res_model">vat.book.wizard</field><field name="view_mode">form</field><field name="target">new</field><field name="context">{'default_book_type': 'sales'}</field>
+  </record>
+  <record id="action_vat_print_high_value_book" model="ir.actions.act_window">
+    <field name="name">Mushak 6.10 High-value Transactions</field><field name="res_model">vat.book.wizard</field><field name="view_mode">form</field><field name="target">new</field><field name="context">{'default_book_type': 'high_value'}</field>
+  </record>
+  <record id="action_vat_print_out_invoice" model="ir.actions.act_window">
+    <field name="name">Mushak 6.3 Tax Invoices</field><field name="res_model">account.move</field><field name="view_mode">list,form</field><field name="domain">[('move_type', '=', 'out_invoice'), ('state', '=', 'posted')]</field>
+  </record>
+  <record id="action_vat_print_credit_note" model="ir.actions.act_window">
+    <field name="name">Mushak 6.7 Credit Notes</field><field name="res_model">account.move</field><field name="view_mode">list,form</field><field name="domain">[('move_type', '=', 'out_refund'), ('state', '=', 'posted')]</field>
+  </record>
+  <record id="action_vat_print_debit_note" model="ir.actions.act_window">
+    <field name="name">Mushak 6.8 Debit Notes / Purchase Returns</field><field name="res_model">account.move</field><field name="view_mode">list,form</field><field name="domain">[('move_type', '=', 'in_refund'), ('state', '=', 'posted')]</field>
+  </record>
+  <record id="action_vat_print_contract_challan" model="ir.actions.act_window">
+    <field name="name">Mushak 6.4 Contract Manufacturing Challans</field><field name="res_model">stock.picking</field><field name="view_mode">list,form</field><field name="domain">[('vat_challan_type', 'in', ('contract_send', 'contract_receive')), ('state', '=', 'done')]</field>
+  </record>
+  <record id="action_vat_print_turnover_return" model="ir.actions.act_window">
+    <field name="name">Mushak 9.2 Turnover Tax Returns</field><field name="res_model">vat.return</field><field name="view_mode">list,form</field><field name="domain">[('return_type', 'in', ('main', 'late', 'amended', 'additional'))]</field><field name="context">{'default_return_type': 'main'}</field>
+  </record>
+  <menuitem id="menu_zsl_vat_root" name="ZSL VAT" sequence="15" groups="zsl_vat.group_vat_user" web_icon="zsl_vat,static/description/icon.svg"/>
+  <menuitem id="menu_vat_dashboard" name="Dashboard" parent="menu_zsl_vat_root" action="action_vat_dashboard" sequence="1"/>
+  <menuitem id="menu_vat_accounts" name="Accounts" parent="menu_zsl_vat_root" sequence="10"/>
+  <menuitem id="menu_vat_ledger_books" name="Ledger Books" parent="menu_vat_accounts" action="action_vat_ledger_books" sequence="10"/>
+  <menuitem id="menu_vat_transactions" name="Transactions" parent="menu_vat_accounts" action="action_vat_transactions" sequence="20"/>
+  <menuitem id="menu_vat_returns" name="Mushak 9.1 VAT Returns" parent="menu_vat_accounts" action="action_vat_return" sequence="30"/>
+  <menuitem id="menu_vat_treasury" name="Treasury Challans &amp; Payments" parent="menu_vat_accounts" action="action_vat_treasury_payment" sequence="40"/>
+  <menuitem id="menu_vat_account_mapping" name="VAT Accounting Mapping" parent="menu_vat_accounts" action="action_vat_account_mapping" sequence="50" groups="zsl_vat.group_vat_manager"/>
+  <menuitem id="menu_vat_reconciliation" name="VAT / Ledger Reconciliation" parent="menu_vat_accounts" action="action_vat_reconciliation" sequence="60"/>
+  <menuitem id="menu_vat_apportionment" name="Input Tax Apportionment" parent="menu_vat_accounts" action="action_vat_input_apportionment" sequence="70"/>
+  <menuitem id="menu_vat_voucher" name="Voucher" parent="menu_zsl_vat_root" sequence="20"/>
+  <menuitem id="menu_vat_voucher_list" name="Voucher List" parent="menu_vat_voucher" action="action_vat_transactions" sequence="10"/>
+  <menuitem id="menu_vat_payment" name="VAT Payment" parent="menu_vat_voucher" action="action_vat_treasury_payment" sequence="20"/>
+  <menuitem id="menu_vat_vds" name="VDS Payment / Certificate (6.6)" parent="menu_vat_voucher" action="action_vds_certificate" sequence="30"/>
+  <menuitem id="menu_vat_adjustment" name="VAT Adjustment" parent="menu_vat_voucher" action="action_vat_return" sequence="40"/>
+  <menuitem id="menu_vat_product" name="Product &amp; Service" parent="menu_zsl_vat_root" sequence="30"/>
+  <menuitem id="menu_vat_categories" name="Item Categories" parent="menu_vat_product" action="product.product_category_action_form" sequence="10"/>
+  <menuitem id="menu_vat_products" name="Product List" parent="menu_vat_product" action="action_vat_products" sequence="20"/>
+  <menuitem id="menu_vat_new_product" name="New Product" parent="menu_vat_product" action="action_vat_products" sequence="30"/>
+  <menuitem id="menu_vat_services" name="Service List" parent="menu_vat_product" action="action_vat_services" sequence="40"/>
+  <menuitem id="menu_vat_hs_code" name="HS Code Management" parent="menu_vat_product" action="zencore_hs_code.action_zencore_hs_code" sequence="50"/>
+  <menuitem id="menu_vat_price_declaration" name="Product Price Declarations (4.3)" parent="menu_vat_product" action="action_vat_price_declaration" sequence="60"/>
+  <menuitem id="menu_vat_inventory" name="Inventory" parent="menu_zsl_vat_root" sequence="40"/>
+  <menuitem id="menu_vat_stock_list" name="Inventory List" parent="menu_vat_inventory" action="stock.product_template_action_product" sequence="10"/>
+  <menuitem id="menu_vat_delivery" name="Delivery List / VAT Challan" parent="menu_vat_inventory" action="stock.action_picking_tree_outgoing" sequence="20"/>
+  <menuitem id="menu_vat_stock_in" name="Stock In" parent="menu_vat_inventory" action="stock.action_picking_tree_incoming" sequence="30"/>
+  <menuitem id="menu_vat_transfers" name="Transfer Order / Mushak 6.5" parent="menu_vat_inventory" action="stock.action_picking_tree_internal" sequence="40"/>
+  <menuitem id="menu_vat_stock_opening" name="VAT Opening Balances" parent="menu_vat_inventory" action="action_vat_stock_opening" sequence="50"/>
+  <menuitem id="menu_vat_stock_register" name="VAT Stock Register" parent="menu_vat_inventory" action="action_vat_stock_register" sequence="60"/>
+  <menuitem id="menu_vat_stock_adjustment" name="Damage &amp; Destruction" parent="menu_vat_inventory" action="action_vat_stock_adjustment" sequence="70"/>
+  <menuitem id="menu_vat_procurement" name="Procurement" parent="menu_zsl_vat_root" sequence="50"/>
+  <menuitem id="menu_vat_purchase_orders" name="Purchase Orders" parent="menu_vat_procurement" action="purchase.purchase_form_action" sequence="10"/>
+  <menuitem id="menu_vat_vendor_bills" name="Purchase Invoices" parent="menu_vat_procurement" action="account.action_move_in_invoice_type" sequence="20"/>
+  <menuitem id="menu_vat_debit_notes" name="Debit Notes / Purchase Returns" parent="menu_vat_procurement" action="account.action_move_in_refund_type" sequence="30"/>
+  <menuitem id="menu_vat_import_declarations" name="Import &amp; Bill of Entry" parent="menu_vat_procurement" action="action_vat_import_declaration" sequence="40"/>
+  <menuitem id="menu_vat_capital_credits" name="Capital Asset Input Credits" parent="menu_vat_procurement" action="action_vat_capital_credit_schedule" sequence="50"/>
+  <menuitem id="menu_vat_sales" name="Sales" parent="menu_zsl_vat_root" sequence="60"/>
+  <menuitem id="menu_vat_sales_orders" name="Sales Orders" parent="menu_vat_sales" action="sale.action_orders" sequence="10"/>
+  <menuitem id="menu_vat_customer_invoices" name="Sale Invoice / Mushak 6.3" parent="menu_vat_sales" action="account.action_move_out_invoice_type" sequence="20"/>
+  <menuitem id="menu_vat_credit_notes" name="Credit Notes / Mushak 6.7" parent="menu_vat_sales" action="account.action_move_out_refund_type" sequence="30"/>
+  <menuitem id="menu_vat_pos_orders" name="POS Sales / Mushak 6.3" parent="menu_vat_sales" action="point_of_sale.action_pos_pos_form" sequence="40"/>
+  <menuitem id="menu_vat_service_plans" name="Recurring Service Billing" parent="menu_vat_sales" action="action_vat_service_plan" sequence="50"/>
+  <menuitem id="menu_vat_timesheet_billing" name="Timesheet / Project Billing" parent="menu_vat_sales" action="action_vat_timesheet_billing" sequence="60"/>
+  <menuitem id="menu_vat_production" name="Production" parent="menu_zsl_vat_root" sequence="70"/>
+  <menuitem id="menu_vat_production_orders" name="Production Order List" parent="menu_vat_production" action="mrp.mrp_production_action" sequence="10"/>
+  <menuitem id="menu_vat_coefficient" name="Input-Output Coefficients (4.3)" parent="menu_vat_production" action="action_vat_io_coefficient" sequence="20"/>
+  <menuitem id="menu_vat_production_valuation" name="Production Valuation &amp; Wastage" parent="menu_vat_production" action="action_vat_production_valuation" sequence="30"/>
+  <menuitem id="menu_vat_parties" name="Parties" parent="menu_zsl_vat_root" sequence="80"/>
+  <menuitem id="menu_vat_customers" name="Customer List" parent="menu_vat_parties" action="action_vat_customers" sequence="10"/>
+  <menuitem id="menu_vat_suppliers" name="Vendor List" parent="menu_vat_parties" action="action_vat_suppliers" sequence="20"/>
+  <menuitem id="menu_vat_contacts" name="All Parties" parent="menu_vat_parties" action="contacts.action_contacts" sequence="30"/>
+  <menuitem id="menu_vat_settings" name="Settings" parent="menu_zsl_vat_root" sequence="90" groups="zsl_vat.group_vat_manager"/>
+  <menuitem id="menu_vat_registration_application" name="Mushak 2.1 Applications" parent="menu_vat_settings" action="action_vat_registration_application" sequence="5"/>
+  <menuitem id="menu_vat_registration_certificate" name="Mushak 2.3 NBR Certificates" parent="menu_vat_settings" action="action_vat_registration_certificate" sequence="6"/>
+  <menuitem id="menu_vat_units" name="Company VAT Units" parent="menu_vat_settings" action="action_vat_unit" sequence="10"/>
+  <menuitem id="menu_vat_periods" name="VAT Periods &amp; Calendar" parent="menu_vat_settings" action="action_vat_period" sequence="20"/>
+  <menuitem id="menu_vat_period_generate" name="Generate Monthly Periods" parent="menu_vat_settings" action="action_vat_period_generate" sequence="25"/>
+  <menuitem id="menu_vat_holidays" name="VAT Calendar Holidays" parent="menu_vat_settings" action="action_vat_holiday" sequence="30"/>
+  <menuitem id="menu_vat_series" name="Mushak Numbering" parent="menu_vat_settings" action="action_vat_document_series" sequence="40"/>
+  <menuitem id="menu_vat_nbr_connector" name="NBR API Connector" parent="menu_vat_settings" action="action_vat_nbr_connector" sequence="50"/>
+  <menuitem id="menu_vat_compliance_checklist" name="NBR Compliance Checklist" parent="menu_vat_settings" action="action_vat_compliance_checklist" sequence="60"/>
+  <menuitem id="menu_vat_print" name="Print" parent="menu_zsl_vat_root" sequence="100"/>
+  <menuitem id="menu_vat_print_21" name="Mushak 2.1 — Registration Application" parent="menu_vat_print" action="action_vat_registration_application" sequence="10"/>
+  <menuitem id="menu_vat_print_23" name="Mushak 2.3 — Registration Certificate" parent="menu_vat_print" action="action_vat_registration_certificate" sequence="20"/>
+  <menuitem id="menu_vat_print_43" name="Mushak 4.3 — Input-Output Coefficient" parent="menu_vat_print" action="action_vat_io_coefficient" sequence="30"/>
+  <menuitem id="menu_vat_print_44" name="Mushak 4.4 — Damage / Destruction" parent="menu_vat_print" action="action_mushak_44_damage_destruction" sequence="35"/>
+  <menuitem id="menu_vat_print_45" name="Mushak 4.5 — Stock Adjustment" parent="menu_vat_print" action="action_mushak_45_stock_adjustment" sequence="36"/>
+  <menuitem id="menu_vat_print_61" name="Mushak 6.1 — Purchase Book" parent="menu_vat_print" action="action_vat_print_purchase_book" sequence="40"/>
+  <menuitem id="menu_vat_print_62" name="Mushak 6.2 — Sales Book" parent="menu_vat_print" action="action_vat_print_sales_book" sequence="50"/>
+  <menuitem id="menu_vat_print_621" name="Mushak 6.2.1 — Stock Register" parent="menu_vat_print" action="action_vat_stock_register" sequence="60"/>
+  <menuitem id="menu_vat_print_63" name="Mushak 6.3 — Tax Invoice" parent="menu_vat_print" action="action_vat_print_out_invoice" sequence="70"/>
+  <menuitem id="menu_vat_print_64" name="Mushak 6.4 — Contract Manufacturing Challan" parent="menu_vat_print" action="action_vat_print_contract_challan" sequence="80"/>
+  <menuitem id="menu_vat_print_65" name="Mushak 6.5 — Transfer Challan" parent="menu_vat_print" action="stock.action_picking_tree_internal" sequence="90"/>
+  <menuitem id="menu_vat_print_66" name="Mushak 6.6 — VDS Certificate" parent="menu_vat_print" action="action_vds_certificate" sequence="100"/>
+  <menuitem id="menu_vat_print_67" name="Mushak 6.7 — Credit Note" parent="menu_vat_print" action="action_vat_print_credit_note" sequence="110"/>
+  <menuitem id="menu_vat_print_68" name="Mushak 6.8 — Debit Note" parent="menu_vat_print" action="action_vat_print_debit_note" sequence="120"/>
+  <menuitem id="menu_vat_print_610" name="Mushak 6.10 — High-value Transactions" parent="menu_vat_print" action="action_vat_print_high_value_book" sequence="130"/>
+  <menuitem id="menu_vat_print_91" name="Mushak 9.1 — VAT Return" parent="menu_vat_print" action="action_vat_return" sequence="140"/>
+  <menuitem id="menu_vat_print_92" name="Mushak 9.2 — Turnover Tax Return" parent="menu_vat_print" action="action_vat_print_turnover_return" sequence="150"/>
+  <menuitem id="menu_vat_print_challan" name="TR-6 — Treasury Challan" parent="menu_vat_print" action="action_vat_treasury_payment" sequence="160"/>
+</odoo>

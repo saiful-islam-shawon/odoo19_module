@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <record id="view_vat_registration_application_list" model="ir.ui.view">
+    <field name="name">vat.registration.application.list</field>
+    <field name="model">vat.registration.application</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="version"/>
+        <field name="legal_name"/>
+        <field name="registration_type"/>
+        <field name="applicant_type"/>
+        <field name="state"/>
+        <field name="approval_date"/>
+      </list>
+    </field>
+  </record>
+  <record id="view_vat_registration_application_form" model="ir.ui.view">
+    <field name="name">vat.registration.application.form</field>
+    <field name="model">vat.registration.application</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_submit" type="object" string="Validate &amp; Mark Ready for Filing" class="btn-primary" invisible="state != 'draft'" groups="zsl_vat.group_vat_officer"/>
+          <button name="action_approve" type="object" string="Approve" invisible="state != 'submitted'" groups="zsl_vat.group_vat_manager"/>
+          <button name="action_create_revision" type="object" string="Create Revised Draft" invisible="state != 'approved'" groups="zsl_vat.group_vat_officer"/>
+          <button name="action_print_application" type="object" string="Print Mushak 2.1" groups="zsl_vat.group_vat_officer"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+        </header>
+        <sheet>
+          <div class="oe_title">
+            <h1>
+              <field name="name"/>
+            </h1>
+            <div>Version <field name="version" readonly="1"/></div>
+          </div>
+          <group>
+            <group>
+              <field name="company_id"/>
+              <field name="applicant_type"/>
+              <field name="registration_type"/>
+              <field name="legal_name"/>
+              <field name="trade_name"/>
+              <field name="tin"/>
+              <field name="nid_or_passport" invisible="applicant_type not in ('individual', 'proprietorship')"/>
+            </group>
+            <group>
+              <field name="trade_license_no"/>
+              <field name="rjsc_no" invisible="applicant_type not in ('company', 'partnership')"/>
+              <field name="bida_no"/>
+              <field name="registration_date"/>
+              <field name="vat_circle"/>
+              <field name="vat_commissionerate"/>
+            </group>
+          </group>
+          <notebook>
+            <page string="Addresses &amp; Operations">
+              <group>
+                <group>
+                  <field name="registered_address"/>
+                  <field name="contact_address"/>
+                  <field name="phone"/>
+                  <field name="email"/>
+                </group>
+                <group>
+                  <field name="business_nature"/>
+                  <field name="business_classification"/>
+                  <field name="manufacturing_category" invisible="business_nature not in ('manufacturing', 'mixed')"/>
+                  <field name="service_category" invisible="business_nature not in ('service', 'mixed')"/>
+                  <field name="business_activity"/>
+                  <field name="business_operations"/>
+                </group>
+              </group>
+            </page>
+            <page string="Bank, Turnover &amp; Workforce">
+              <group>
+                <group>
+                  <field name="bank_name"/>
+                  <field name="bank_branch"/>
+                  <field name="bank_account_no"/>
+                </group>
+                <group>
+                  <field name="historical_turnover"/>
+                  <field name="projected_turnover"/>
+                  <field name="workforce_count"/>
+                </group>
+              </group>
+            </page>
+            <page string="Branches / VAT Units">
+              <field name="branch_unit_ids" widget="many2many_tags"/>
+            </page>
+            <page string="Owners / Directors">
+              <field name="owner_ids">
+                <list editable="bottom">
+                  <field name="name"/>
+                  <field name="designation"/>
+                  <field name="nid_or_passport"/>
+                  <field name="tin"/>
+                  <field name="phone"/>
+                  <field name="address"/>
+                </list>
+              </field>
+            </page>
+            <page string="Authorised Persons">
+              <field name="authorised_person_ids">
+                <list editable="bottom">
+                  <field name="name"/>
+                  <field name="designation"/>
+                  <field name="nid_or_passport"/>
+                  <field name="phone"/>
+                  <field name="email"/>
+                  <field name="authorisation_attachment_id"/>
+                </list>
+              </field>
+            </page>
+            <page string="Filing Evidence">
+              <field name="document_ids">
+                <list editable="bottom">
+                  <field name="document_type"/>
+                  <field name="reference"/>
+                  <field name="attachment_id"/>
+                </list>
+              </field>
+            </page>
+            <page string="Declaration">
+              <group>
+                <field name="declaration_name"/>
+                <field name="declaration_date"/>
+                <field name="approval_date" readonly="1"/>
+                <field name="approval_note" readonly="1"/>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="action_vat_registration_application" model="ir.actions.act_window">
+    <field name="name">Mushak 2.1 Applications</field>
+    <field name="res_model">vat.registration.application</field>
+    <field name="view_mode">list,form</field>
+  </record>
+  <record id="view_vat_registration_certificate_list" model="ir.ui.view">
+    <field name="name">vat.registration.certificate.list</field>
+    <field name="model">vat.registration.certificate</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="taxpayer_name"/>
+        <field name="bin"/>
+        <field name="registration_type"/>
+        <field name="issue_date"/>
+        <field name="effective_date"/>
+        <field name="bin_mismatch"/>
+        <field name="state"/>
+      </list>
+    </field>
+  </record>
+  <record id="view_vat_registration_certificate_form" model="ir.ui.view">
+    <field name="name">vat.registration.certificate.form</field>
+    <field name="model">vat.registration.certificate</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_print_certificate" type="object" string="Print Archive Copy"/>
+          <field name="state" widget="statusbar"/>
+        </header>
+        <sheet>
+          <div class="oe_title">
+            <h1>
+              <field name="name"/>
+            </h1>
+          </div>
+          <div class="alert alert-warning" role="alert" invisible="not bin_mismatch">Certificate BIN does not match the taxpayer profile BIN.</div>
+          <group>
+            <group>
+              <field name="company_id"/>
+              <field name="application_id"/>
+              <field name="taxpayer_name"/>
+              <field name="bin"/>
+              <field name="registration_type"/>
+              <field name="registered_address"/>
+            </group>
+            <group>
+              <field name="certificate_reference"/>
+              <field name="issue_date"/>
+              <field name="effective_date"/>
+              <field name="issuing_authority"/>
+              <field name="original_pdf_id"/>
+              <field name="replaces_id"/>
+              <field name="replaced_by_id" readonly="1"/>
+              <field name="issuer_id" readonly="1"/>
+            </group>
+          </group>
+          <chatter/>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <record id="action_vat_registration_certificate" model="ir.actions.act_window">
+    <field name="name">Mushak 2.3 NBR Certificates</field>
+    <field name="res_model">vat.registration.certificate</field>
+    <field name="view_mode">list,form</field>
+  </record>
+</odoo>

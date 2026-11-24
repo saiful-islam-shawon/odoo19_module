@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <record id="view_product_template_vat_form" model="ir.ui.view">
+    <field name="name">product.template.vat.form</field>
+    <field name="model">product.template</field>
+    <field name="inherit_id" ref="product.product_template_only_form_view"/>
+    <field name="arch" type="xml">
+      <xpath expr="//notebook" position="inside">
+        <page string="Bangladesh VAT" groups="zsl_vat.group_vat_user">
+          <group>
+            <group>
+              <field name="hs_code_id" options="{'no_create_edit': false}"/>
+              <field name="vat_uom_id"/>
+              <field name="vat_uom_factor"/>
+              <field name="vat_special_treatment"/>
+            </group>
+            <group>
+              <field name="vat_input_credit"/>
+              <field name="vat_vds_rate"/>
+              <field name="vat_is_capital_good"/>
+              <field name="vat_traceability_required"/>
+              <field name="vat_price_policy"/>
+              <field name="vat_declared_price" readonly="1"/>
+            </group>
+          </group>
+          <group string="Tax Mapping">
+            <field name="taxes_id" widget="many2many_tags"/>
+            <field name="supplier_taxes_id" widget="many2many_tags"/>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+  <record id="view_partner_vat_form" model="ir.ui.view">
+    <field name="name">res.partner.vat.form</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//notebook" position="inside">
+        <page string="Bangladesh VAT" groups="zsl_vat.group_vat_user">
+          <group>
+            <group>
+              <field name="vat_registration_status"/>
+              <field name="vat_bin"/>
+              <field name="vat_legacy_bin"/>
+              <field name="vat_tin"/>
+              <field name="vat_nid"/>
+            </group>
+            <group>
+              <field name="vat_partner_category"/>
+              <field name="vat_vds_withholding_entity"/>
+              <field name="vat_vds_applicable_supplier"/>
+              <field name="vat_vds_rate"/>
+            </group>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+  <record id="view_company_vat_form" model="ir.ui.view">
+    <field name="name">res.company.vat.form</field>
+    <field name="model">res.company</field>
+    <field name="inherit_id" ref="base.view_company_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//notebook" position="inside">
+        <page string="Bangladesh VAT" groups="zsl_vat.group_vat_manager">
+          <group>
+            <group>
+              <field name="vat_legal_name"/>
+              <field name="vat_trade_name"/>
+              <field name="vat_bin"/>
+              <field name="vat_legacy_bin"/>
+              <field name="vat_tin"/>
+              <field name="vat_business_nature"/>
+              <field name="vat_registration_date"/>
+              <field name="vat_registration_type"/>
+            </group>
+            <group>
+              <field name="vat_circle"/>
+              <field name="vat_commissionerate"/>
+              <field name="vat_registered_address"/>
+              <field name="vat_enforce_declared_price"/>
+              <field name="vat_high_value_threshold"/>
+              <field name="vat_late_interest_rate"/>
+              <field name="vat_late_fine_rate"/>
+            </group>
+          </group>
+          <group string="VAT Return Calendar &amp; Numbering">
+            <group>
+              <field name="vat_return_due_day"/>
+              <field name="vat_holiday_adjustment"/>
+            </group>
+            <group>
+              <field name="vat_fiscal_year_start_month"/>
+            </group>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+</odoo>

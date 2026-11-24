@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="action_print_official_mushak_67" model="ir.actions.server">
+    <field name="name">Mushak 6.7 — QWeb Print</field>
+    <field name="model_id" ref="account.model_account_move"/>
+    <field name="state">code</field>
+    <field name="code">action = records.action_print_mushak_63()</field>
+  </record>
+  <record id="action_report_mushak_67" model="ir.actions.report"><field name="name">Mushak 6.7 — Credit Note</field><field name="model">account.move</field><field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_67</field><field name="report_file">zsl_vat.report_mushak_67</field><field name="binding_model_id" ref="account.model_account_move"/><field name="binding_type">report</field></record>
+  <template id="report_mushak_67"><t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-set="form_code" t-value="'Mushak 6.7'"/><t t-set="form_title" t-value="'Credit Note'"/><t t-call="zsl_vat.mushak_qweb_layout"><div class="zsl-mushak-section"><h4>Credit note information</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Credit note / date</td><td><span t-field="o.vat_mushak_number"/> / <span t-field="o.invoice_date"/></td><td class="zsl-mushak-label">Original tax invoice</td><td><span t-field="o.vat_original_move_id.vat_mushak_number"/></td></tr><tr><td class="zsl-mushak-label">Customer</td><td><span t-field="o.partner_id"/></td><td class="zsl-mushak-label">Customer BIN</td><td><span t-field="o.partner_id.vat_bin"/></td></tr><tr><td class="zsl-mushak-label">Reason</td><td colspan="3"><span t-field="o.vat_adjustment_reason"/></td></tr></table></div><div class="zsl-mushak-section"><table class="zsl-mushak-table"><tr><th>Description</th><th>Taxable value</th><th>VAT reduction</th><th>SD reduction</th></tr><tr t-foreach="o.invoice_line_ids" t-as="line" t-if="not line.display_type"><td><span t-field="line.name"/></td><td class="zsl-mushak-number"><span t-field="line.price_subtotal"/></td><td class="zsl-mushak-number"><span t-esc="line.price_total - line.price_subtotal"/></td><td class="zsl-mushak-number">—</td></tr></table></div></t></t></t></template>
+</odoo>

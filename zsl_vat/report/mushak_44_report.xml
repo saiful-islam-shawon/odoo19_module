@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <!-- Mushak 4.4 work queue: damage and destruction cases only. -->
+  <record id="action_mushak_44_damage_destruction" model="ir.actions.act_window">
+    <field name="name">Mushak 4.4 — Damage / Destruction</field>
+    <field name="res_model">vat.stock.adjustment</field>
+    <field name="view_mode">list,form</field>
+    <field name="domain">[('adjustment_type', 'in', ['damage', 'destruction'])]</field>
+    <field name="context">{'default_adjustment_type': 'damage'}</field>
+  </record>
+  <record id="action_report_mushak_44" model="ir.actions.report"><field name="name">Mushak 4.4 — Damage / Destruction</field><field name="model">vat.stock.adjustment</field><field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_44</field><field name="report_file">zsl_vat.report_mushak_44</field><field name="binding_model_id" ref="model_vat_stock_adjustment"/><field name="binding_type">report</field></record>
+  <template id="report_mushak_44"><t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-set="form_code" t-value="'Mushak 4.4'"/><t t-set="form_title" t-value="'Damage / Destruction Declaration'"/><t t-call="zsl_vat.mushak_qweb_layout"><div class="zsl-mushak-section"><h4>Stock damage or destruction details</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Reference / date</td><td><span t-field="o.name"/> / <span t-field="o.adjustment_date"/></td><td class="zsl-mushak-label">VAT unit</td><td><span t-field="o.unit_id"/></td></tr><tr><td class="zsl-mushak-label">Nature</td><td><span t-field="o.adjustment_type"/></td><td class="zsl-mushak-label">Approval status</td><td><span t-field="o.state"/></td></tr><tr><td class="zsl-mushak-label">Product / quantity</td><td><span t-field="o.product_id"/> / <span t-field="o.quantity"/></td><td class="zsl-mushak-label">Input VAT reversal</td><td><span t-field="o.input_vat_reversal"/></td></tr><tr><td class="zsl-mushak-label">Reason and evidence</td><td colspan="3"><span t-field="o.reason"/></td></tr></table></div></t></t></t></template>
+</odoo>

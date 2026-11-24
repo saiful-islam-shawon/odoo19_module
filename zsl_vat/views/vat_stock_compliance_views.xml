@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <record id="view_stock_landed_cost_vat_form" model="ir.ui.view">
+    <field name="name">stock.landed.cost.vat.form</field>
+    <field name="model">stock.landed.cost</field>
+    <field name="inherit_id" ref="stock_landed_costs.view_stock_landed_cost_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='vendor_bill_id']" position="after">
+        <field name="vat_unit_id"/>
+        <field name="vat_import_reference"/>
+      </xpath>
+      <xpath expr="//field[@name='cost_lines']/list/field[@name='price_unit']" position="after">
+        <field name="vat_duty_type"/>
+        <field name="vat_creditable"/>
+      </xpath>
+      <xpath expr="//page[@name='additional_costs']" position="after">
+        <page name="creditable_import_taxes" string="Creditable Import Taxes">
+          <field name="vat_creditable_tax_line_ids">
+            <list editable="bottom">
+              <field name="tax_type"/>
+              <field name="amount"/>
+              <field name="bill_of_entry"/>
+              <field name="evidence_id"/>
+            </list>
+          </field>
+          <group class="oe_subtotal_footer">
+            <field name="vat_creditable_tax_total" readonly="1"/>
+          </group>
+        </page>
+      </xpath>
+      <xpath expr="//field[@name='amount_total']" position="after">
+        <field name="vat_cost_bearing_total" readonly="1"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="view_vat_stock_opening_list" model="ir.ui.view">
+    <field name="name">vat.stock.opening.list</field>
+    <field name="model">vat.stock.opening</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="effective_date"/>
+        <field name="unit_id"/>
+        <field name="product_id"/>
+        <field name="vat_uom_id"/>
+        <field name="quantity"/>
+        <field name="value"/>
+        <field name="source_reference"/>
+      </list>
+    </field>
+  </record>
+  <record id="view_vat_stock_opening_form" model="ir.ui.view">
+    <field name="name">vat.stock.opening.form</field>
+    <field name="model">vat.stock.opening</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group>
+            <field name="company_id"/>
+            <field name="unit_id"/>
+            <field name="effective_date"/>
+            <field name="product_id"/>
+            <field name="vat_uom_id" readonly="1"/>
+            <field name="quantity"/>
+            <field name="value"/>
+            <field name="source_reference"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <record id="action_vat_stock_opening" model="ir.actions.act_window">
+    <field name="name">VAT Stock Opening Balances</field>
+    <field name="res_model">vat.stock.opening</field>
+    <field name="view_mode">list,form</field>
+  </record>
+  <record id="view_vat_stock_register_list" model="ir.ui.view">
+    <field name="name">vat.stock.register.list</field>
+    <field name="model">vat.stock.register</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="unit_id"/>
+        <field name="period_id"/>
+        <field name="state"/>
+      </list>
+    </field>
+  </record>
+  <record id="view_vat_stock_register_form" model="ir.ui.view">
+    <field name="name">vat.stock.register.form</field>
+    <field name="model">vat.stock.register</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_generate" type="object" string="Generate from Stock Moves" class="btn-primary" invisible="state == 'locked'" groups="zsl_vat.group_vat_officer"/>
+          <button name="action_print_stock_register" type="object" string="Print Mushak 6.2.1" invisible="state == 'draft'"/>
+          <button name="action_lock" type="object" string="Lock" invisible="state != 'generated'" groups="zsl_vat.group_vat_manager"/>
+          <field name="state" widget="statusbar"/>
+        </header>
+        <sheet>
+          <group>
+            <field name="company_id"/>
+            <field name="unit_id"/>
+            <field name="period_id"/>
+          </group>
+          <field name="line_ids" readonly="state == 'locked'">
+            <list>
+              <field name="product_id"/>
+              <field name="vat_uom_id"/>
+              <field name="opening_qty"/>
+              <field name="opening_value"/>
+              <field name="purchase_qty"/>
+              <field name="transfer_in_qty"/>
+              <field name="sale_qty"/>
+              <field name="adjustment_qty"/>
+              <field name="closing_qty"/>
+            </list>
+          </field>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <record id="action_vat_stock_register" model="ir.actions.act_window">
+    <field name="name">VAT Stock Registers</field>
+    <field name="res_model">vat.stock.register</field>
+    <field name="view_mode">list,form</field>
+  </record>
+  <record id="view_vat_stock_adjustment_list" model="ir.ui.view">
+    <field name="name">vat.stock.adjustment.list</field>
+    <field name="model">vat.stock.adjustment</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="adjustment_date"/>
+        <field name="unit_id"/>
+        <field name="product_id"/>
+        <field name="adjustment_type"/>
+        <field name="quantity"/>
+        <field name="input_vat_reversal"/>
+        <field name="state"/>
+      </list>
+    </field>
+  </record>
+  <record id="view_vat_stock_adjustment_form" model="ir.ui.view">
+    <field name="name">vat.stock.adjustment.form</field>
+    <field name="model">vat.stock.adjustment</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_approve" type="object" string="Approve" class="btn-primary" invisible="state != 'draft'" groups="zsl_vat.group_vat_manager"/>
+          <button name="action_post" type="object" string="Post Stock &amp; VAT Adjustment" class="btn-primary" invisible="state != 'approved'" groups="zsl_vat.group_vat_officer"/>
+          <field name="state" widget="statusbar"/>
+        </header>
+        <sheet>
+          <group>
+            <group>
+              <field name="company_id"/>
+              <field name="unit_id"/>
+              <field name="adjustment_type"/>
+              <field name="adjustment_date"/>
+              <field name="product_id"/>
+              <field name="quantity"/>
+            </group>
+            <group>
+              <field name="input_vat_reversal"/>
+              <field name="vat_return_id" required="input_vat_reversal != 0"/>
+              <field name="reason"/>
+              <field name="evidence_ids" widget="many2many_binary"/>
+              <field name="scrap_id" readonly="1"/>
+              <field name="vat_adjustment_id" readonly="1"/>
+              <field name="approver_id" readonly="1"/>
+            </group>
+          </group>
+          <chatter/>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <record id="action_vat_stock_adjustment" model="ir.actions.act_window">
+    <field name="name">Damage &amp; Destruction Adjustments</field>
+    <field name="res_model">vat.stock.adjustment</field>
+    <field name="view_mode">list,form</field>
+  </record>
+</odoo>

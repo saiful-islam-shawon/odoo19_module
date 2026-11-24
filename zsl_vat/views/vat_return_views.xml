@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <record id="view_vat_return_list" model="ir.ui.view">
+    <field name="name">vat.return.list</field>
+    <field name="model">vat.return</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="period_id"/>
+        <field name="unit_id"/>
+        <field name="return_type"/>
+        <field name="output_vat"/>
+        <field name="input_vat"/>
+        <field name="net_payable"/>
+        <field name="state"/>
+        <field name="nbr_acknowledgement"/>
+      </list>
+    </field>
+  </record>
+  <record id="view_vat_return_form" model="ir.ui.view">
+    <field name="name">vat.return.form</field>
+    <field name="model">vat.return</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_generate" type="object" string="Generate from Posted Documents" class="btn-primary" invisible="state not in ('draft', 'review')" groups="zsl_vat.group_vat_officer"/>
+          <button name="action_validate" type="object" string="Run Pre-submission Check" invisible="state != 'draft'" groups="zsl_vat.group_vat_officer"/>
+          <button name="action_approve" type="object" string="Approve" invisible="state != 'review'" groups="zsl_vat.group_vat_manager"/>
+          <button name="action_export_nbr" type="object" string="Export NBR CSV" invisible="state != 'approved'" groups="zsl_vat.group_vat_officer"/>
+          <button name="action_prepare_nbr_payload" type="object" string="Prepare NBR API Payload" invisible="state != 'approved'" groups="zsl_vat.group_vat_officer"/>
+          <button name="action_submit_nbr_api" type="object" string="Submit to NBR API" class="btn-primary" invisible="state != 'approved' or nbr_submission_mode != 'api'" groups="zsl_vat.group_vat_manager"/>
+          <button name="action_print_mushak_return" type="object" string="Print Official Mushak" invisible="state == 'draft'"/>
+          <button name="action_submit" type="object" string="Mark Submitted &amp; Lock Period" invisible="state != 'approved'" groups="zsl_vat.group_vat_manager"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,review,approved,submitted"/>
+        </header>
+        <sheet>
+          <div class="oe_title">
+            <h1>
+              <field name="name"/>
+            </h1>
+          </div>
+          <group>
+            <group>
+              <field name="company_id"/>
+              <field name="unit_id"/>
+              <field name="period_id"/>
+              <field name="return_type"/>
+              <field name="parent_return_id" invisible="return_type != 'amended'"/>
+            </group>
+            <group>
+              <field name="nbr_acknowledgement" readonly="state == 'submitted'"/>
+              <field name="nbr_submission_date" readonly="1"/>
+              <field name="nbr_submission_mode" readonly="state == 'submitted'"/>
+              <field name="nbr_connector_id" invisible="nbr_submission_mode != 'api'" readonly="state == 'submitted'"/>
+              <field name="nbr_submission_status" readonly="1"/>
+              <field name="nbr_export_file" filename="nbr_export_filename" readonly="1" invisible="not nbr_export_file"/>
+              <field name="attachment_ids" widget="many2many_binary"/>
+            </group>
+          </group>
+          <group string="VAT Current Account" col="4">
+            <field name="opening_balance"/>
+            <field name="output_vat" readonly="1"/>
+            <field name="input_vat" readonly="1"/>
+          <field name="reverse_charge_vat" readonly="1"/>
+            <field name="sd_amount" readonly="1"/>
+            <field name="adjustments_amount" readonly="1"/>
+            <field name="vds_suffered" readonly="1"/>
+            <field name="late_interest"/>
+            <field name="late_fine"/>
+            <field name="net_payable" readonly="1"/>
+            <field name="closing_credit" readonly="1"/>
+          </group>
+          <notebook>
+            <page string="Source Documents">
+              <field name="line_ids" readonly="state == 'submitted'">
+                <list>
+                  <field name="document_date"/>
+                  <field name="move_id"/>
+                  <field name="mushak_number"/>
+                  <field name="partner_id"/>
+                  <field name="supply_type"/>
+                  <field name="base_amount"/>
+                  <field name="output_vat"/>
+                  <field name="input_vat"/>
+              <field name="reverse_charge_vat"/>
+              <field name="capital_credit_line_id" optional="hide"/>
+                  <field name="sd_amount"/>
+                </list>
+              </field>
+            </page>
+            <page string="Adjustments">
+              <field name="adjustment_ids" readonly="state == 'submitted'">
+                <list editable="bottom">
+                  <field name="name"/>
+                  <field name="adjustment_type"/>
+                  <field name="amount"/>
+                  <field name="signed_amount" readonly="1"/>
+                  <field name="return_note"/>
+                  <field name="reason"/>
+                  <field name="state"/>
+                </list>
+              </field>
+            </page>
+            <page string="Treasury Payments">
+              <field name="treasury_payment_ids" readonly="1">
+                <list>
+                  <field name="challan_number"/>
+                  <field name="payment_date"/>
+                  <field name="payment_type"/>
+                  <field name="amount"/>
+                  <field name="state"/>
+                </list>
+              </field>
+            </page>
+            <page string="Validation">
+              <field name="validation_note" readonly="1" nolabel="1"/>
+            </page>
+            <page string="NBR Submission">
+              <group>
+                <field name="nbr_submission_payload" readonly="1" nolabel="1"/>
+                <field name="nbr_submission_response" readonly="1" nolabel="1"/>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="action_vat_return" model="ir.actions.act_window">
+    <field name="name">Mushak 9.1 VAT Returns</field>
+    <field name="res_model">vat.return</field>
+    <field name="view_mode">list,form</field>
+  </record>
+  <record id="view_vat_book_wizard" model="ir.ui.view">
+    <field name="name">vat.book.wizard.form</field>
+    <field name="model">vat.book.wizard</field>
+    <field name="arch" type="xml">
+      <form string="Print VAT Book">
+        <group>
+          <field name="company_id" invisible="1"/>
+          <field name="period_id"/>
+          <field name="unit_id"/>
+          <field name="book_type"/>
+        </group>
+        <footer>
+          <button name="action_print" type="object" string="Print" class="btn-primary"/>
+          <button string="Cancel" special="cancel" class="btn-secondary"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+  <record id="action_vat_book_wizard" model="ir.actions.act_window">
+    <field name="name">Print VAT Book</field>
+    <field name="res_model">vat.book.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+</odoo>

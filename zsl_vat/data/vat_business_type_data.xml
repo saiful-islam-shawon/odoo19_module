@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+  <record id="business_type_trading" model="vat.business.type"><field name="name">Trading</field><field name="code">trading</field></record>
+  <record id="business_type_manufacturing" model="vat.business.type"><field name="name">Manufacturing</field><field name="code">manufacturing</field></record>
+  <record id="business_type_service" model="vat.business.type"><field name="name">Service</field><field name="code">service</field></record>
+</odoo>

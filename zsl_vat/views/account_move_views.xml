@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <record id="view_move_form_vat" model="ir.ui.view">
+    <field name="name">account.move.vat.form</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//header" position="inside">
+        <button name="action_print_mushak_63" type="object" string="Print Mushak" invisible="not vat_mushak_number"/>
+      </xpath>
+      <xpath expr="//notebook" position="inside">
+        <page string="Bangladesh VAT" groups="zsl_vat.group_vat_user">
+          <group>
+            <group>
+              <field name="vat_unit_id" readonly="state == 'posted'"/>
+              <field name="vat_mushak_number" readonly="1"/>
+              <field name="vat_document_type" readonly="1"/>
+              <field name="vat_supply_type" readonly="state == 'posted'"/>
+              <field name="vat_original_move_id" readonly="state == 'posted'"/>
+              <field name="vat_adjustment_reason" readonly="state == 'posted'"/>
+              <field name="vat_supplier_document_number" readonly="state == 'posted'" invisible="move_type not in ('in_invoice', 'in_refund')"/>
+              <field name="vat_supplier_document_date" readonly="state == 'posted'" invisible="move_type not in ('in_invoice', 'in_refund')"/>
+              <field name="vat_supplier_document_id" readonly="state == 'posted'" invisible="move_type not in ('in_invoice', 'in_refund')"/>
+            </group>
+            <group>
+              <field name="vat_vds_rate" readonly="state == 'posted'"/>
+              <field name="vat_vds_amount" readonly="1"/>
+              <field name="vat_vds_reverse_charge" readonly="state == 'posted'"/>
+              <field name="vat_input_credit_status" readonly="state == 'posted'"/>
+              <field name="vat_import_declaration_id" readonly="state == 'posted'" invisible="move_type not in ('in_invoice', 'in_refund')"/>
+              <field name="vat_export_reference" invisible="vat_supply_type not in ('zero', 'export')"/>
+              <field name="vat_import_bill_of_entry" invisible="vat_supply_type != 'import'"/>
+              <field name="vat_import_bill_date" invisible="vat_supply_type != 'import'"/>
+              <field name="vat_reverse_charge_rate" readonly="state == 'posted'" invisible="not vat_vds_reverse_charge"/>
+              <field name="vat_reverse_charge_payment_id" readonly="state == 'posted'" invisible="not vat_vds_reverse_charge"/>
+            </group>
+          </group>
+          <group string="Computed VAT">
+            <field name="vat_taxable_amount" readonly="1"/>
+            <field name="vat_output_amount" readonly="1"/>
+            <field name="vat_input_amount" readonly="1"/>
+            <field name="vat_sd_amount" readonly="1"/>
+            <field name="vat_reverse_charge_amount" readonly="1"/>
+            <field name="vat_is_high_value" readonly="1"/>
+          </group>
+          <group string="Capital Asset Input Credit" invisible="not vat_capital_schedule_ids">
+            <field name="vat_capital_schedule_ids" readonly="1">
+              <list><field name="name"/><field name="product_id"/><field name="total_credit_amount"/><field name="deferred_months"/><field name="state"/></list>
+            </field>
+          </group>
+          <field name="vat_vds_certificate_ids" readonly="1">
+            <list>
+              <field name="name"/>
+              <field name="direction"/>
+              <field name="amount"/>
+              <field name="state"/>
+            </list>
+          </field>
+        </page>
+      </xpath>
+      <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='product_id']" position="after">
+        <field name="vat_input_credit_status" optional="hide"/>
+        <field name="vat_partial_credit_percent" optional="hide"/>
+        <field name="vat_is_capital_good" column_invisible="1"/>
+        <field name="vat_capital_credit_treatment" optional="hide"/>
+        <field name="vat_deferred_months" optional="hide"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>

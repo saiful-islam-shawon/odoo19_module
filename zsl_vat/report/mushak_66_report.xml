@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="action_print_official_mushak_vds" model="ir.actions.server">
+    <field name="name">Mushak 6.6 — QWeb Print</field>
+    <field name="model_id" ref="zsl_vat.model_vat_vds_certificate"/>
+    <field name="binding_model_id" eval="False"/><field name="state">code</field>
+    <field name="code">action = records.action_print_mushak_vds()</field>
+  </record>
+  <record id="action_report_mushak_66" model="ir.actions.report"><field name="name">Mushak 6.6 — VDS Certificate</field><field name="model">vat.vds.certificate</field><field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_66</field><field name="report_file">zsl_vat.report_mushak_66</field><field name="binding_model_id" ref="model_vat_vds_certificate"/><field name="binding_type">report</field></record>
+  <template id="report_mushak_66"><t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-set="form_code" t-value="'Mushak 6.6'"/><t t-set="form_title" t-value="'VAT Deduction at Source Certificate'"/><t t-call="zsl_vat.mushak_qweb_layout"><div class="zsl-mushak-section"><h4>Certificate particulars</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Certificate no. / date</td><td><span t-field="o.name"/> / <span t-field="o.certificate_date"/></td><td class="zsl-mushak-label">Direction</td><td><span t-field="o.direction"/></td></tr><tr><td class="zsl-mushak-label">Deducting entity</td><td><span t-field="o.company_id.name"/><br/><span t-field="o.company_id.vat_bin"/></td><td class="zsl-mushak-label">Supplier / recipient</td><td><span t-field="o.partner_id"/><br/><span t-field="o.partner_id.vat_bin"/></td></tr><tr><td class="zsl-mushak-label">Source invoice</td><td><span t-field="o.move_id.name"/></td><td class="zsl-mushak-label">Mushak / supplier document</td><td><span t-field="o.move_id.vat_supplier_document_number"/></td></tr><tr><td class="zsl-mushak-label">Taxable base</td><td><span t-field="o.base_amount"/></td><td class="zsl-mushak-label">VDS rate / amount</td><td><span t-field="o.rate"/>% / <span t-field="o.amount"/></td></tr></table></div></t></t></t></template>
+</odoo>

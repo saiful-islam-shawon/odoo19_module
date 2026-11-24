@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+  <t t-name="zsl_vat.VatDashboard">
+    <div class="o_zsl_vat_dashboard p-4" t-if="state.loaded">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div><h1>VAT Dashboard</h1><p class="text-muted mb-0"><t t-esc="state.data.period"/> · Return status: <t t-esc="state.data.return_state"/></p></div>
+        <button class="btn btn-primary" t-on-click="openReturns">Open VAT Returns</button>
+      </div>
+      <div class="row g-3">
+        <div class="col-12 col-sm-6 col-xl-3"><button class="vat-kpi w-100 text-start" t-on-click="openReturns"><span>VAT Balance</span><strong>৳ <t t-esc="format(state.data.vat_balance)"/></strong><small>Current net payable / credit</small></button></div>
+        <div class="col-12 col-sm-6 col-xl-3"><button class="vat-kpi w-100 text-start" t-on-click="openVds"><span>VDS Balance</span><strong>৳ <t t-esc="format(state.data.vds_balance)"/></strong><small><t t-esc="state.data.pending_vds"/> certificate(s) pending</small></button></div>
+        <div class="col-12 col-sm-6 col-xl-3"><button class="vat-kpi w-100 text-start" t-on-click="openTreasury"><span>Last Paid Date</span><strong class="vat-kpi-date"><t t-esc="state.data.last_paid_date || '—'"/></strong><small>Latest confirmed treasury challan</small></button></div>
+        <div class="col-12 col-sm-6 col-xl-3"><button class="vat-kpi w-100 text-start" t-on-click="openPeriods"><span>Next Return Due In</span><strong><t t-esc="state.data.due_days === null ? '—' : state.data.due_days + ' days'"/></strong><small t-if="state.data.due_date">Due date: <t t-esc="state.data.due_date"/></small><small t-else="">Configure VAT periods to enable reminders</small></button></div>
+        <div class="col-12 col-sm-6 col-xl-3"><button class="vat-kpi vat-kpi-light w-100 text-start" t-on-click="openSales"><span>Last Sale</span><strong><t t-esc="state.data.last_sale"/></strong><small><t t-esc="state.data.last_sale_date || 'No posted sale'"/></small></button></div>
+        <div class="col-12 col-sm-6 col-xl-3"><button class="vat-kpi vat-kpi-light w-100 text-start" t-on-click="openPurchases"><span>Last Purchase</span><strong><t t-esc="state.data.last_purchase"/></strong><small><t t-esc="state.data.last_purchase_date || 'No posted purchase'"/></small></button></div>
+        <div class="col-12 col-sm-6 col-xl-3"><button class="vat-kpi vat-kpi-light w-100 text-start" t-on-click="openPurchases"><span>Total Purchase</span><strong>৳ <t t-esc="format(state.data.total_purchase)"/></strong><small><t t-esc="state.data.purchase_count"/> posted purchase(s) this period</small></button></div>
+        <div class="col-12 col-sm-6 col-xl-3"><button class="vat-kpi vat-kpi-light w-100 text-start" t-on-click="openSales"><span>Total Sale</span><strong>৳ <t t-esc="format(state.data.total_sale)"/></strong><small><t t-esc="state.data.sales_count"/> posted sale(s) this period</small></button></div>
+      </div>
+      <div class="row g-3 mt-1">
+        <div class="col-12 col-xl-6">
+          <div class="card vat-chart-card"><div class="card-header">VAT Balance in Last Six Months</div><div class="card-body">
+            <div class="vat-chart"><div class="vat-column" t-foreach="state.data.trend" t-as="point" t-key="point.label"><div class="vat-bar vat-bar-blue" t-att-style="'height:' + point.vat_height + '%'"/><small t-esc="point.label"/></div></div>
+            <div class="vat-legend"><span><i class="vat-legend-blue"/> VAT balance</span></div>
+          </div></div>
+        </div>
+        <div class="col-12 col-xl-6">
+          <div class="card vat-chart-card"><div class="card-header">VAT vs Payment</div><div class="card-body">
+            <div class="vat-chart"><div class="vat-column vat-column-paired" t-foreach="state.data.trend" t-as="point" t-key="point.label"><div class="vat-pair"><i class="vat-bar vat-bar-blue" t-att-style="'height:' + point.vat_height + '%'"/><i class="vat-bar vat-bar-yellow" t-att-style="'height:' + point.payment_height + '%'"/></div><small t-esc="point.label"/></div></div>
+            <div class="vat-legend"><span><i class="vat-legend-blue"/> VAT</span><span><i class="vat-legend-yellow"/> Payment</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+    <div class="o_zsl_vat_dashboard p-4" t-else=""><span class="o_spinner"/></div>
+  </t>
+</templates>

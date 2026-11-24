@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data noupdate="1"><record id="mail_activity_type_vat_review" model="mail.activity.type"><field name="name">VAT Review</field><field name="category">default</field><field name="icon">fa-check</field></record></data></odoo>

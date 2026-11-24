@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <record id="view_picking_form_vat" model="ir.ui.view">
+    <field name="name">stock.picking.vat.form</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.view_picking_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//header" position="inside">
+        <button name="action_confirm_delivery" type="object" string="Confirm Delivery" class="btn-primary" invisible="state != 'done' or picking_type_code != 'outgoing' or vat_delivery_confirmed"/>
+        <button name="action_print_vat_challan" type="object" string="Print VAT Challan" invisible="not vat_challan_number"/>
+        <button name="action_view_vat_traceability" type="object" string="VAT Traceability" invisible="not move_ids"/>
+      </xpath>
+      <xpath expr="//notebook" position="inside">
+        <page string="Bangladesh VAT" groups="zsl_vat.group_vat_user">
+          <group>
+            <group>
+              <field name="vat_unit_id" readonly="state == 'done'"/>
+              <field name="vat_receiving_unit_id" readonly="state == 'done'" invisible="vat_challan_type != 'transfer'"/>
+              <field name="vat_challan_type" readonly="state == 'done'"/>
+              <field name="vat_challan_number" readonly="1"/>
+              <field name="vat_challan_date" readonly="1"/>
+              <field name="vat_transfer_value" readonly="1"/>
+              <field name="vat_transfer_tax_amount" readonly="1"/>
+            </group>
+            <group>
+              <field name="vat_invoice_id" readonly="state == 'done'"/>
+              <field name="vat_tax_document_id" readonly="state == 'done'" invisible="vat_challan_type != 'transfer'"/>
+              <field name="vat_delivery_trip_no" readonly="state == 'done'"/>
+              <field name="vat_delivery_confirmed" readonly="1"/>
+              <field name="vat_delivery_confirmation_date" readonly="1"/>
+              <field name="vat_delivery_receiver" readonly="not vat_delivery_confirmed"/>
+              <field name="vat_delivery_evidence_id" readonly="not vat_delivery_confirmed"/>
+              <field name="vat_remarks"/>
+              <field name="vat_adjustment_reason" placeholder="Required for damage, destruction or shortage adjustment"/>
+            </group>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+  <record id="view_stock_move_vat_traceability" model="ir.ui.view">
+    <field name="name">stock.move.vat.traceability</field>
+    <field name="model">stock.move</field>
+    <field name="inherit_id" ref="stock.view_move_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//group[@name='main_grp']" position="after">
+        <group string="VAT Traceability" groups="zsl_vat.group_vat_user">
+          <field name="vat_trace_lot_ids" widget="many2many_tags" readonly="1"/>
+          <field name="vat_source_purchase_line_ids" readonly="1"><list><field name="order_id"/><field name="product_id"/><field name="product_qty"/></list></field>
+          <field name="vat_source_vendor_bill_ids" readonly="1"><list><field name="name"/><field name="invoice_date"/><field name="vat_supplier_document_number"/><field name="vat_input_amount"/></list></field>
+          <field name="vat_source_input_tax" readonly="1"/>
+        </group>
+      </xpath>
+    </field>
+  </record>
+</odoo>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="action_print_official_mushak_23" model="ir.actions.server">
+    <field name="name">Mushak 2.3 — QWeb Print</field>
+    <field name="model_id" ref="zsl_vat.model_vat_registration_certificate"/>
+    <field name="binding_model_id" eval="False"/><field name="state">code</field>
+    <field name="code">action = records.action_print_certificate()</field>
+  </record>
+  <record id="action_report_mushak_23" model="ir.actions.report"><field name="name">Mushak 2.3 — Registration Certificate</field><field name="model">vat.registration.certificate</field><field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_23</field><field name="report_file">zsl_vat.report_mushak_23</field><field name="binding_model_id" ref="model_vat_registration_certificate"/><field name="binding_type">report</field></record>
+  <template id="report_mushak_23"><t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-set="form_code" t-value="'Mushak 2.3'"/><t t-set="form_title" t-value="'VAT / Turnover Tax Registration Certificate'"/><t t-call="zsl_vat.mushak_qweb_layout"><div class="zsl-mushak-section"><h4>Registration / Enlistment Certificate</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Certificate no.</td><td><span t-field="o.certificate_reference"/></td><td class="zsl-mushak-label">Issue / effective date</td><td><span t-field="o.issue_date"/> / <span t-field="o.effective_date"/></td></tr><tr><td class="zsl-mushak-label">Taxpayer name</td><td><span t-field="o.taxpayer_name"/></td><td class="zsl-mushak-label">BIN</td><td><span t-field="o.bin"/></td></tr><tr><td class="zsl-mushak-label">Registration type</td><td><span t-field="o.registration_type"/></td><td class="zsl-mushak-label">Issuing authority</td><td><span t-field="o.issuing_authority"/></td></tr><tr><td class="zsl-mushak-label">Registered address</td><td colspan="3"><span t-field="o.registered_address"/></td></tr></table></div><p class="zsl-mushak-muted">This is a system-generated reference copy. The uploaded NBR-issued original remains the legal certificate.</p></t></t></t></template>
+</odoo>

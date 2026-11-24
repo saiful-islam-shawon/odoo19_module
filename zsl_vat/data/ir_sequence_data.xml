@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+  <record id="seq_vat_import_declaration" model="ir.sequence">
+    <field name="name">VAT Import Declaration</field>
+    <field name="code">zsl_vat.import_declaration</field>
+    <field name="prefix">IMP/%(year)s/</field>
+    <field name="padding">5</field>
+    <field name="company_id" eval="False"/>
+  </record>
+  <record id="seq_vat_capital_credit" model="ir.sequence">
+    <field name="name">VAT Capital Input Credit Schedule</field>
+    <field name="code">zsl_vat.capital_credit</field>
+    <field name="prefix">CAP-ITC/%(year)s/</field>
+    <field name="padding">5</field>
+    <field name="company_id" eval="False"/>
+  </record>
+    <record id="seq_mushak_63" model="ir.sequence"><field name="name">Mushak 6.3</field><field name="code">zsl_vat.mushak_63</field><field name="prefix">6.3/COMPANY/FY%(range_year)s/</field><field name="padding">6</field><field name="implementation">no_gap</field><field name="use_date_range">True</field></record>
+    <record id="seq_mushak_64" model="ir.sequence"><field name="name">Mushak 6.4</field><field name="code">zsl_vat.mushak_64</field><field name="prefix">6.4/COMPANY/FY%(range_year)s/</field><field name="padding">6</field><field name="implementation">no_gap</field><field name="use_date_range">True</field></record>
+    <record id="seq_mushak_65" model="ir.sequence"><field name="name">Mushak 6.5</field><field name="code">zsl_vat.mushak_65</field><field name="prefix">6.5/COMPANY/FY%(range_year)s/</field><field name="padding">6</field><field name="implementation">no_gap</field><field name="use_date_range">True</field></record>
+    <record id="seq_mushak_66" model="ir.sequence"><field name="name">Mushak 6.6</field><field name="code">zsl_vat.mushak_66</field><field name="prefix">6.6/COMPANY/FY%(range_year)s/</field><field name="padding">6</field><field name="implementation">no_gap</field><field name="use_date_range">True</field></record>
+    <record id="seq_mushak_67" model="ir.sequence"><field name="name">Mushak 6.7</field><field name="code">zsl_vat.mushak_67</field><field name="prefix">6.7/COMPANY/FY%(range_year)s/</field><field name="padding">6</field><field name="implementation">no_gap</field><field name="use_date_range">True</field></record>
+    <record id="seq_mushak_68" model="ir.sequence"><field name="name">Mushak 6.8</field><field name="code">zsl_vat.mushak_68</field><field name="prefix">6.8/COMPANY/FY%(range_year)s/</field><field name="padding">6</field><field name="implementation">no_gap</field><field name="use_date_range">True</field></record>
+    <record id="seq_mushak_91" model="ir.sequence"><field name="name">Mushak 9.1</field><field name="code">zsl_vat.mushak_91</field><field name="prefix">9.1/COMPANY/FY%(range_year)s/</field><field name="padding">6</field><field name="implementation">no_gap</field><field name="use_date_range">True</field></record>
+    <record id="seq_mushak_21" model="ir.sequence"><field name="name">Mushak 2.1 Application</field><field name="code">zsl_vat.mushak_21</field><field name="prefix">2.1/%(year)s/</field><field name="padding">6</field><field name="implementation">no_gap</field></record>
+    <record id="seq_mushak_23" model="ir.sequence"><field name="name">Mushak 2.3 Certificate Archive</field><field name="code">zsl_vat.mushak_23</field><field name="prefix">2.3/%(year)s/</field><field name="padding">6</field><field name="implementation">no_gap</field></record>
+    <record id="seq_stock_adjustment" model="ir.sequence"><field name="name">VAT Stock Adjustment</field><field name="code">zsl_vat.stock_adjustment</field><field name="prefix">VSA/%(year)s/</field><field name="padding">6</field><field name="implementation">no_gap</field></record>
+</odoo>

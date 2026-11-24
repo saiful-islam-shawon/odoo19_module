@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="action_print_official_stock_register" model="ir.actions.server">
+    <field name="name">Mushak 6.2.1 — QWeb Print</field>
+    <field name="model_id" ref="zsl_vat.model_vat_stock_register"/>
+    <field name="binding_model_id" eval="False"/><field name="state">code</field>
+    <field name="code">action = records.action_print_stock_register()</field>
+  </record>
+  <record id="action_report_mushak_621" model="ir.actions.report"><field name="name">Mushak 6.2.1 — Stock Register</field><field name="model">vat.stock.register</field><field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_621</field><field name="report_file">zsl_vat.report_mushak_621</field><field name="binding_model_id" ref="model_vat_stock_register"/><field name="binding_type">report</field></record>
+  <template id="report_mushak_621"><t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-set="form_code" t-value="'Mushak 6.2.1'"/><t t-set="form_title" t-value="'VAT Stock Register'"/><t t-call="zsl_vat.mushak_qweb_layout"><div class="zsl-mushak-section"><h4>VAT unit: <span t-field="o.unit_id"/> | Tax period: <span t-field="o.period_id"/> | Status: <span t-field="o.state"/></h4><table class="zsl-mushak-table"><tr><th>SL</th><th>Product</th><th>VAT UoM</th><th>Opening qty</th><th>Opening value</th><th>Purchase</th><th>Transfer in</th><th>Sale / issue</th><th>Adjustment</th><th>Closing qty</th></tr><tr t-foreach="o.line_ids" t-as="line"><td><span t-esc="line_index + 1"/></td><td><span t-field="line.product_id"/></td><td><span t-field="line.vat_uom_id"/></td><td class="zsl-mushak-number"><span t-field="line.opening_qty"/></td><td class="zsl-mushak-number"><span t-field="line.opening_value"/></td><td class="zsl-mushak-number"><span t-field="line.purchase_qty"/></td><td class="zsl-mushak-number"><span t-field="line.transfer_in_qty"/></td><td class="zsl-mushak-number"><span t-field="line.sale_qty"/></td><td class="zsl-mushak-number"><span t-field="line.adjustment_qty"/></td><td class="zsl-mushak-number"><span t-field="line.closing_qty"/></td></tr></table></div></t></t></t></template>
+</odoo>

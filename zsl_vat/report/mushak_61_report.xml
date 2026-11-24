@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="paperformat_mushak_61_landscape" model="report.paperformat">
+        <field name="name">Mushak 6.1 Landscape</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">6</field>
+        <field name="margin_bottom">6</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="action_print_official_mushak_61" model="ir.actions.server">
+        <field name="name">Mushak 6.1 — QWeb Print</field>
+        <field name="model_id" ref="zsl_vat.model_vat_book_wizard"/>
+        <field name="state">code</field>
+        <field name="code">action = records.with_context(default_book_type='purchase').action_print()</field>
+    </record>
+
+    <record id="action_report_mushak_61" model="ir.actions.report">
+        <field name="name">Mushak 6.1 — Purchase Book</field>
+        <field name="model">vat.book.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">zsl_vat.report_mushak_61</field>
+        <field name="report_file">zsl_vat.report_mushak_61</field>
+        <field name="paperformat_id" ref="paperformat_mushak_61_landscape"/>
+    </record>
+
+    <template id="report_mushak_61">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
+                    <div class="page mushak-61-page">
+                        <style type="text/css">
+                            @page {
+                                size: A4 landscape;
+                                margin: 5mm;
+                            }
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
+                            .mushak-61-page {
+                                font-family: 'Noto Sans Bengali', Arial, sans-serif !important;
+                                color: #000;
+                                border: 1.5px solid #000;
+                                padding: 8px 10px;
+                                box-sizing: border-box;
+                                width: 100%;
+                                line-height: 1.15;
+                            }
+                            .mushak-61-top-table {
+                                width: 100%;
+                                border: none !important;
+                                margin-bottom: 6px;
+                                border-collapse: collapse;
+                            }
+                            .mushak-61-top-table td {
+                                border: none !important;
+                                padding: 0;
+                            }
+                            .mushak-61-badge {
+                                display: inline-block;
+                                border: 1.5px solid #000;
+                                padding: 2px 8px;
+                                font-weight: bold;
+                                font-size: 11px;
+                            }
+                            .mushak-61-title-block {
+                                text-align: center;
+                            }
+                            .mushak-61-title-1 {
+                                font-size: 11.5px;
+                                font-weight: bold;
+                            }
+                            .mushak-61-title-2 {
+                                font-size: 13.5px;
+                                font-weight: bold;
+                                margin-top: 1px;
+                            }
+                            .mushak-61-title-3 {
+                                font-size: 10px;
+                                font-weight: bold;
+                                margin-top: 1px;
+                            }
+                            .mushak-61-title-4 {
+                                font-size: 9.5px;
+                                font-weight: bold;
+                                margin-top: 1px;
+                            }
+                            .mushak-61-title-5 {
+                                font-size: 11px;
+                                font-weight: bold;
+                                margin-top: 2px;
+                            }
+                            .mushak-61-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                border: 1.5px solid #000;
+                                table-layout: fixed;
+                            }
+                            .mushak-61-table th, .mushak-61-table td {
+                                border: 1px solid #000;
+                                padding: 2px 1px;
+                                text-align: center;
+                                vertical-align: middle;
+                                word-wrap: break-word;
+                                font-size: 8.5px;
+                                line-height: 1.1;
+                            }
+                            .mushak-61-table th {
+                                font-weight: bold;
+                                background-color: #fff;
+                            }
+                            .mushak-61-table td {
+                                height: 20px;
+                            }
+                            .mushak-61-notes {
+                                margin-top: 8px;
+                                font-size: 8.5px;
+                                line-height: 1.35;
+                                text-align: left;
+                            }
+                            .mushak-61-notes-title {
+                                font-weight: bold;
+                                margin-bottom: 2px;
+                            }
+                            .mushak-61-notes-item {
+                                margin-bottom: 1px;
+                            }
+                        </style>
+
+                        <!-- Top Header Area with Badge -->
+                        <table class="mushak-61-top-table">
+                            <tr>
+                                <td style="width: 15%;"></td>
+                                <td style="width: 70%; text-align: center; vertical-align: top;">
+                                    <div class="mushak-61-title-block">
+                                        <div class="mushak-61-title-1">
+                                            <t t-if="o.company_id and o.company_id.name and o.company_id.vat">
+                                                <span t-esc="o.company_id.name"/>
+                                                <t t-if="o.company_id.street">, <span t-esc="o.company_id.street"/></t>
+                                                <span>, বিআইএন: </span><span t-esc="o.company_id.vat"/>
+                                            </t>
+                                            <t t-else="">
+                                                প্রতিষ্ঠানের নাম, ঠিকানা ও ব্যবসা সনাক্তকরণ সংখ্যা
+                                            </t>
+                                        </div>
+                                        <div class="mushak-61-title-2">ক্রয় হিসাব পুস্তক</div>
+                                        <div class="mushak-61-title-3">(পণ্য বা সেবা প্রক্রিয়াকরণে সম্পৃক্ত এমন নিবন্ধিত বা তালিকাভুক্ত ব্যক্তির জন্য প্রযোজ্য)</div>
+                                        <div class="mushak-61-title-4">[বিধি ৪০(১) এর দফা (ক) এবং ৪১ এর দফা (ক) দ্রষ্টব্য]</div>
+                                        <div class="mushak-61-title-5">পণ্য/সেবার উপকরণ ক্রয়</div>
+                                    </div>
+                                </td>
+                                <td style="width: 15%; text-align: right; vertical-align: top;">
+                                    <div class="mushak-61-badge">মূসক-৬.১</div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- 21-Column Hierarchical Statutory Table -->
+                        <table class="mushak-61-table">
+                            <colgroup>
+                                <col style="width: 3.5%;"/>
+                                <col style="width: 4.5%;"/>
+                                <col style="width: 4.5%;"/>
+                                <col style="width: 5.0%;"/>
+                                <col style="width: 5.5%;"/>
+                                <col style="width: 4.5%;"/>
+                                <col style="width: 6.0%;"/>
+                                <col style="width: 6.0%;"/>
+                                <col style="width: 6.0%;"/>
+                                <col style="width: 6.0%;"/>
+                                <col style="width: 4.5%;"/>
+                                <col style="width: 5.0%;"/>
+                                <col style="width: 4.5%;"/>
+                                <col style="width: 4.5%;"/>
+                                <col style="width: 5.0%;"/>
+                                <col style="width: 5.5%;"/>
+                                <col style="width: 4.5%;"/>
+                                <col style="width: 5.0%;"/>
+                                <col style="width: 4.5%;"/>
+                                <col style="width: 5.0%;"/>
+                                <col style="width: 5.0%;"/>
+                            </colgroup>
+                            <thead>
+                                <!-- Tier 1 Header -->
+                                <tr>
+                                    <th rowspan="3">ক্রমিক<br/>সংখ্যা</th>
+                                    <th rowspan="3">তারিখ</th>
+                                    <th colspan="2">মজুদ উপকরণের<br/>প্রারম্ভিক জের</th>
+                                    <th colspan="10">ক্রয়কৃত উপকরণ</th>
+                                    <th colspan="2">মোট উপকরণের<br/>পরিমাণ</th>
+                                    <th colspan="2">পণ্য<br/>প্রস্তুত/প্রক্রিয়া<br/>করণে<br/>উপকরণের<br/>ব্যবহার</th>
+                                    <th colspan="2">উপকরণের প্রান্তিক জের</th>
+                                    <th rowspan="3">মন্তব্য</th>
+                                </tr>
+                                <!-- Tier 2 Header -->
+                                <tr>
+                                    <th rowspan="2">পরিমাণ<br/>(একক)</th>
+                                    <th rowspan="2">মূল্য<br/>(সকল<br/>প্রকার<br/>কর<br/>ব্যতীত)</th>
+                                    <th rowspan="2">চালানপত্র/<br/>বিল অব<br/>এন্ট্রি নম্বর</th>
+                                    <th rowspan="2">তারিখ</th>
+                                    <th colspan="3">বিক্রেতা/ সরবরাহকারী</th>
+                                    <th rowspan="2">বিবরণ</th>
+                                    <th rowspan="2">পরিমাণ</th>
+                                    <th rowspan="2">মূল্য<br/>(সকল<br/>প্রকার<br/>কর<br/>ব্যতীত)</th>
+                                    <th rowspan="2">সম্পূরকশুল্ক<br/>(যদি<br/>থাকে)</th>
+                                    <th rowspan="2">মূসক</th>
+                                    <th rowspan="2">পরিমাণ<br/>(একক)</th>
+                                    <th rowspan="2">মূল্য<br/>(সকল<br/>প্রকার<br/>কর<br/>ব্যতীত)</th>
+                                    <th rowspan="2">পরিমাণ<br/>(একক)</th>
+                                    <th rowspan="2">মূল্য<br/>(সকল<br/>প্রকার<br/>কর<br/>ব্যতীত)</th>
+                                    <th rowspan="2">পরিমাণ<br/>(একক)</th>
+                                    <th rowspan="2">মূল্য<br/>(সকল<br/>প্রকার<br/>কর<br/>ব্যতীত)</th>
+                                </tr>
+                                <!-- Tier 3 Header -->
+                                <tr>
+                                    <th>নাম</th>
+                                    <th>ঠিকানা</th>
+                                    <th>নিবন্ধন/<br/>তালিকাভুক্তি/<br/>জাতীয়<br/>পরিচয়পত্র নং</th>
+                                </tr>
+                                <!-- Tier 4 Column Numbering Row -->
+                                <tr style="background-color: #fafafa;">
+                                    <th>(১)</th>
+                                    <th>(২)</th>
+                                    <th>(৩)</th>
+                                    <th>(৪)</th>
+                                    <th>(৫)</th>
+                                    <th>(৬)</th>
+                                    <th>(৭)</th>
+                                    <th>(৮)</th>
+                                    <th>(৯)</th>
+                                    <th>(১০)</th>
+                                    <th>(১১)</th>
+                                    <th>(১২)</th>
+                                    <th>(১৩)</th>
+                                    <th>(১৪)</th>
+                                    <th>(১৫)<br/>=(৩+১১)</th>
+                                    <th>(১৬)<br/>=(৪+১২)</th>
+                                    <th>(১৭)</th>
+                                    <th>(১৮)</th>
+                                    <th>(১৯)</th>
+                                    <th>(২০)</th>
+                                    <th>(২১)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Phase 1 Skeleton Rows for visual verification -->
+                                <t t-foreach="range(1, 11)" t-as="row_idx">
+                                    <tr>
+                                        <td><span t-esc="row_idx"/></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- Statutory Footnotes (বিশেষ দ্রষ্টব্যঃ) -->
+                        <div class="mushak-61-notes">
+                            <div class="mushak-61-notes-title">বিশেষ দ্রষ্টব্যঃ</div>
+                            <div class="mushak-61-notes-item">১। অর্থনৈতিক কার্যক্রম সংশ্লিষ্ট সকল প্রকার ক্রয়ের তথ্য এই ফরমে অন্তর্ভুক্ত করিতে হইবে।</div>
+                            <div class="mushak-61-notes-item">২। যে ক্ষেত্রে অনিবন্ধিত ব্যক্তির নিকট হইতে পণ্য ক্রয় করা হইবে সেই ক্ষেত্রে উক্ত ব্যক্তির পূর্ণাঙ্গ নাম, ঠিকানা ও জাতীয় পরিচয়পত্র নম্বর যথাযথভাবে সংশ্লিষ্ট কলাম [(৭), (৮) ও (৯)] এ আবশ্যিকভাবে উল্লেখ করিতে হইবে।</div>
+                            <div class="mushak-61-notes-item">৩। উপকরণ ক্রয়ের স্বপক্ষে প্রামাণিক দলিল হিসাবে বিল অব এন্ট্রি বা চালানপত্রের কপি সংরক্ষণ করিতে হইবে।</div>
+                        </div>
+
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

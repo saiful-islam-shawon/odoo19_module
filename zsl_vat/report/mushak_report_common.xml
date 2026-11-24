@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <!-- Shared frame only.  Every statutory form remains in its own XML file. -->
+  <template id="mushak_qweb_layout">
+    <!-- Inline deliberately: wkhtmltopdf can render a report without fetching
+         the web asset bundle from a separate HTTP port. -->
+    <style type="text/css">
+      @page { size: A4; margin: 8mm; }
+      .zsl-mushak-form { color: #111; font-family: 'Noto Sans Bengali', 'Noto Sans', Arial, sans-serif; font-size: 9px; line-height: 1.32; }
+      .zsl-mushak-title { align-items: center; background: #edf4f8; border: 1px solid #202020; display: flex; font-size: 12px; justify-content: space-between; padding: 6px 8px; }
+      .zsl-mushak-title-separator { margin: 0 7px; }.zsl-mushak-copy { font-size: 8px; font-weight: 600; }
+      .zsl-government-heading { line-height: 1.5; padding: 8px 0 6px; text-align: center; }.zsl-government-heading span { font-size: 8px; }
+      .zsl-mushak-section { border: 1px solid #222; margin: 7px 0; }.zsl-mushak-section &gt; h4 { background: #e6e6e6; border-bottom: 1px solid #222; font-size: 9px; margin: 0; padding: 4px 6px; }
+      .zsl-mushak-table { border-collapse: collapse; margin: 0; width: 100%; }.zsl-mushak-table td, .zsl-mushak-table th { border: 1px solid #333; padding: 3px 4px; vertical-align: top; }.zsl-mushak-table th { background: #f2f2f2; font-weight: 700; text-align: center; }
+      .zsl-mushak-label { background: #f7f7f7; font-weight: 600; width: 21%; }.zsl-mushak-number { text-align: right; white-space: nowrap; }.zsl-mushak-muted { color: #666; font-size: 8px; }
+      .zsl-mushak-signature { display: flex; justify-content: space-between; margin-top: 25px; text-align: center; }.zsl-mushak-signature &gt; div { border-top: 1px dotted #222; padding-top: 4px; width: 31%; }.zsl-mushak-signature span { font-size: 8px; }.zsl-mushak-footer { border-top: 1px solid #444; font-size: 7px; margin-top: 15px; padding-top: 3px; text-align: right; }
+    </style>
+    <div class="page zsl-mushak-form">
+      <div class="zsl-mushak-title">
+        <div>
+          <strong t-esc="form_code"/>
+          <span class="zsl-mushak-title-separator">|</span>
+          <span t-esc="form_title"/>
+        </div>
+        <div class="zsl-mushak-copy">Original Copy</div>
+      </div>
+      <div class="zsl-government-heading">
+        <strong>গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</strong><br/>
+        জাতীয় রাজস্ব বোর্ড<br/>
+        <span>National Board of Revenue, Bangladesh</span>
+      </div>
+      <t t-out="0"/>
+      <div class="zsl-mushak-signature">
+        <div>প্রস্তুতকারীর স্বাক্ষর ও তারিখ<br/><span>Prepared by / Date</span></div>
+        <div>অনুমোদিত স্বাক্ষর ও সীল<br/><span>Authorised signature / Seal</span></div>
+      </div>
+      <div class="zsl-mushak-footer">Computer generated from ZSL VAT Management System</div>
+    </div>
+  </template>
+</odoo>
