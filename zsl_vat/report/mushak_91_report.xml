@@ -6,10 +6,10 @@
         <field name="default" eval="False"/>
         <field name="format">A4</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">10</field>
-        <field name="margin_bottom">10</field>
-        <field name="margin_left">10</field>
-        <field name="margin_right">10</field>
+        <field name="margin_top">32</field>
+        <field name="margin_bottom">30</field>
+        <field name="margin_left">43</field>
+        <field name="margin_right">43</field>
         <field name="header_line" eval="False"/>
         <field name="header_spacing">0</field>
         <field name="dpi">96</field>
@@ -42,7 +42,10 @@
                         <style type="text/css">
                             @page {
                                 size: A4 portrait;
-                                margin: 10mm;
+                                margin-top: 32mm;
+                                margin-bottom: 30mm;
+                                margin-left: 43mm;
+                                margin-right: 43mm;
                             }
                             body {
                                 margin: 0;
@@ -52,48 +55,72 @@
                                 font-family: 'Nikosh', 'Noto Sans Bengali', Arial, sans-serif !important;
                                 color: #000;
                                 width: 100%;
-                                line-height: 1.15;
-                                font-size: 8pt;
+                                line-height: 1.18;
+                                font-size: 8.8pt;
                             }
                             .mushak-91-header {
                                 text-align: center;
                                 position: relative;
-                                margin-bottom: 4px;
+                                margin-bottom: 8px;
                             }
                             .mushak-91-badge {
                                 position: absolute;
                                 right: 0;
-                                top: 5px;
+                                top: 0px;
                                 border: 1.5px solid #008080;
                                 color: #008080;
                                 padding: 2px 8px;
                                 font-weight: bold;
-                                font-size: 10pt;
+                                font-size: 10.5pt;
+                                background: #fff;
                             }
                             .mushak-section-header {
                                 background-color: #fabf8f;
                                 border: 1px solid #000;
-                                padding: 2px 6px;
+                                padding: 3px 6px;
                                 font-weight: bold;
-                                font-size: 8.5pt;
-                                margin-top: 4px;
+                                font-size: 9.5pt;
+                                margin-top: 5px;
                                 text-align: center;
+                            }
+                            .mushak-section-header-gray {
+                                background-color: #cec2b9;
+                                border: 1px solid #000;
+                                padding: 3px 6px;
+                                font-weight: bold;
+                                font-size: 9.5pt;
+                                margin-top: 5px;
+                                text-align: center;
+                            }
+                            .instructions-box-peach {
+                                background-color: #fbd4b4;
+                                border: 1px solid #000;
+                                padding: 4px 6px;
+                                font-size: 8.5pt;
+                                line-height: 1.25;
+                                margin-top: -1px;
+                                margin-bottom: 4px;
                             }
                             .mushak-table {
                                 width: 100%;
                                 border-collapse: collapse;
                                 border: 1px solid #000;
-                                font-size: 7.8pt;
-                                margin-bottom: 4px;
+                                font-size: 8.8pt;
+                                margin-bottom: 5px;
                             }
                             .mushak-table th, .mushak-table td {
                                 border: 1px solid #000;
-                                padding: 2px 3px;
+                                padding: 3px 4px;
                             }
                             .mushak-table th {
                                 background-color: #fabf8f;
                                 text-align: center;
                                 font-weight: bold;
+                            }
+                            .subform-tag-gray {
+                                background-color: #d9d9d9 !important;
+                                text-align: center;
+                                font-size: 8pt;
                             }
                             .page-break {
                                 page-break-after: always;
@@ -102,262 +129,261 @@
                             .text-right { text-align: right; }
                             .text-left { text-align: left; }
                             .fw-bold { font-weight: bold; }
+                            .bg-header { background-color: #fabf8f !important; }
                             .square-box {
                                 display: inline-block;
-                                width: 13px;
-                                height: 13px;
+                                width: 14px;
+                                height: 14px;
                                 border: 1px solid #000;
                                 vertical-align: middle;
                                 text-align: center;
-                                line-height: 13px;
-                                font-size: 7.5pt;
+                                line-height: 14px;
+                                font-size: 8.5pt;
                             }
                             .date-char-box {
                                 display: inline-block;
-                                width: 13px;
-                                height: 14px;
+                                width: 12px;
+                                height: 15px;
                                 border: 1px solid #000;
                                 text-align: center;
-                                line-height: 14px;
-                                font-size: 7.5pt;
+                                line-height: 15px;
+                                font-size: 8pt;
                                 margin-right: 1px;
                             }
                         </style>
 
 
                         <!-- ================= PAGE 1 ================= -->
-                        <div class="mushak-91-header">
-                            <img src="data:image/jpeg;base64,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" style="position: absolute; left: 14%; top: 0px; width: 48px; height: 48px;" alt="BD Emblem"/>
-                            <div style="font-size: 11pt; font-weight: normal;">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
-                            <div style="font-size: 11pt; font-weight: bold; margin-top: 1px;">জাতীয় রাজস্ব বোর্ড</div>
-                            <div class="mushak-91-badge">মূসক-৯.১</div>
-                            <div style="font-size: 13pt; font-weight: bold; margin-top: 3px;">মূল্য সংযোজন কর দাখিলপত্র</div>
-                            <div style="font-size: 9pt; margin-top: 1px; margin-bottom: 4px;">[বিধি ৪৭ এর উপ-বিধি (১) দ্রষ্টব্য]</div>
+                        <div class="mushak-91-p1" style="font-size: 9.2pt;">
+                            <div class="mushak-91-header" style="text-align: center; position: relative; margin-bottom: 18px;">
+                                <img src="data:image/jpeg;base64,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" style="position: absolute; left: 0px; top: 0px; width: 48px; height: 38px;" alt="BD Emblem"/>
+                                <div style="font-size: 11.5pt; font-weight: normal; margin-bottom: 2px;">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
+                                <div style="font-size: 12.5pt; font-weight: bold; margin-bottom: 3px;">জাতীয় রাজস্ব বোর্ড</div>
+                                <div class="mushak-91-badge">মূসক-৯.১</div>
+                                <div style="font-size: 13.5pt; font-weight: bold; margin-bottom: 2px;">মূল্য সংযোজন কর দাখিলপত্র</div>
+                                <div style="font-size: 10pt;">[বিধি ৪৭ এর উপ-বিধি (১) দ্রষ্টব্য]</div>
+                            </div>
+
+                            <!-- অংশ-১: করদাতার তথ্য -->
+                            <div class="mushak-section-header">অংশ-১: করদাতার তথ্য</div>
+                            <table class="mushak-table">
+                                <colgroup>
+                                    <col style="width: 38%;"/>
+                                    <col style="width: 3%;"/>
+                                    <col style="width: 59%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td style="padding: 4.5px 5px;">(১) ব্যবসায় সনাক্তকরণ সংখ্যা</td>
+                                    <td class="text-center" style="padding: 4.5px 5px;">:</td>
+                                    <td style="padding: 4.5px 5px;"><span t-field="o.company_id.vat_bin"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4.5px 5px;">(২) করদাতার নাম</td>
+                                    <td class="text-center" style="padding: 4.5px 5px;">:</td>
+                                    <td style="padding: 4.5px 5px;"><span t-field="o.company_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4.5px 5px;">(৩) করদাতার ঠিকানা</td>
+                                    <td class="text-center" style="padding: 4.5px 5px;">:</td>
+                                    <td style="padding: 4.5px 5px;"><span t-field="o.company_id.street"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4.5px 5px;">(৪) ব্যবসার প্রকৃতি</td>
+                                    <td class="text-center" style="padding: 4.5px 5px;">:</td>
+                                    <td style="padding: 4.5px 5px;"><span t-field="o.unit_id.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4.5px 5px;">(৫) অর্থনৈতিক কার্যক্রম এর প্রকৃতি</td>
+                                    <td class="text-center" style="padding: 4.5px 5px;">:</td>
+                                    <td style="padding: 4.5px 5px;">&#160;</td>
+                                </tr>
+                            </table>
+
+                            <!-- অংশ-২: দাখিলপত্র জমার তথ্য -->
+                            <div class="mushak-section-header">অংশ-২: দাখিলপত্র জমার তথ্য</div>
+                            <table class="mushak-table">
+                                <colgroup>
+                                    <col style="width: 38%;"/>
+                                    <col style="width: 3%;"/>
+                                    <col style="width: 59%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td style="padding: 5px;">(১) কর মেয়াদ</td>
+                                    <td class="text-center" style="padding: 5px;">:</td>
+                                    <td style="padding: 5px;">
+                                        মাস &#160; <span t-if="o.period_id.date_start" t-field="o.period_id.date_start" t-options="{'format': 'MMMM'}"/> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; / &#160; বৎসর &#160; <span t-if="o.period_id.date_start" t-field="o.period_id.date_start" t-options="{'format': 'yyyy'}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: middle; padding: 9px 5px;">
+                                        (২) দাখিলপত্রের প্রকার<br/>
+                                        <span style="font-size: 7.5pt;">[অনুগ্রহ করিয়া প্রযোজ্যটিতে টিক দিন]</span>
+                                    </td>
+                                    <td class="text-center" style="vertical-align: middle;">:</td>
+                                    <td style="padding: 4px 6px;">
+                                        <table style="width: 100%; border-collapse: collapse; border: none; font-size: 8.8pt;">
+                                            <tr>
+                                                <td style="border: none; padding: 18px 0 16px 0;">(ক) &#160; মূল দাখিলপত্র (ধারা ৬৪)</td>
+                                                <td style="border: none; text-align: right; padding: 18px 8px 16px 0;"><span class="square-box" style="width: 16px; height: 16px; border: 1.5px solid #000; line-height: 16px; font-size: 10pt;"><t t-if="o.return_type == 'main'">✓</t></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="border: none; padding: 18px 0 16px 0;">(খ) &#160; সংশোধিত দাখিলপত্র (ধারা ৬৬)</td>
+                                                <td style="border: none; text-align: right; padding: 18px 8px 16px 0;"><span class="square-box" style="width: 16px; height: 16px; border: 1.5px solid #000; line-height: 16px; font-size: 10pt;"><t t-if="o.return_type == 'amended'">✓</t></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="border: none; padding: 18px 0 16px 0;">(গ) &#160; পূর্ণ, অতিরিক্ত বা বিকল্প দাখিলপত্র (ধারা ৬৭)</td>
+                                                <td style="border: none; text-align: right; padding: 18px 8px 16px 0;"><span class="square-box" style="width: 16px; height: 16px; border: 1.5px solid #000; line-height: 16px; font-size: 10pt;"><t t-if="o.return_type in ('late', 'additional')">✓</t></span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: middle; padding: 9px 5px;">
+                                        (৩) বিগত করমেয়াদে কোনো কার্যক্রম সম্পাদিত হইয়াছে কি?
+                                    </td>
+                                    <td class="text-center" style="vertical-align: middle;">:</td>
+                                    <td style="padding: 14px 6px;">
+                                        <span class="square-box" style="width: 15px; height: 15px; border: 1.5px solid #000; line-height: 15px; font-size: 9.5pt;"><t t-if="bool(o.line_ids)">✓</t></span> হ্যাঁ &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                                        <span class="square-box" style="width: 15px; height: 15px; border: 1.5px solid #000; line-height: 15px; font-size: 9.5pt;"><t t-if="not bool(o.line_ids)">✓</t></span> না<br/>
+                                        <div style="font-size: 7.5pt; margin-top: 4px;">[যদি 'না' হয় তাহা হইলে অংশ-১, ৩, এবং ১১ পূরণ করুন]</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 9px 5px;">(৪) পেশের তারিখ</td>
+                                    <td class="text-center" style="padding: 9px 5px;">:</td>
+                                    <td style="padding: 6px;">
+                                        <span class="date-char-box" style="width: 14px; height: 16px; border: 1px solid #000; line-height: 16px; font-size: 8.5pt;">D</span><span class="date-char-box" style="width: 14px; height: 16px; border: 1px solid #000; line-height: 16px; font-size: 8.5pt;">D</span> / 
+                                        <span class="date-char-box" style="width: 14px; height: 16px; border: 1px solid #000; line-height: 16px; font-size: 8.5pt;">M</span><span class="date-char-box" style="width: 14px; height: 16px; border: 1px solid #000; line-height: 16px; font-size: 8.5pt;">M</span> / 
+                                        <span class="date-char-box" style="width: 14px; height: 16px; border: 1px solid #000; line-height: 16px; font-size: 8.5pt;">Y</span><span class="date-char-box" style="width: 14px; height: 16px; border: 1px solid #000; line-height: 16px; font-size: 8.5pt;">Y</span><span class="date-char-box" style="width: 14px; height: 16px; border: 1px solid #000; line-height: 16px; font-size: 8.5pt;">Y</span><span class="date-char-box" style="width: 14px; height: 16px; border: 1px solid #000; line-height: 16px; font-size: 8.5pt;">Y</span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- অংশ-৩: সরবরাহ প্রদান - প্রদেয় কর -->
+                            <div class="mushak-section-header-gray">অংশ-৩: সরবরাহ প্রদান - প্রদেয় কর</div>
+                            <table class="mushak-table">
+                                <colgroup>
+                                    <col style="width: 15%;"/>
+                                    <col style="width: 19%;"/>
+                                    <col style="width: 6%;"/>
+                                    <col style="width: 17%;"/>
+                                    <col style="width: 14%;"/>
+                                    <col style="width: 14%;"/>
+                                    <col style="width: 15%;"/>
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th colspan="2" style="background-color: #fff; padding: 6px 4px;">সরবরাহের প্রকৃতি</th>
+                                        <th style="background-color: #fff; padding: 6px 4px;">নোট</th>
+                                        <th style="background-color: #fff; padding: 6px 4px;">মূল্য (ক)</th>
+                                        <th style="background-color: #fff; padding: 6px 4px;">এসডি (খ)</th>
+                                        <th style="background-color: #fff; padding: 6px 4px;">মূসক (গ)</th>
+                                        <th class="subform-tag-gray"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="2" class="text-center" style="padding: 5px 3px;">শূন্যহার<br/>বিশিষ্ট<br/>পণ্য/সেবা</td>
+                                        <td style="padding: 5px 4px;">সরাসরি রপ্তানি</td>
+                                        <td class="text-center">১</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="subform-tag-gray">সাবফর্ম-ক</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 4px;">প্রচ্ছন্ন রপ্তানি</td>
+                                        <td class="text-center">২</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="subform-tag-gray">সাবফর্ম-ক</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="padding: 5px 4px;">অব্যাহতিপ্রাপ্ত পণ্য/সেবা</td>
+                                        <td class="text-center">৩</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="subform-tag-gray">সাবফর্ম-ক</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="padding: 5px 4px;">আদর্শ হারের পণ্য/সেবা</td>
+                                        <td class="text-center">৪</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="subform-tag-gray">সাবফর্ম-ক</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="padding: 5px 4px;">সর্বোচ্চ খুচরা মূল্যভিত্তিক পণ্য</td>
+                                        <td class="text-center">৫</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="subform-tag-gray">সাবফর্ম-ক</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="padding: 5px 4px;">সুনির্দিষ্ট কর ভিত্তিক পণ্য/সেবা</td>
+                                        <td class="text-center">৬</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="subform-tag-gray">সাবফর্ম-গ</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="padding: 5px 4px;">আদর্শ করহার ব্যতীত ভিন্ন করহার ভিত্তিক পণ্য/সেবা</td>
+                                        <td class="text-center">৭</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="subform-tag-gray">সাবফর্ম-ক</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="padding: 5px 4px;">খুচরা/পাইকারী/ব্যবসায়ী ভিত্তিক সরবরাহ</td>
+                                        <td class="text-center">৮</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="text-right">&#160;</td>
+                                        <td class="subform-tag-gray">সাবফর্ম-খ</td>
+                                    </tr>
+                                    <tr class="fw-bold" style="background-color: #fff;">
+                                        <td colspan="2" style="padding: 6px 4px;">মোট বিক্রয়মূল্য ও মোট প্রদেয় কর</td>
+                                        <td class="text-center">৯</td>
+                                        <td class="text-right"><t t-esc="'{:,.2f}'.format(sum(l.base_amount for l in o.line_ids if l.output_vat or l.supply_type in ('taxable', 'exempt', 'export', 'zero'))) if o.line_ids else '&#160;'"/></td>
+                                        <td class="text-right"><t t-esc="'{:,.2f}'.format(o.sd_amount) if o.sd_amount else '&#160;'"/></td>
+                                        <td class="text-right"><t t-esc="'{:,.2f}'.format(o.output_vat) if o.output_vat else '&#160;'"/></td>
+                                        <td style="border-right: none; background: #fff;"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- অংশ-৪: ক্রয় - উপকরণ কর -->
+                            <div class="mushak-section-header">অংশ-৪: ক্রয় - উপকরণ কর</div>
+                            <div class="instructions-box-peach">
+                                <div>(ক) আপনার সরবরাহকৃত সকল পণ্য যদি আদর্শ হারের হয়, সেক্ষেত্রে নোট ১০-২০ পূরণ করুন।</div>
+                                <div>(খ) আপনার সরবরাহকৃত সকল পণ্য যদি আদর্শ হারের না হয়, সেক্ষেত্রে নোট ২১-২২ পূরণ করুন।</div>
+                                <div>(গ) আপনার সরবরাহকৃত পণ্য যদি আদর্শ হারের এবং আদর্শহার ব্যতীত উভয় হয়, সেক্ষেত্রে পণ্য উৎপাদনে উপকরণের ব্যবহার অনুযায়ী উপকরণ মূল্য আনুপাতিক হারে প্রযোজ্যতা অনুযায়ী নোট ১০-২২ পূরণ করুন।</div>
+                            </div>
+                            <table class="mushak-table" style="margin-bottom: 0;">
+                                <colgroup>
+                                    <col style="width: 40%;"/>
+                                    <col style="width: 14%;"/>
+                                    <col style="width: 23%;"/>
+                                    <col style="width: 23%;"/>
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th style="background-color: #bfbfbf; padding: 6px 4px;">ক্রয়ের প্রকৃতি</th>
+                                        <th style="background-color: #bfbfbf; padding: 6px 4px;">নোট</th>
+                                        <th style="background-color: #bfbfbf; padding: 6px 4px;">মূল্য (ক)</th>
+                                        <th style="background-color: #bfbfbf; padding: 6px 4px;">মূসক (খ)</th>
+                                    </tr>
+                                </thead>
+                            </table>
                         </div>
-
-                        <!-- অংশ-১: করদাতার তথ্য -->
-                        <div class="mushak-section-header">অংশ-১: করদাতার তথ্য</div>
-                        <table class="mushak-table">
-                            <colgroup>
-                                <col style="width: 32%;"/>
-                                <col style="width: 2%;"/>
-                                <col style="width: 66%;"/>
-                            </colgroup>
-                            <tr>
-                                <td>(১) ব্যবসায় সনাক্তকরণ সংখ্যা</td>
-                                <td class="text-center">:</td>
-                                <td><span t-field="o.company_id.vat_bin"/></td>
-                            </tr>
-                            <tr>
-                                <td>(২) করদাতার নাম</td>
-                                <td class="text-center">:</td>
-                                <td><span t-field="o.company_id.name"/></td>
-                            </tr>
-                            <tr>
-                                <td>(৩) করদাতার ঠিকানা</td>
-                                <td class="text-center">:</td>
-                                <td><span t-field="o.company_id.street"/></td>
-                            </tr>
-                            <tr>
-                                <td>(৪) ব্যবসার প্রকৃতি</td>
-                                <td class="text-center">:</td>
-                                <td><span t-field="o.unit_id.name"/></td>
-                            </tr>
-                            <tr>
-                                <td>(৫) অর্থনৈতিক কার্যক্রম এর প্রকৃতি</td>
-                                <td class="text-center">:</td>
-                                <td>&#160;</td>
-                            </tr>
-                        </table>
-
-                        <!-- অংশ-২: দাখিলপত্র জমার তথ্য -->
-                        <div class="mushak-section-header">অংশ-২: দাখিলপত্র জমার তথ্য</div>
-                        <table class="mushak-table">
-                            <colgroup>
-                                <col style="width: 32%;"/>
-                                <col style="width: 2%;"/>
-                                <col style="width: 66%;"/>
-                            </colgroup>
-                            <tr>
-                                <td>(১) কর মেয়াদ</td>
-                                <td class="text-center">:</td>
-                                <td>
-                                    মাস <span class="square-box" style="width: 50px; text-align: center; border: 1px solid #777;"><span t-field="o.period_id.date_start" t-options="{'format': 'MMMM'}"/></span> / বৎসর <span class="square-box" style="width: 40px; text-align: center; border: 1px solid #777;"><span t-field="o.period_id.date_start" t-options="{'format': 'yyyy'}"/></span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="vertical-align: middle;">
-                                    (২) দাখিলপত্রের প্রকার<br/>
-                                    <span style="font-size: 7pt;">[অনুগ্রহ করিয়া প্রযোজ্যটিতে টিক দিন]</span>
-                                </td>
-                                <td class="text-center" style="vertical-align: middle;">:</td>
-                                <td style="padding: 1px 3px;">
-                                    <table style="width: 100%; border-collapse: collapse; border: none; font-size: 7.8pt;">
-                                        <tr>
-                                            <td style="border: none; padding: 2px 0;">(ক) &#160; মূল দাখিলপত্র (ধারা ৬৪)</td>
-                                            <td style="border: none; text-align: right; padding: 2px 8px 2px 0;"><span class="square-box"><t t-if="o.return_type == 'main'">✓</t></span></td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: none; padding: 2px 0;">(খ) &#160; সংশোধিত দাখিলপত্র (ধারা ৬৬)</td>
-                                            <td style="border: none; text-align: right; padding: 2px 8px 2px 0;"><span class="square-box"><t t-if="o.return_type == 'amended'">✓</t></span></td>
-                                        </tr>
-                                        <tr>
-                                            <td style="border: none; padding: 2px 0;">(গ) &#160; পূর্ণ, অতিরিক্ত বা বিকল্প দাখিলপত্র (ধারা ৬৭)</td>
-                                            <td style="border: none; text-align: right; padding: 2px 8px 2px 0;"><span class="square-box"><t t-if="o.return_type in ('late', 'additional')">✓</t></span></td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    (৩) বিগত করমেয়াদে কোনো কার্যক্রম সম্পাদিত হইয়াছে কি?
-                                </td>
-                                <td class="text-center">:</td>
-                                <td>
-                                    <span class="square-box"><t t-if="bool(o.line_ids)">✓</t></span> হ্যাঁ &#160;&#160;&#160;&#160;
-                                    <span class="square-box"><t t-if="not bool(o.line_ids)">✓</t></span> না<br/>
-                                    <span style="font-size: 7pt;">[যদি 'না' হয় তাহা হইলে অংশ-১, ৩,এবং ১১ পূরণ করুন]</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>(৪) পেশের তারিখ</td>
-                                <td class="text-center">:</td>
-                                <td>
-                                    <span class="date-char-box">D</span><span class="date-char-box">D</span> / <span class="date-char-box">M</span><span class="date-char-box">M</span> / <span class="date-char-box">Y</span><span class="date-char-box">Y</span><span class="date-char-box">Y</span><span class="date-char-box">Y</span>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <!-- অংশ-৩: সরবরাহ প্রদান - প্রদেয় কর -->
-                        <div class="mushak-section-header">অংশ-৩: সরবরাহ প্রদান - প্রদেয় কর</div>
-                        <table class="mushak-table">
-                            <colgroup>
-                                <col style="width: 18%;"/>
-                                <col style="width: 17%;"/>
-                                <col style="width: 6%;"/>
-                                <col style="width: 16%;"/>
-                                <col style="width: 14%;"/>
-                                <col style="width: 15%;"/>
-                                <col style="width: 14%;"/>
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th colspan="2">সরবরাহের প্রকৃতি</th>
-                                    <th>নোট</th>
-                                    <th>মূল্য (ক)</th>
-                                    <th>এসডি (খ)</th>
-                                    <th>মূসক (গ)</th>
-                                    <th>&#160;</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td rowspan="2">শূন্যহার বিশিষ্ট পণ্য/সেবা</td>
-                                    <td>সরাসরি রপ্তানি</td>
-                                    <td class="text-center">১</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-center">সাবফর্ম-ক</td>
-                                </tr>
-                                <tr>
-                                    <td>প্রচ্ছন্ন রপ্তানি</td>
-                                    <td class="text-center">২</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-center">সাবফর্ম-ক</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">অব্যাহতিপ্রাপ্ত পণ্য/সেবা</td>
-                                    <td class="text-center">৩</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-center">সাবফর্ম-ক</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">আদর্শ হারের পণ্য/সেবা</td>
-                                    <td class="text-center">৪</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-center">সাবফর্ম-ক</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">সর্বোচ্চ খুচরা মূল্যভিত্তিক পণ্য</td>
-                                    <td class="text-center">৫</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-center">সাবফর্ম-ক</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">সুনির্দিষ্ট কর ভিত্তিক পণ্য/সেবা</td>
-                                    <td class="text-center">৬</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-center">সাবফর্ম-গ</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">আদর্শ করহার ব্যতীত ভিন্ন করহার ভিত্তিক পণ্য/সেবা</td>
-                                    <td class="text-center">৭</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-center">সাবফর্ম-ক</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">খুচরা/পাইকারী/ব্যবসায়ী ভিত্তিক সরবরাহ</td>
-                                    <td class="text-center">৮</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-right">&#160;</td>
-                                    <td class="text-center">সাবফর্ম-খ</td>
-                                </tr>
-                                <tr class="fw-bold bg-header">
-                                    <td colspan="2">মোট বিক্রয়মূল্য ও মোট প্রদেয় কর</td>
-                                    <td class="text-center">৯</td>
-                                    <td class="text-right"><t t-esc="'{:,.2f}'.format(sum(l.base_amount for l in o.line_ids if l.output_vat or l.supply_type in ('taxable', 'exempt', 'export', 'zero'))) if o.line_ids else '&#160;'"/></td>
-                                    <td class="text-right"><t t-esc="'{:,.2f}'.format(o.sd_amount) if o.sd_amount else '&#160;'"/></td>
-                                    <td class="text-right"><t t-esc="'{:,.2f}'.format(o.output_vat) if o.output_vat else '&#160;'"/></td>
-                                    <td>&#160;</td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <!-- অংশ-৪: ক্রয় - উপকরণ কর -->
-                        <div class="mushak-section-header">অংশ-৪: ক্রয় - উপকরণ কর</div>
-                        <div style="font-size: 7.5pt; line-height: 1.25; margin-top: 3px; margin-bottom: 3px; font-weight: bold;">
-                            <div>(ক) আপনার সরবরাহকৃত সকল পণ্য যদি আদর্শ হারের হয়, সেক্ষেত্রে নোট ১০-২০ পূরণ করুন।</div>
-                            <div>(খ) আপনার সরবরাহকৃত সকল পণ্য যদি আদর্শ হারের না হয়, সেক্ষেত্রে নোট ২১-২২ পূরণ করুন।</div>
-                            <div>(গ) আপনার সরবরাহকৃত পণ্য যদি আদর্শ হারের এবং আদর্শহার ব্যতীত উভয় হয়, সেক্ষেত্রে পণ্য উৎপাদনে উপকরণের ব্যবহার অনুযায়ী উপকরণ মূল্য আনুপাতিক হারে প্রযোজ্যতা অনুযায়ী নোট ১০-২২ পূরণ করুন।</div>
-                        </div>
-                        <table class="mushak-table" style="margin-bottom: 0;">
-                            <colgroup>
-                                <col style="width: 22%;"/>
-                                <col style="width: 18%;"/>
-                                <col style="width: 6%;"/>
-                                <col style="width: 20%;"/>
-                                <col style="width: 20%;"/>
-                                <col style="width: 14%;"/>
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th colspan="2">ক্রয়ের প্রকৃতি</th>
-                                    <th>নোট</th>
-                                    <th>মূল্য (ক)</th>
-                                    <th>মূসক (খ)</th>
-                                    <th>&#160;</th>
-                                </tr>
-                            </thead>
-                        </table>
-                        <div style="font-size: 8pt; font-weight: normal; margin-top: 2px;">মূসক-৯.১</div>
                         <div class="page-break" style="page-break-after: always;"/>
-
-
-                        <!-- ================= PAGE 2 ================= -->
+<!-- ================= PAGE 2 ================= -->
                         <table class="mushak-table">
                             <colgroup>
                                 <col style="width: 22%;"/>
@@ -834,7 +860,7 @@
 
 
                         <!-- ================= PAGE 4 ================= -->
-                        <div style="font-size: 8pt; margin-bottom: 4px;">আমি ঘোষণা করিতেছি যে, এই দাখিলপত্রে প্রদত্ত তথ্য সর্বতোভাবে সম্পূর্ণ, সত্য ও নির্ভুল।</div>
+                        <div style="font-size: 7.2pt; margin-bottom: 4px;">আমি ঘোষণা করিতেছি যে, এই দাখিলপত্রে প্রদত্ত তথ্য সর্বতোভাবে সম্পূর্ণ, সত্য ও নির্ভুল।</div>
                         <table class="mushak-table">
                             <colgroup>
                                 <col style="width: 20%;"/>
@@ -1112,7 +1138,7 @@
                             মূসক দাখিলপত্র পূরণের নির্দেশিকা
                         </div>
                         
-                        <div style="border: 1px solid #7f7f7f; background-color: #f2f2f2; padding: 10px 14px; margin-bottom: 14px; border-radius: 2px;">
+                        <div style="border: 1px solid #7f7f7f; background-color: #f2f2f2; padding: 10px 14px; margin-bottom: 18px; border-radius: 2px;">
                             <div style="text-align: center; font-weight: bold; font-size: 10.5pt; margin-bottom: 8px;">
                                 মূসক দাখিলপত্র পূরণের গুরুত্বপূর্ণ আইনগত নির্দেশনা
                             </div>
@@ -1126,7 +1152,7 @@
                             </div>
                         </div>
                         
-                        <div style="border: 1px solid #7f7f7f; background-color: #f2f2f2; padding: 10px 14px; margin-bottom: 14px; border-radius: 2px;">
+                        <div style="border: 1px solid #7f7f7f; background-color: #f2f2f2; padding: 10px 14px; margin-bottom: 18px; border-radius: 2px;">
                             <div style="text-align: center; font-weight: bold; font-size: 10.5pt; margin-bottom: 8px;">
                                 ফরম মূসক-৯.১পূরণের নির্দেশনা
                             </div>
@@ -1145,7 +1171,7 @@
                         <div class="page-break" style="page-break-after: always;"/>
 
 <!-- ================= PAGE 7: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1227,7 +1253,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 8: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1265,7 +1291,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 9: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1313,7 +1339,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 10: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1359,7 +1385,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 11: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1402,7 +1428,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 12: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1450,7 +1476,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 13: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1498,7 +1524,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 14: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1536,7 +1562,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 15: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1587,7 +1613,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 16: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1628,7 +1654,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 17: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1689,7 +1715,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 18: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1762,7 +1788,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 19: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1823,7 +1849,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 20: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1871,7 +1897,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 21: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
@@ -1932,7 +1958,7 @@
 </div>
 <div class="page-break" style="page-break-after: always;"/>
 <!-- ================= PAGE 22: METHOD ================= -->
-<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.15; color: #000;">
+<div class="mushak-method-page" style="font-family: 'Nikosh', Arial, sans-serif; font-size: 7.8pt; line-height: 1.12; color: #000;">
     <div style="background-color: #800000; color: #ffffff; font-weight: bold; font-size: 9.5pt; text-align: center; padding: 3px; margin-bottom: 2px;">
         ফরম মূসক-৯.১ (মূসক দাখিলপত্র) পূরণের পদ্ধতি
     </div>
