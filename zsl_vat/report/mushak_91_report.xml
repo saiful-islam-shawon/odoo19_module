@@ -1,11 +1,1277 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <record id="action_print_official_mushak_91" model="ir.actions.server">
-    <field name="name">Mushak 9.1 — QWeb Print</field>
-    <field name="model_id" ref="zsl_vat.model_vat_return"/>
-    <field name="binding_model_id" eval="False"/><field name="state">code</field>
-    <field name="code">action = records.action_print_mushak_return()</field>
-  </record>
-  <record id="action_report_mushak_91" model="ir.actions.report"><field name="name">Mushak 9.1 — VAT Return</field><field name="model">vat.return</field><field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_91</field><field name="report_file">zsl_vat.report_mushak_91</field><field name="binding_model_id" ref="model_vat_return"/><field name="binding_type">report</field></record>
-  <template id="report_mushak_91"><t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-set="form_code" t-value="'Mushak 9.1'"/><t t-set="form_title" t-value="'Monthly VAT Return'"/><t t-call="zsl_vat.mushak_qweb_layout"><div class="zsl-mushak-section"><h4>Registered person and tax period</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Registered person / BIN</td><td><span t-field="o.company_id.name"/> / <span t-field="o.company_id.vat_bin"/></td><td class="zsl-mushak-label">VAT unit</td><td><span t-field="o.unit_id"/></td></tr><tr><td class="zsl-mushak-label">Return no. / type</td><td><span t-field="o.name"/> / <span t-field="o.return_type"/></td><td class="zsl-mushak-label">Tax period</td><td><span t-field="o.period_id.date_start"/> to <span t-field="o.period_id.date_end"/></td></tr></table></div><div class="zsl-mushak-section"><h4>VAT computation</h4><table class="zsl-mushak-table"><tr><th>Particulars</th><th>Amount</th><th>Particulars</th><th>Amount</th></tr><tr><td>Output VAT</td><td class="zsl-mushak-number"><span t-field="o.output_vat"/></td><td>Input tax credit</td><td class="zsl-mushak-number"><span t-field="o.input_vat"/></td></tr><tr><td>Supplementary duty</td><td class="zsl-mushak-number"><span t-field="o.sd_amount"/></td><td>VDS suffered</td><td class="zsl-mushak-number"><span t-field="o.vds_suffered"/></td></tr><tr><td>Reverse charge VAT</td><td class="zsl-mushak-number"><span t-field="o.reverse_charge_vat"/></td><td>Adjustments</td><td class="zsl-mushak-number"><span t-field="o.adjustments_amount"/></td></tr><tr><td>Opening balance</td><td class="zsl-mushak-number"><span t-field="o.opening_balance"/></td><td>Late interest / fine</td><td class="zsl-mushak-number"><span t-field="o.late_interest"/> / <span t-field="o.late_fine"/></td></tr><tr><th>Net payable</th><th class="zsl-mushak-number"><span t-field="o.net_payable"/></th><th>Closing credit</th><th class="zsl-mushak-number"><span t-field="o.closing_credit"/></th></tr></table></div><div class="zsl-mushak-section"><h4>Transaction schedule</h4><table class="zsl-mushak-table"><tr><th>Date</th><th>Document no.</th><th>Party</th><th>Supply</th><th>Value</th><th>Output VAT</th><th>Input VAT</th><th>SD</th></tr><tr t-foreach="o.line_ids" t-as="line"><td><span t-field="line.document_date"/></td><td><span t-field="line.mushak_number"/></td><td><span t-field="line.partner_id"/></td><td><span t-field="line.supply_type"/></td><td class="zsl-mushak-number"><span t-field="line.base_amount"/></td><td class="zsl-mushak-number"><span t-field="line.output_vat"/></td><td class="zsl-mushak-number"><span t-field="line.input_vat"/></td><td class="zsl-mushak-number"><span t-field="line.sd_amount"/></td></tr></table></div></t></t></t></template>
+
+    <record id="paperformat_mushak_91_portrait" model="report.paperformat">
+        <field name="name">Mushak 9.1 Portrait</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">12</field>
+        <field name="margin_bottom">12</field>
+        <field name="margin_left">12</field>
+        <field name="margin_right">12</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="action_print_official_mushak_91" model="ir.actions.server">
+        <field name="name">Mushak 9.1 — QWeb Print</field>
+        <field name="model_id" ref="zsl_vat.model_vat_return"/>
+        <field name="binding_model_id" eval="False"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_print_mushak_return()</field>
+    </record>
+
+    <record id="action_report_mushak_91" model="ir.actions.report">
+        <field name="name">Mushak 9.1 — VAT Return</field>
+        <field name="model">vat.return</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">zsl_vat.report_mushak_91</field>
+        <field name="report_file">zsl_vat.report_mushak_91</field>
+        <field name="binding_model_id" ref="model_vat_return"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_mushak_91_portrait"/>
+    </record>
+
+    <template id="report_mushak_91">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
+                    <div class="page mushak-91-page">
+                        <style type="text/css">
+                            @page {
+                                size: A4 portrait;
+                                margin: 12mm;
+                            }
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
+                            .mushak-91-page {
+                                font-family: 'Nikosh', 'Noto Sans Bengali', Arial, sans-serif !important;
+                                color: #000;
+                                width: 100%;
+                                line-height: 1.18;
+                                font-size: 8.5pt;
+                            }
+                            .mushak-91-header {
+                                text-align: center;
+                                position: relative;
+                                margin-bottom: 4px;
+                            }
+                            .mushak-91-gov-1 {
+                                font-size: 11pt;
+                                font-weight: normal;
+                            }
+                            .mushak-91-gov-2 {
+                                font-size: 11pt;
+                                font-weight: bold;
+                                margin-top: 1px;
+                            }
+                            .mushak-91-badge {
+                                position: absolute;
+                                right: 0;
+                                top: 5px;
+                                border: 1.5px solid #008080;
+                                color: #008080;
+                                padding: 2px 8px;
+                                font-weight: bold;
+                                font-size: 10pt;
+                            }
+                            .mushak-91-title-1 {
+                                font-size: 12pt;
+                                font-weight: bold;
+                                margin-top: 3px;
+                            }
+                            .mushak-91-title-2 {
+                                font-size: 9pt;
+                                margin-top: 1px;
+                                margin-bottom: 4px;
+                            }
+                            .mushak-91-section-header {
+                                background-color: #fce4d6;
+                                border: 1px solid #000;
+                                padding: 2px 6px;
+                                font-weight: bold;
+                                font-size: 9pt;
+                                margin-top: 4px;
+                                text-align: center;
+                            }
+                            .mushak-91-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                border: 1px solid #000;
+                                table-layout: fixed;
+                                margin-bottom: 4px;
+                            }
+                            .mushak-91-table th, .mushak-91-table td {
+                                border: 1px solid #000;
+                                padding: 2px 3px;
+                                vertical-align: middle;
+                                word-wrap: break-word;
+                                font-size: 8pt;
+                                line-height: 1.15;
+                            }
+                            .mushak-91-table th {
+                                font-weight: bold;
+                                text-align: center;
+                                background-color: #fff;
+                            }
+                            .mushak-91-subform-tag {
+                                font-size: 7.5pt;
+                                text-align: center;
+                                background-color: #fff;
+                            }
+                            .mushak-91-check-box {
+                                display: inline-block;
+                                width: 14px;
+                                height: 14px;
+                                border: 1px solid #000;
+                                vertical-align: middle;
+                                margin-left: 4px;
+                            }
+                            .mushak-91-box-digit {
+                                display: inline-block;
+                                width: 13px;
+                                height: 14px;
+                                border: 1px solid #000;
+                                text-align: center;
+                                line-height: 13px;
+                                font-size: 8pt;
+                                margin-right: 2px;
+                            }
+                            .page-break {
+                                page-break-after: always;
+                            }
+                            .text-center { text-align: center; }
+                            .text-right { text-align: right; }
+                            .text-left { text-align: left; }
+                            .fw-bold { font-weight: bold; }
+                            .bg-header { background-color: #f2f2f2; }
+                        </style>
+
+                        <!-- ================= PAGE 1 ================= -->
+                        <div class="mushak-91-header">
+                            <div class="mushak-91-gov-1">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
+                            <div class="mushak-91-gov-2">জাতীয় রাজস্ব বোর্ড</div>
+                            <div class="mushak-91-badge">মূসক-৯.১</div>
+                            <div class="mushak-91-title-1">মূল্য সংযোজন কর দাখিলপত্র</div>
+                            <div class="mushak-91-title-2">[বিধি ৪৭ এর উপ-বিধি (১) দ্রষ্টব্য]</div>
+                        </div>
+
+                        <!-- অংশ-১: করদাতার তথ্য -->
+                        <div class="mushak-91-section-header">অংশ-১: করদাতার তথ্য</div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 32%;"/>
+                                <col style="width: 2%;"/>
+                                <col style="width: 66%;"/>
+                            </colgroup>
+                            <tr>
+                                <td>(১) ব্যবসায় সনাক্তকরণ সংখ্যা</td>
+                                <td class="text-center">:</td>
+                                <td><span t-field="o.company_id.vat_bin"/></td>
+                            </tr>
+                            <tr>
+                                <td>(২) করদাতার নাম</td>
+                                <td class="text-center">:</td>
+                                <td><span t-field="o.company_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td>(৩) করদাতার ঠিকানা</td>
+                                <td class="text-center">:</td>
+                                <td><span t-field="o.company_id.street"/></td>
+                            </tr>
+                            <tr>
+                                <td>(৪) ব্যবসার প্রকৃতি</td>
+                                <td class="text-center">:</td>
+                                <td><span t-field="o.unit_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td>(৫) অর্থনৈতিক কার্যক্রম এর প্রকৃতি</td>
+                                <td class="text-center">:</td>
+                                <td>&#160;</td>
+                            </tr>
+                        </table>
+
+                        <!-- অংশ-২: দাখিলপত্র জমার তথ্য -->
+                        <div class="mushak-91-section-header">অংশ-২: দাখিলপত্র জমার তথ্য</div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 32%;"/>
+                                <col style="width: 2%;"/>
+                                <col style="width: 66%;"/>
+                            </colgroup>
+                            <tr>
+                                <td>(১) কর মেয়াদ</td>
+                                <td class="text-center">:</td>
+                                <td>
+                                    মাস <span class="mushak-91-check-box" style="width: 50px; text-align: center; border: 1px solid #ccc;"><span t-field="o.period_id.date_start" t-options="{'format': 'MMMM'}"/></span> / 
+                                    বৎসর <span class="mushak-91-check-box" style="width: 45px; text-align: center; border: 1px solid #ccc;"><span t-field="o.period_id.date_start" t-options="{'format': 'yyyy'}"/></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>(২) দাখিলপত্রের প্রকার<br/><span style="font-size: 7.5pt;">[অনুগ্রহ করিয়া প্রযোজ্যটিতে টিক দিন]</span></td>
+                                <td class="text-center">:</td>
+                                <td>
+                                    <table style="width: 100%; border: none;">
+                                        <tr style="border: none;">
+                                            <td style="border: none; width: 85%;">(ক) মূল দাখিলপত্র (ধারা ৬৪)</td>
+                                            <td style="border: none; width: 15%;"><span class="mushak-91-check-box">&#160;</span></td>
+                                        </tr>
+                                        <tr style="border: none;">
+                                            <td style="border: none;">(খ) সংশোধিত দাখিলপত্র (ধারা ৬৬)</td>
+                                            <td style="border: none;"><span class="mushak-91-check-box">&#160;</span></td>
+                                        </tr>
+                                        <tr style="border: none;">
+                                            <td style="border: none;">(গ) পূর্ণ, অতিরিক্ত বা বিকল্প দাখিলপত্র (ধারা ৬৭)</td>
+                                            <td style="border: none;"><span class="mushak-91-check-box">&#160;</span></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>(৩) বিগত করমেয়াদে কোনো কার্যক্রম সম্পাদিত হইয়াছে কি?</td>
+                                <td class="text-center">:</td>
+                                <td>
+                                    হ্যাঁ <span class="mushak-91-check-box">&#160;</span> &#160;&#160;&#160;&#160; না <span class="mushak-91-check-box">&#160;</span>
+                                    <span style="font-size: 7.5pt; margin-left: 10px;">[যদি 'না' হয় তাহা হইলে অংশ-১, ৩, এবং ১১ পূরণ করুন]</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>(৪) পেশের তারিখ</td>
+                                <td class="text-center">:</td>
+                                <td>
+                                    <span class="mushak-91-box-digit">D</span><span class="mushak-91-box-digit">D</span> / 
+                                    <span class="mushak-91-box-digit">M</span><span class="mushak-91-box-digit">M</span> / 
+                                    <span class="mushak-91-box-digit">Y</span><span class="mushak-91-box-digit">Y</span><span class="mushak-91-box-digit">Y</span><span class="mushak-91-box-digit">Y</span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- অংশ-৩: সরবরাহ প্রদান - প্রদেয় কর -->
+                        <div class="mushak-91-section-header">অংশ-৩: সরবরাহ প্রদান - প্রদেয় কর</div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 14%;"/>
+                                <col style="width: 22%;"/>
+                                <col style="width: 6%;"/>
+                                <col style="width: 18%;"/>
+                                <col style="width: 14%;"/>
+                                <col style="width: 14%;"/>
+                                <col style="width: 12%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th colspan="2">সরবরাহের প্রকৃতি</th>
+                                    <th>নোট</th>
+                                    <th>মূল্য (ক)</th>
+                                    <th>এসডি (খ)</th>
+                                    <th>মূসক (গ)</th>
+                                    <th>সাবফর্ম</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="2" class="text-center">শূন্যহার বিশিষ্ট<br/>পণ্য/সেবা</td>
+                                    <td>সরাসরি রপ্তানি</td>
+                                    <td class="text-center">১</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td>প্রচ্ছন্ন রপ্তানি</td>
+                                    <td class="text-center">২</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">অব্যাহতিপ্রাপ্ত পণ্য/সেবা</td>
+                                    <td class="text-center">৩</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">আদর্শ হারের পণ্য/সেবা</td>
+                                    <td class="text-center">৪</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">সর্বোচ্চ খুচরা মূল্যভিত্তিক পণ্য</td>
+                                    <td class="text-center">৫</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">সুনির্দিষ্ট কর ভিত্তিক পণ্য/সেবা</td>
+                                    <td class="text-center">৬</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-গ</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">আদর্শ করহার ব্যতীত ভিন্ন করহার ভিত্তিক পণ্য/সেবা</td>
+                                    <td class="text-center">৭</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">খুচরা/পাইকারী/ব্যবসায়ী ভিত্তিক সরবরাহ</td>
+                                    <td class="text-center">৮</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-খ</td>
+                                </tr>
+                                <tr class="fw-bold bg-header">
+                                    <td colspan="2">মোট বিক্রয়মূল্য ও মোট প্রদেয় কর</td>
+                                    <td class="text-center">৯</td>
+                                    <td class="text-right">&#160;</td>
+                                    <td class="text-right">&#160;</td>
+                                    <td class="text-right">&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="page-break"/>
+
+                        <!-- ================= PAGE 2 ================= -->
+                        <!-- অংশ-৪: ক্রয় - উপকরণ কর -->
+                        <div class="mushak-91-section-header">অংশ-৪: ক্রয় - উপকরণ কর</div>
+                        <div style="font-size: 7.5pt; margin: 3px 0; line-height: 1.2;">
+                            <strong>(ক)</strong> আপনার সরবরাহকৃত সকল পণ্য যদি আদর্শ হারের হয়, সেক্ষেত্রে নোট ১০-২০ পূরণ করুন।<br/>
+                            <strong>(খ)</strong> আপনার সরবরাহকৃত সকল পণ্য যদি আদর্শ হারের না হয়, সেক্ষেত্রে নোট ২১-২২ পূরণ করুন।<br/>
+                            <strong>(গ)</strong> আপনার সরবরাহকৃত পণ্য যদি আদর্শ হারের এবং আদর্শহার ব্যতীত উভয় হয়, সেক্ষেত্রে পণ্য উৎপাদনে উপকরণের ব্যবহার অনুযায়ী উপকরণ মূল্য আনুপাতিক হারে প্রযোজ্যতা অনুযায়ী নোট ১০-২২ পূরণ করুন।
+                        </div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 25%;"/>
+                                <col style="width: 17%;"/>
+                                <col style="width: 6%;"/>
+                                <col style="width: 20%;"/>
+                                <col style="width: 20%;"/>
+                                <col style="width: 12%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th colspan="2">ক্রয়ের প্রকৃতি</th>
+                                    <th>নোট</th>
+                                    <th>মূল্য (ক)</th>
+                                    <th>মূসক (খ)</th>
+                                    <th>সাবফর্ম</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="2">শূন্যহার বিশিষ্ট পণ্য/সেবা</td>
+                                    <td>স্থানীয় ক্রয়</td>
+                                    <td class="text-center">১০</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td>আমদানি</td>
+                                    <td class="text-center">১১</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="2">অব্যাহতিপ্রাপ্ত পণ্য/সেবা</td>
+                                    <td>স্থানীয় ক্রয়</td>
+                                    <td class="text-center">১২</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td>আমদানি</td>
+                                    <td class="text-center">১৩</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="2">আদর্শ হারের পণ্য/সেবা</td>
+                                    <td>স্থানীয় ক্রয়</td>
+                                    <td class="text-center">১৪</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td>আমদানি</td>
+                                    <td class="text-center">১৫</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="2">আদর্শ হার ব্যতীত অন্যান্য হারের পণ্য/সেবা</td>
+                                    <td>স্থানীয় ক্রয়</td>
+                                    <td class="text-center">১৬</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td>আমদানি</td>
+                                    <td class="text-center">১৭</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">সুনির্দিষ্ট কর ভিত্তিক পণ্য/সেবা (স্থানীয় ক্রয়)</td>
+                                    <td class="text-center">১৮</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-গ</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="2">রেয়াতযোগ্য নয় এরূপ পণ্য/সেবা (স্থানীয় ক্রয়)</td>
+                                    <td>টার্নওভার প্রতিষ্ঠান হইতে</td>
+                                    <td class="text-center">১৯</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td>অনিবন্ধিত প্রতিষ্ঠান হইতে</td>
+                                    <td class="text-center">২০</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="2" style="font-size: 7pt;">রেয়াতযোগ্য নয় এরূপ পণ্য/সেবা (যে সকল করদাতা শুধুমাত্র অব্যাহতিপ্রাপ্ত/সুনির্দিষ্ট কর/আদর্শ হার ব্যতীত অন্যান্য হারের পণ্য/সেবা সরবরাহ করেন)</td>
+                                    <td>স্থানীয় ক্রয়</td>
+                                    <td class="text-center">২১</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr>
+                                    <td>আমদানি</td>
+                                    <td class="text-center">২২</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম-ক</td>
+                                </tr>
+                                <tr class="fw-bold bg-header">
+                                    <td colspan="2">মোট উপকরণ কর রেয়াত</td>
+                                    <td class="text-center">২৩</td>
+                                    <td class="text-right">&#160;</td>
+                                    <td class="text-right">&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- অংশ-৫: বৃদ্ধিকারী সমন্বয় -->
+                        <div class="mushak-91-section-header">অংশ-৫: বৃদ্ধিকারী সমন্বয় (মূল্য সংযোজন কর)</div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 58%;"/>
+                                <col style="width: 6%;"/>
+                                <col style="width: 24%;"/>
+                                <col style="width: 12%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>সমন্বয় ঘটনা</th>
+                                    <th>নোট</th>
+                                    <th>পরিমাণ</th>
+                                    <th>সাবফর্ম</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>সরবরাহ গ্রহীতা কর্তৃক উৎসে কর্তনের জন্য</td>
+                                    <td class="text-center">২৪</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম - ঘ</td>
+                                </tr>
+                                <tr>
+                                    <td>ব্যাংকিং চ্যানেলে মূল্য পরিশোধিত হয় নাই এমন সরবরাহের জন্য</td>
+                                    <td class="text-center">২৫</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>ডেবিট নোটের জন্য</td>
+                                    <td class="text-center">২৬</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>অন্যকোনো সমন্বয় ঘটনার জন্য (নিচে বর্ণনা করুন)</td>
+                                    <td class="text-center">২৭</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr class="fw-bold bg-header">
+                                    <td>মোট বৃদ্ধিকারী সমন্বয়</td>
+                                    <td class="text-center">২৮</td>
+                                    <td class="text-right">&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- অংশ-৬: হ্রাসকারী সমন্বয় -->
+                        <div class="mushak-91-section-header">অংশ-৬: হ্রাসকারী সমন্বয় (মূল্য সংযোজন কর)</div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 58%;"/>
+                                <col style="width: 6%;"/>
+                                <col style="width: 24%;"/>
+                                <col style="width: 12%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>সমন্বয় ঘটনা</th>
+                                    <th>নোট</th>
+                                    <th>পরিমাণ</th>
+                                    <th>সাবফর্ম</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>প্রদত্ত সরবরাহ হইতে উৎসে কর্তনের জন্য</td>
+                                    <td class="text-center">২৯</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম – ঙ</td>
+                                </tr>
+                                <tr>
+                                    <td>আমদানি পর্যায়ে প্রদেয় আগাম কর</td>
+                                    <td class="text-center">৩০</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম – চ</td>
+                                </tr>
+                                <tr>
+                                    <td>রপ্তানি পণ্য উৎপাদনে ব্যবহৃত কাঁচামালের বিপরীতে প্রদেয় মূল্য সংযোজন কর</td>
+                                    <td class="text-center">৩১</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>ক্রেডিট নোট ইস্যুর জন্য</td>
+                                    <td class="text-center">৩২</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>অন্যকোনো সমন্বয় ঘটনার জন্য (নিচে বর্ণনা করুন)</td>
+                                    <td class="text-center">৩৩</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr class="fw-bold bg-header">
+                                    <td>মোট হ্রাসকারী সমন্বয়</td>
+                                    <td class="text-center">৩৪</td>
+                                    <td class="text-right">&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="page-break"/>
+
+                        <!-- ================= PAGE 3 ================= -->
+                        <!-- অংশ-৭: নীট কর হিসাব -->
+                        <div class="mushak-91-section-header">অংশ-৭: নীট কর হিসাব</div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 68%;"/>
+                                <col style="width: 8%;"/>
+                                <col style="width: 24%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>আইটেম</th>
+                                    <th>নোট</th>
+                                    <th>পরিমাণ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>বর্তমান করমেয়াদে প্রদেয় মোট মূসক (সমাপনী জের এর সহিত সমন্বয় ব্যতীত) (৯গ-২৩খ+২৮-৩৪)</td>
+                                    <td class="text-center">৩৫</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>সমাপনী জের এর সহিত সমন্বয়ের পর বর্তমান করমেয়াদে প্রদেয় মোট মূসক (৩৫-৫০)</td>
+                                    <td class="text-center">৩৬</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>বর্তমান করমেয়াদে প্রদেয় মোট সম্পূরক শুল্ক (সমাপনী জের এর সহিত সমন্বয় ব্যতীত) (৯খ+৩৯-৪০-৪১)</td>
+                                    <td class="text-center">৩৭</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>সমাপনী জের এর সহিত সমন্বয়ের পর বর্তমান করমেয়াদে প্রদেয় মোট সম্পূরক শুল্ক (৩৭-৫১)</td>
+                                    <td class="text-center">৩৮</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>ডেবিট নোট ইস্যুর জন্য সমন্বয়কৃত সম্পূরক শুল্ক</td>
+                                    <td class="text-center">৩৯</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>ক্রেডিট নোট ইস্যুর জন্য সমন্বয়কৃত সম্পূরক শুল্ক</td>
+                                    <td class="text-center">৪০</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>রপ্তানি পণ্য উৎপাদনে ব্যবহৃত কাঁচামালের বিপরীতে প্রদেয় সম্পূরক শুল্ক</td>
+                                    <td class="text-center">৪১</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>অপরিশোধিত মূসকের জন্য সুদ</td>
+                                    <td class="text-center">৪২</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>অপরিশোধিত সম্পূরক শুল্ক এর জন্য সুদ</td>
+                                    <td class="text-center">৪৩</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>অর্থদণ্ড ও জরিমানা</td>
+                                    <td class="text-center">৪৪</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>আবগারি শুল্ক</td>
+                                    <td class="text-center">৪৫</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>উন্নয়ন সারচার্জ</td>
+                                    <td class="text-center">৪৬</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>তথ্য প্রযুক্তি উন্নয়ন সারচার্জ</td>
+                                    <td class="text-center">৪৭</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>স্বাস্থ্য সুরক্ষা সারচার্জ</td>
+                                    <td class="text-center">৪৮</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>পরিবেশ সুরক্ষা সারচার্জ</td>
+                                    <td class="text-center">৪৯</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>শেষ করমেয়াদের সমাপনী জের (মূল্য সংযোজন কর)</td>
+                                    <td class="text-center">৫০</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>শেষ করমেয়াদের সমাপনী জের (সম্পূরক শুল্ক)</td>
+                                    <td class="text-center">৫১</td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- অংশ-৮: কর পরিশোধের তফসিল (ট্রেজারী জমা) -->
+                        <div class="mushak-91-section-header">অংশ-৮: কর পরিশোধের তফসিল (ট্রেজারী জমা)</div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 50%;"/>
+                                <col style="width: 6%;"/>
+                                <col style="width: 16%;"/>
+                                <col style="width: 16%;"/>
+                                <col style="width: 12%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>আইটেম</th>
+                                    <th>নোট</th>
+                                    <th>অর্থনৈতিক কোড</th>
+                                    <th>পরিমাণ</th>
+                                    <th>সাবফর্ম</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>বর্তমান করমেয়াদে পরিশোধিত মোট মূসক</td>
+                                    <td class="text-center">৫২</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম – ছ</td>
+                                </tr>
+                                <tr>
+                                    <td>বর্তমান করমেয়াদে পরিশোধিত মোট সম্পূরক শুল্ক</td>
+                                    <td class="text-center">৫৩</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম – ছ</td>
+                                </tr>
+                                <tr>
+                                    <td>অপরিশোধিত মূসকের জন্য সুদ</td>
+                                    <td class="text-center">৫৪</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম – ছ</td>
+                                </tr>
+                                <tr>
+                                    <td>অপরিশোধিত সম্পূরক শুল্ক এর জন্য সুদ</td>
+                                    <td class="text-center">৫৫</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম – ছ</td>
+                                </tr>
+                                <tr>
+                                    <td>অর্থদণ্ড ও জরিমানা</td>
+                                    <td class="text-center">৫৬</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম – ছ</td>
+                                </tr>
+                                <tr>
+                                    <td>আবগারি শুল্ক</td>
+                                    <td class="text-center">৫৭</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম – ছ</td>
+                                </tr>
+                                <tr>
+                                    <td>উন্নয়ন সারচার্জ</td>
+                                    <td class="text-center">৫৮</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম – ছ</td>
+                                </tr>
+                                <tr>
+                                    <td>তথ্য প্রযুক্তি উন্নয়ন সারচার্জ</td>
+                                    <td class="text-center">৫৯</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম – ছ</td>
+                                </tr>
+                                <tr>
+                                    <td>স্বাস্থ্য সুরক্ষা সারচার্জ</td>
+                                    <td class="text-center">৬০</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম – ছ</td>
+                                </tr>
+                                <tr>
+                                    <td>পরিবেশ সুরক্ষা সারচার্জ</td>
+                                    <td class="text-center">৬১</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td class="mushak-91-subform-tag">সাবফর্ম – ছ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- অংশ-৯: সমাপনী জের -->
+                        <div class="mushak-91-section-header">অংশ-৯: সমাপনী জের (পরবর্তী কর মেয়াদের প্রারম্ভিক জের)</div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 68%;"/>
+                                <col style="width: 8%;"/>
+                                <col style="width: 24%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>আইটেম</th>
+                                    <th>নোট</th>
+                                    <th>পরিমাণ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>সমাপনী জের (মূল্য সংযোজন কর)</td>
+                                    <td class="text-center">৬২</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>সমাপনী জের (সম্পূরক শুল্ক)</td>
+                                    <td class="text-center">৬৩</td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- অংশ-১০: ফেরত -->
+                        <div class="mushak-91-section-header">অংশ-১০: ফেরত</div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 76%;"/>
+                                <col style="width: 12%;"/>
+                                <col style="width: 12%;"/>
+                            </colgroup>
+                            <tr>
+                                <td>আমি সমাপনী জেরে উল্লিখিত অর্থ ফেরৎ গ্রহণে ইচ্ছুক</td>
+                                <td class="text-center">হ্যাঁ <span class="mushak-91-check-box">&#160;</span></td>
+                                <td class="text-center">না <span class="mushak-91-check-box">&#160;</span></td>
+                            </tr>
+                        </table>
+
+                        <div class="page-break"/>
+
+                        <!-- ================= PAGE 4 ================= -->
+                        <!-- অংশ-১১: ঘোষণা -->
+                        <div class="mushak-91-section-header">অংশ-১১: ঘোষণা</div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 20%;"/>
+                                <col style="width: 35%;"/>
+                                <col style="width: 45%;"/>
+                            </colgroup>
+                            <tr>
+                                <td colspan="3" class="fw-bold" style="padding: 4px;">আমি ঘোষণা করিতেছি যে, এই দাখিলপত্রে প্রদত্ত তথ্য সর্বোতভাবে সম্পূর্ণ, সত্য ও নির্ভুল।</td>
+                            </tr>
+                            <tr>
+                                <td>নাম</td>
+                                <td>&#160;</td>
+                                <td rowspan="4" style="vertical-align: bottom; text-align: center;">
+                                    <div style="border-top: 1px dashed #000; width: 70%; margin: 0 auto; padding-top: 4px;">স্বাক্ষর</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>পদবি</td>
+                                <td>&#160;</td>
+                            </tr>
+                            <tr>
+                                <td>তারিখ</td>
+                                <td>&#160;</td>
+                            </tr>
+                            <tr>
+                                <td>মোবাইল নম্বর</td>
+                                <td>&#160;</td>
+                            </tr>
+                            <tr>
+                                <td>ইমেইল</td>
+                                <td>&#160;</td>
+                                <td>&#160;</td>
+                            </tr>
+                        </table>
+
+                        <!-- সাবফর্ম সমূহ শিরোনাম -->
+                        <div style="text-align: center; font-size: 11pt; font-weight: bold; margin-top: 8px; margin-bottom: 4px;">সাবফর্ম সমূহ</div>
+
+                        <!-- সাবফর্ম - ক -->
+                        <div style="font-size: 8pt; font-weight: bold; margin-top: 4px; margin-bottom: 2px;">
+                            সাবফর্ম - ক (নোট ১,২,৩,৪,৫,৭,১০,১১,১২,১৩,১৪,১৫,১৬,১৭,১৯,২০,২১,২২ এর জন্য প্রযোজ্য)
+                        </div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 7%;"/>
+                                <col style="width: 23%;"/>
+                                <col style="width: 12%;"/>
+                                <col style="width: 16%;"/>
+                                <col style="width: 12%;"/>
+                                <col style="width: 11%;"/>
+                                <col style="width: 11%;"/>
+                                <col style="width: 8%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr style="background-color: #fce4d6;">
+                                    <th>ক্রমিক নং</th>
+                                    <th>পণ্য/ সেবার বাণিজ্যিক বর্ণনা</th>
+                                    <th>পণ্য/সেবার কোড</th>
+                                    <th>পণ্য/সেবার নাম</th>
+                                    <th>মূল্য (ক)</th>
+                                    <th>সম্পূরক শুল্ক (খ)</th>
+                                    <th>মূল্য সংযোজন কর (গ)</th>
+                                    <th>মন্তব্য</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr class="fw-bold bg-header">
+                                    <td colspan="4" class="text-center">মোট</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- সাবফর্ম - খ -->
+                        <div style="font-size: 8pt; font-weight: bold; margin-top: 6px; margin-bottom: 2px;">
+                            সাবফর্ম - খ (নোট ৮ এর জন্য প্রযোজ্য)
+                        </div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 7%;"/>
+                                <col style="width: 18%;"/>
+                                <col style="width: 17%;"/>
+                                <col style="width: 11%;"/>
+                                <col style="width: 15%;"/>
+                                <col style="width: 10%;"/>
+                                <col style="width: 8%;"/>
+                                <col style="width: 8%;"/>
+                                <col style="width: 6%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr style="background-color: #fce4d6;">
+                                    <th>ক্রমিক নং</th>
+                                    <th>ক্যাটাগরি</th>
+                                    <th>পণ্য/ সেবার বাণিজ্যিক বর্ণনা</th>
+                                    <th>পণ্য/সেবার কোড</th>
+                                    <th>পণ্য/সেবার নাম</th>
+                                    <th>মূল্য (ক)</th>
+                                    <th>সম্পূরক শুল্ক (খ)</th>
+                                    <th>মূল্য সংযোজন কর (গ)</th>
+                                    <th>মন্তব্য</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="5">&#160;</td>
+                                    <td>বাণিজ্যিক আমদানিকারক</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>পেট্রোলিয়াম জাতীয় পণ্য</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>সুপার শপ</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>ঔষধ জাতীয় পণ্য</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td>অন্যান্য ব্যবসায়ী</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr class="fw-bold bg-header">
+                                    <td colspan="5" class="text-center">মোট</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- সাবফর্ম - গ -->
+                        <div style="font-size: 8pt; font-weight: bold; margin-top: 6px; margin-bottom: 2px;">
+                            সাবফর্ম - গ (নোট ৬,১৮ এর জন্য প্রযোজ্য)
+                        </div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 6%;"/>
+                                <col style="width: 14%;"/>
+                                <col style="width: 12%;"/>
+                                <col style="width: 14%;"/>
+                                <col style="width: 9%;"/>
+                                <col style="width: 9%;"/>
+                                <col style="width: 11%;"/>
+                                <col style="width: 9%;"/>
+                                <col style="width: 9%;"/>
+                                <col style="width: 7%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr style="background-color: #fce4d6;">
+                                    <th>ক্রমিক নং</th>
+                                    <th>পণ্য/ সেবার বর্ণনা</th>
+                                    <th>পণ্য/ সেবার বাণিজ্যিক কোড</th>
+                                    <th>পণ্য/ সেবার নাম</th>
+                                    <th>পরিমাপের একক (ক)</th>
+                                    <th>পরিমাণ (খ)</th>
+                                    <th>প্রকৃত বিক্রয়/ক্রয় মূল্য (গ)</th>
+                                    <th>সম্পূরক শুল্ক (ঘ)</th>
+                                    <th>মূল্য সংযোজন কর (ঙ)</th>
+                                    <th>মন্তব্য</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr class="fw-bold bg-header">
+                                    <td colspan="6" class="text-center">মোট</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="page-break"/>
+
+                        <!-- ================= PAGE 5 ================= -->
+                        <!-- সাবফর্ম - ঘ -->
+                        <div style="font-size: 8pt; font-weight: bold; margin-top: 4px; margin-bottom: 2px;">
+                            সাবফর্ম - ঘ (নোট ২৪- "সরবরাহ গ্রহীতা কর্তৃক উৎসে কর্তনের জন্য" এর জন্য প্রযোজ্য)
+                        </div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 5%;"/>
+                                <col style="width: 12%;"/>
+                                <col style="width: 14%;"/>
+                                <col style="width: 14%;"/>
+                                <col style="width: 9%;"/>
+                                <col style="width: 9%;"/>
+                                <col style="width: 13%;"/>
+                                <col style="width: 9%;"/>
+                                <col style="width: 9%;"/>
+                                <col style="width: 6%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr style="background-color: #fce4d6;">
+                                    <th>ক্রমিক নং</th>
+                                    <th>সরবরাহকারীর বিআইএন নম্বর</th>
+                                    <th>সরবরাহকারীর নাম</th>
+                                    <th>সরবরাহকারীর ঠিকানা</th>
+                                    <th>সরবরাহ মূল্য</th>
+                                    <th>কর্তিত মূল্য সংযোজন কর</th>
+                                    <th>ইনভয়েস নং (চালানপত্র/ বিল নম্বর ইত্যাদি)</th>
+                                    <th>ইনভয়েস/ বিলের তারিখ</th>
+                                    <th>একাউন্ট কোডে কর পরিশোধিত</th>
+                                    <th>মন্তব্য</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr class="fw-bold bg-header">
+                                    <td colspan="4" class="text-center">মোট</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td colspan="4">&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- সাবফর্ম - ঙ -->
+                        <div style="font-size: 8pt; font-weight: bold; margin-top: 6px; margin-bottom: 2px;">
+                            সাবফর্ম - ঙ (নোট ২৯- "প্রদত্ত সরবরাহ হইতে উৎসে কর্তনের জন্য" এর জন্য প্রযোজ্য)
+                        </div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 5%;"/>
+                                <col style="width: 12%;"/>
+                                <col style="width: 14%;"/>
+                                <col style="width: 14%;"/>
+                                <col style="width: 9%;"/>
+                                <col style="width: 9%;"/>
+                                <col style="width: 13%;"/>
+                                <col style="width: 9%;"/>
+                                <col style="width: 9%;"/>
+                                <col style="width: 6%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr style="background-color: #fce4d6;">
+                                    <th>ক্রমিক নং</th>
+                                    <th>ক্রেতার বিআইএন নম্বর</th>
+                                    <th>ক্রেতার নাম</th>
+                                    <th>ক্রেতার ঠিকানা</th>
+                                    <th>মূল্য</th>
+                                    <th>কর্তিত মূল্য সংযোজন কর</th>
+                                    <th>ইনভয়েস নং (চালানপত্র/ বিল নম্বর ইত্যাদি)</th>
+                                    <th>ইনভয়েস/ বিলের তারিখ</th>
+                                    <th>একাউন্ট কোডে কর পরিশোধিত</th>
+                                    <th>মন্তব্য</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr class="fw-bold bg-header">
+                                    <td colspan="4" class="text-center">মোট</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td colspan="4">&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- সাবফর্ম - চ -->
+                        <div style="font-size: 8pt; font-weight: bold; margin-top: 6px; margin-bottom: 2px;">
+                            সাবফর্ম - চ (নোট ৩০ - "আমদানি পর্যায়ে প্রদেয় আগাম কর" এর জন্য প্রযোজ্য)
+                        </div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 8%;"/>
+                                <col style="width: 25%;"/>
+                                <col style="width: 15%;"/>
+                                <col style="width: 22%;"/>
+                                <col style="width: 20%;"/>
+                                <col style="width: 10%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr style="background-color: #fce4d6;">
+                                    <th>ক্রমিক নং</th>
+                                    <th>বিল অব এন্ট্রি নম্বর</th>
+                                    <th>তারিখ</th>
+                                    <th>কাস্টম হাউস/শুল্ক স্টেশন</th>
+                                    <th>আগাম করের পরিমাণ</th>
+                                    <th>মন্তব্য</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr class="fw-bold bg-header">
+                                    <td colspan="4" class="text-center">মোট</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- সাবফর্ম - ছ -->
+                        <div style="font-size: 8pt; font-weight: bold; margin-top: 6px; margin-bottom: 2px;">
+                            সাবফর্ম - ছ (নোট ৫২,৫৩,৫৪,৫৫,৫৬,৫৭,৫৮,৫৯,৬০,৬১ এর জন্য প্রযোজ্য)
+                        </div>
+                        <table class="mushak-91-table">
+                            <colgroup>
+                                <col style="width: 8%;"/>
+                                <col style="width: 20%;"/>
+                                <col style="width: 15%;"/>
+                                <col style="width: 14%;"/>
+                                <col style="width: 12%;"/>
+                                <col style="width: 13%;"/>
+                                <col style="width: 10%;"/>
+                                <col style="width: 8%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr style="background-color: #fce4d6;">
+                                    <th>ক্রমিক নং</th>
+                                    <th>ট্রেজারী চালান নম্বর</th>
+                                    <th>ব্যাংক</th>
+                                    <th>শাখা</th>
+                                    <th>তারিখ</th>
+                                    <th>একাউন্ট কোডে কর পরিশোধিত</th>
+                                    <th>পরিমাণ</th>
+                                    <th>মন্তব্য</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr class="fw-bold bg-header">
+                                    <td colspan="6" class="text-center">মোট</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
 </odoo>

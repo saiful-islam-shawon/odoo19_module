@@ -1,11 +1,249 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <record id="action_print_official_mushak_65" model="ir.actions.server">
-    <field name="name">Mushak 6.5 — QWeb Print</field>
-    <field name="model_id" ref="stock.model_stock_picking"/>
-    <field name="binding_model_id" eval="False"/><field name="state">code</field>
-    <field name="code">action = records.action_print_vat_challan()</field>
-  </record>
-  <record id="action_report_mushak_65" model="ir.actions.report"><field name="name">Mushak 6.5 — Transfer Challan</field><field name="model">stock.picking</field><field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_65</field><field name="report_file">zsl_vat.report_mushak_65</field><field name="binding_model_id" ref="stock.model_stock_picking"/><field name="binding_type">report</field></record>
-  <template id="report_mushak_65"><t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-set="form_code" t-value="'Mushak 6.5'"/><t t-set="form_title" t-value="'Transfer Challan'"/><t t-call="zsl_vat.mushak_qweb_layout"><div class="zsl-mushak-section"><h4>Inter-unit movement details</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Challan no. / date</td><td><span t-field="o.vat_challan_number"/> / <span t-field="o.vat_challan_date"/></td><td class="zsl-mushak-label">Issue time</td><td><span t-field="o.scheduled_date"/></td></tr><tr><td class="zsl-mushak-label">Sending VAT unit</td><td><span t-field="o.vat_unit_id"/><br/><span t-field="o.vat_unit_id.bin"/><br/><span t-field="o.vat_unit_id.address"/></td><td class="zsl-mushak-label">Receiving VAT unit</td><td><span t-field="o.vat_receiving_unit_id"/><br/><span t-field="o.vat_receiving_unit_id.bin"/><br/><span t-field="o.vat_receiving_unit_id.address"/></td></tr><tr><td class="zsl-mushak-label">Applicable tax</td><td><span t-field="o.vat_transfer_tax_amount"/></td><td class="zsl-mushak-label">Remarks</td><td><span t-field="o.vat_remarks"/></td></tr></table></div><div class="zsl-mushak-section"><table class="zsl-mushak-table"><tr><th>SL</th><th>Item / HS code</th><th>UoM</th><th>Quantity</th><th>Value excl. tax</th></tr><tr t-foreach="o.move_ids" t-as="move"><td><span t-esc="move_index + 1"/></td><td><span t-field="move.product_id"/> / <span t-field="move.product_id.product_tmpl_id.vat_hs_code_id"/></td><td><span t-field="move.product_uom"/></td><td class="zsl-mushak-number"><span t-field="move.quantity"/></td><td class="zsl-mushak-number"><span t-esc="move.quantity * move.product_id.standard_price"/></td></tr><tr><th colspan="4">Total value</th><th class="zsl-mushak-number"><span t-field="o.vat_transfer_value"/></th></tr></table></div></t></t></t></template>
+
+    <record id="paperformat_mushak_65_portrait" model="report.paperformat">
+        <field name="name">Mushak 6.5 Portrait</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">35</field>
+        <field name="margin_bottom">30</field>
+        <field name="margin_left">40</field>
+        <field name="margin_right">30</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="action_print_official_mushak_65" model="ir.actions.server">
+        <field name="name">Mushak 6.5 — QWeb Print</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_model_id" eval="False"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_print_vat_challan()</field>
+    </record>
+
+    <record id="action_report_mushak_65" model="ir.actions.report">
+        <field name="name">Mushak 6.5 — Transfer Challan</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">zsl_vat.report_mushak_65</field>
+        <field name="report_file">zsl_vat.report_mushak_65</field>
+        <field name="paperformat_id" ref="paperformat_mushak_65_portrait"/>
+    </record>
+
+    <template id="report_mushak_65">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
+                    <div class="page mushak-65-page">
+                        <style type="text/css">
+                            @page {
+                                size: A4 portrait;
+                                margin: 35mm 30mm 30mm 40mm;
+                            }
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
+                            .mushak-65-page {
+                                font-family: 'Nikosh', 'Noto Sans Bengali', Arial, sans-serif !important;
+                                color: #000;
+                                width: 100%;
+                                line-height: 1.25;
+                            }
+                            .mushak-65-top-gov {
+                                text-align: center;
+                                margin-bottom: 2px;
+                            }
+                            .mushak-65-top-gov-1 {
+                                font-size: 13pt;
+                                font-weight: normal;
+                                line-height: 1.25;
+                            }
+                            .mushak-65-top-gov-2 {
+                                font-size: 13pt;
+                                font-weight: normal;
+                                line-height: 1.25;
+                                margin-top: 1px;
+                            }
+                            .mushak-65-badge-container {
+                                width: 100%;
+                                text-align: right;
+                                margin-top: 2px;
+                                margin-bottom: 8px;
+                            }
+                            .mushak-65-badge {
+                                display: inline-block;
+                                border: 1.5px solid #000;
+                                padding: 2px 10px;
+                                font-weight: bold;
+                                font-size: 12pt;
+                                line-height: 1.2;
+                            }
+                            .mushak-65-title-block {
+                                text-align: center;
+                                margin-top: 6px;
+                                margin-bottom: 18px;
+                            }
+                            .mushak-65-title-1 {
+                                font-size: 13.5pt;
+                                font-weight: bold;
+                                line-height: 1.3;
+                            }
+                            .mushak-65-title-2 {
+                                font-size: 11pt;
+                                font-weight: normal;
+                                line-height: 1.3;
+                                margin-top: 4px;
+                            }
+                            .mushak-65-meta-container {
+                                width: 100%;
+                                font-size: 11pt;
+                                line-height: 1.45;
+                                margin-bottom: 16px;
+                            }
+                            .mushak-65-meta-left {
+                                width: 100%;
+                                margin-bottom: 12px;
+                            }
+                            .mushak-65-meta-right {
+                                float: right;
+                                width: 220px;
+                                text-align: left;
+                                margin-top: 4px;
+                                margin-bottom: 14px;
+                            }
+                            .mushak-65-clear {
+                                clear: both;
+                            }
+                            .mushak-65-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                border: 1px solid #000;
+                                table-layout: fixed;
+                            }
+                            .mushak-65-table th, .mushak-65-table td {
+                                border: 1px solid #000;
+                                padding: 6px 3px;
+                                text-align: center;
+                                vertical-align: middle;
+                                word-wrap: break-word;
+                                font-size: 10.5pt;
+                                line-height: 1.25;
+                            }
+                            .mushak-65-table th {
+                                font-weight: bold;
+                                background-color: #fff;
+                            }
+                            .mushak-65-num-row th {
+                                font-size: 10pt !important;
+                                font-weight: normal !important;
+                                vertical-align: middle !important;
+                                padding: 3px 0 !important;
+                                background-color: #fff !important;
+                            }
+                            .mushak-65-data-row td {
+                                height: 35px;
+                            }
+                            .mushak-65-sign-block {
+                                margin-top: 28px;
+                                font-size: 11pt;
+                                font-weight: normal;
+                                line-height: 1.5;
+                                text-align: left;
+                            }
+                            .mushak-65-sign-item {
+                                margin-bottom: 2px;
+                            }
+                        </style>
+
+                        <!-- Top Government Title -->
+                        <div class="mushak-65-top-gov">
+                            <div class="mushak-65-top-gov-1">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
+                            <div class="mushak-65-top-gov-2">জাতীয় রাজস্ব বোর্ড</div>
+                        </div>
+
+                        <!-- Top-Right Badge Box -->
+                        <div class="mushak-65-badge-container">
+                            <div class="mushak-65-badge">মূসক-৬.৫</div>
+                        </div>
+
+                        <!-- Document Title & Rule -->
+                        <div class="mushak-65-title-block">
+                            <div class="mushak-65-title-1">কেন্দ্রীয় নিবন্ধিত প্রতিষ্ঠানের পণ্য স্থানান্তর চালানপত্র</div>
+                            <div class="mushak-65-title-2">[বিধি ৪০ এর উপ-বিধি (১) এর দফা (ঙ) দ্রষ্টব্য]</div>
+                        </div>
+
+                        <!-- Metadata Section -->
+                        <div class="mushak-65-meta-container">
+                            <div class="mushak-65-meta-left">
+                                <div>নিবন্ধিত ব্যক্তির নাম :</div>
+                                <div>নিবন্ধিত ব্যক্তির বিআইএন :</div>
+                                <div>প্রেরণকারী ইউনিট/শাখা/পণ্যাগারের নাম ও ঠিকানা :</div>
+                                <div style="margin-top: 14px;">গ্রহীতা ইউনিট/শাখা/পণ্যাগারের নাম ও ঠিকানা :</div>
+                            </div>
+                            <div class="mushak-65-meta-right">
+                                <div>চালান নম্বর :</div>
+                                <div>ইস্যুর তারিখ :</div>
+                                <div>ইস্যুর সময় :</div>
+                            </div>
+                            <div class="mushak-65-clear"/>
+                        </div>
+
+                        <!-- 6-Column Table -->
+                        <table class="mushak-65-table">
+                            <colgroup>
+                                <col style="width: 16.51%;"/>
+                                <col style="width: 20.64%;"/>
+                                <col style="width: 15.47%;"/>
+                                <col style="width: 17.04%;"/>
+                                <col style="width: 15.69%;"/>
+                                <col style="width: 14.65%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>ক্রমিক নং</th>
+                                    <th>পণ্যের<br/>(প্রযোজ্য<br/>ক্ষেত্রে সুনির্দিষ্ট<br/>ব্র্যান্ড নামসহ)<br/>বিবরণ</th>
+                                    <th>পরিমাণ</th>
+                                    <th>কর ব্যতীত<br/>মূল্য</th>
+                                    <th>প্রযোজ্য<br/>করের<br/>পরিমাণ</th>
+                                    <th>মন্তব্য</th>
+                                </tr>
+                                <tr class="mushak-65-num-row">
+                                    <th>(১)</th>
+                                    <th>(২)</th>
+                                    <th>(৩)</th>
+                                    <th>(৪)</th>
+                                    <th>(৫)</th>
+                                    <th>(৬)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Exact single blank row matching the statutory template -->
+                                <tr class="mushak-65-data-row">
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Signature Block (Left-Aligned) -->
+                        <div class="mushak-65-sign-block">
+                            <div class="mushak-65-sign-item">প্রতিষ্ঠান কর্তৃপক্ষের দায়িত্বপ্রাপ্ত ব্যক্তির নাম:</div>
+                            <div class="mushak-65-sign-item">পদবী:</div>
+                            <div class="mushak-65-sign-item" style="margin-top: 10px;">স্বাক্ষর:</div>
+                            <div class="mushak-65-sign-item" style="margin-top: 8px;">সীল:</div>
+                        </div>
+
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
 </odoo>
