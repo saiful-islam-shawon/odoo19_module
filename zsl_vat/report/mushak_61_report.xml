@@ -110,12 +110,12 @@
                             }
                             .mushak-61-table th, .mushak-61-table td {
                                 border: 1px solid #000;
-                                padding: 1px 0.5px;
+                                padding: 2px 1px;
                                 text-align: center;
-                                vertical-align: middle;
+                                vertical-align: top;
                                 word-wrap: break-word;
-                                font-size: 8pt;
-                                line-height: 1.1;
+                                font-size: 7.5pt;
+                                line-height: 1.15;
                             }
                             .mushak-61-table th {
                                 font-weight: bold;
@@ -124,6 +124,7 @@
                             .mushak-61-num-row th {
                                 font-size: 7pt !important;
                                 font-weight: normal !important;
+                                vertical-align: middle !important;
                                 padding: 2px 0 !important;
                                 background-color: #fff !important;
                             }
@@ -164,27 +165,27 @@
                         <!-- 21-Column Table -->
                         <table class="mushak-61-table">
                             <colgroup>
-                                <col style="width: 3.75%;"/>
-                                <col style="width: 4.18%;"/>
-                                <col style="width: 4.68%;"/>
-                                <col style="width: 4.68%;"/>
-                                <col style="width: 5.88%;"/>
-                                <col style="width: 4.18%;"/>
-                                <col style="width: 4.00%;"/>
-                                <col style="width: 6.17%;"/>
-                                <col style="width: 6.71%;"/>
-                                <col style="width: 4.53%;"/>
-                                <col style="width: 5.64%;"/>
-                                <col style="width: 4.74%;"/>
-                                <col style="width: 5.86%;"/>
-                                <col style="width: 3.77%;"/>
-                                <col style="width: 4.71%;"/>
-                                <col style="width: 4.02%;"/>
-                                <col style="width: 3.52%;"/>
-                                <col style="width: 3.17%;"/>
-                                <col style="width: 5.32%;"/>
-                                <col style="width: 5.10%;"/>
-                                <col style="width: 3.84%;"/>
+                                <col style="width: 3.82%;"/>
+                                <col style="width: 4.26%;"/>
+                                <col style="width: 4.75%;"/>
+                                <col style="width: 4.78%;"/>
+                                <col style="width: 5.95%;"/>
+                                <col style="width: 4.23%;"/>
+                                <col style="width: 4.07%;"/>
+                                <col style="width: 6.22%;"/>
+                                <col style="width: 6.78%;"/>
+                                <col style="width: 4.58%;"/>
+                                <col style="width: 5.72%;"/>
+                                <col style="width: 4.81%;"/>
+                                <col style="width: 5.93%;"/>
+                                <col style="width: 3.89%;"/>
+                                <col style="width: 4.77%;"/>
+                                <col style="width: 4.11%;"/>
+                                <col style="width: 3.58%;"/>
+                                <col style="width: 3.26%;"/>
+                                <col style="width: 5.39%;"/>
+                                <col style="width: 5.18%;"/>
+                                <col style="width: 3.92%;"/>
                             </colgroup>
                             <thead>
                                 <!-- Tier 1 Header -->
@@ -192,16 +193,17 @@
                                     <th rowspan="3">ক্রমিক<br/>সংখ্যা</th>
                                     <th rowspan="3">তারিখ</th>
                                     <th colspan="2">মজুদ উপকরণের<br/>প্রারম্ভিক জের</th>
-                                    <th colspan="10">ক্রয়কৃত উপকরণ</th>
-                                    <th colspan="2">মোট উপকরণের<br/>পরিমাণ</th>
-                                    <th colspan="2">পণ্য<br/>প্রস্তুত/প্রক্রিয়া<br/>করণে<br/>উপকরণের<br/>ব্যবহার</th>
+                                    <th colspan="14">ক্রয়কৃত উপকরণ</th>
                                     <th colspan="2">উপকরণের প্রান্তিক জের</th>
                                     <th rowspan="3">মন্তব্য</th>
                                 </tr>
                                 <!-- Tier 2 Header -->
                                 <tr>
+                                    <!-- Under মজুদ উপকরণের প্রারম্ভিক জের -->
                                     <th rowspan="2">পরিমাণ<br/>(একক)</th>
                                     <th rowspan="2">মূল্য<br/>(সকল<br/>প্রকার<br/>কর<br/>ব্যতীত)</th>
+
+                                    <!-- Under ক্রয়কৃত উপকরণ -->
                                     <th rowspan="2">চালানপত্র/<br/>বিল অব<br/>এন্ট্রি নম্বর</th>
                                     <th rowspan="2">তারিখ</th>
                                     <th colspan="3">বিক্রেতা/ সরবরাহকারী</th>
@@ -210,18 +212,27 @@
                                     <th rowspan="2">মূল্য<br/>(সকল<br/>প্রকার<br/>কর<br/>ব্যতীত)</th>
                                     <th rowspan="2">সম্পূরকশুল্ক<br/>(যদি<br/>থাকে)</th>
                                     <th rowspan="2">মূসক</th>
-                                    <th rowspan="2">পরিমাণ<br/>(একক)</th>
-                                    <th rowspan="2">মূল্য<br/>(সকল<br/>প্রকার<br/>কর<br/>ব্যতীত)</th>
-                                    <th rowspan="2">পরিমাণ<br/>(একক)</th>
-                                    <th rowspan="2">মূল্য<br/>(সকল<br/>প্রকার<br/>কর<br/>ব্যতীত)</th>
+                                    <th colspan="2">মোট উপকরণের<br/>পরিমাণ</th>
+                                    <th colspan="2">পণ্য<br/>প্রস্তুত/প্রক্রিয়া<br/>করণে<br/>উপকরণের<br/>ব্যবহার</th>
+
+                                    <!-- Under উপকরণের প্রান্তিক জের -->
                                     <th rowspan="2">পরিমাণ<br/>(একক)</th>
                                     <th rowspan="2">মূল্য<br/>(সকল<br/>প্রকার<br/>কর<br/>ব্যতীত)</th>
                                 </tr>
                                 <!-- Tier 3 Header -->
                                 <tr>
+                                    <!-- Under বিক্রেতা/ সরবরাহকারী -->
                                     <th>নাম</th>
                                     <th>ঠিকানা</th>
                                     <th>নিবন্ধন/<br/>তালিকাভুক্তি/<br/>জাতীয়<br/>পরিচয়পত্র নং</th>
+
+                                    <!-- Under মোট উপকরণের পরিমাণ -->
+                                    <th>পরিমাণ<br/>(একক)</th>
+                                    <th>মূল্য<br/>(সকল<br/>প্রকার<br/>কর<br/>ব্যতীত)</th>
+
+                                    <!-- Under পণ্য প্রস্তুত/প্রক্রিয়াকরণে উপকরণের ব্যবহার -->
+                                    <th>পরিমাণ<br/>(একক)</th>
+                                    <th>মূল্য<br/>(সকল<br/>প্রকার<br/>কর<br/>ব্যতীত)</th>
                                 </tr>
                                 <!-- Tier 4 Column Numbering Row -->
                                 <tr class="mushak-61-num-row">

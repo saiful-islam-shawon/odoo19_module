@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Execute on install and every upgrade so existing users land on VAT. -->
+    <function model="res.users" name="set_vat_dashboard_as_home_action"/>
+    <function model="ir.ui.menu" name="cleanup_obsolete_vat_settings_shortcuts"/>
+</odoo>

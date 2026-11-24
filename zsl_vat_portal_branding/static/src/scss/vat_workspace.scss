@@ -1,0 +1,170 @@
+// Dedicated VAT workspace: the technical dependency modules remain installed,
+// while the user sees one focused ZSL VAT application.
+.o_web_client {
+    grid-template-areas:
+        '.'
+        '.'
+        '.'
+        'navbar'
+        'content'
+        'components' !important;
+    grid-template-columns: 1fr !important;
+
+    > .mk_apps_sidebar_panel {
+        display: none !important;
+    }
+}
+
+.o_main_navbar {
+    min-height: 58px;
+    height: 58px;
+    padding: 0 !important;
+    border-bottom: 2px solid #b6cdd3;
+    background: #f8fbfc !important;
+    color: #21495a;
+    // Odoo systray entries (messages, activities, company and user menu)
+    // inherit these variables instead of their parent text color.
+    --NavBar-entry-color: #234656;
+    --NavBar-entry-color--hover: #075d75;
+    --NavBar-entry-color--active: #075d75;
+    --NavBar-brand-color: #234656;
+    --NavBar-entry-backgroundColor--hover: #d9edf2;
+    --NavBar-entry-backgroundColor--focus: #d9edf2;
+    --NavBar-entry-backgroundColor--active: #c9e6ed;
+
+    .o_navbar_apps_menu,
+    .o_menu_brand {
+        display: none !important;
+    }
+
+    .zsl_vat_navbar_brand {
+        display: flex;
+        width: 222px;
+        min-width: 222px;
+        height: 58px;
+        flex-direction: column;
+        justify-content: center;
+        padding: 7px 21px;
+        background: #062d63;
+        color: #fff;
+        text-decoration: none;
+        clip-path: polygon(0 0, 100% 0, 91% 100%, 0 100%);
+
+        &:hover,
+        &:focus {
+            color: #fff;
+            background: #073873;
+        }
+    }
+
+    .zsl_vat_navbar_zencore {
+        color: #fff;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: .25px;
+        line-height: 1;
+    }
+
+    .zsl_vat_navbar_subtitle {
+        margin-top: 4px;
+        color: #bde7ef;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: .35px;
+        text-transform: uppercase;
+    }
+
+    .o_menu_sections {
+        margin-left: 7px;
+
+        .o_nav_entry,
+        .dropdown-toggle {
+            height: 56px;
+            padding: 0 10px;
+            border: 0 !important;
+            background: transparent !important;
+            color: #243f4b !important;
+            font-size: 14px;
+            font-weight: 600;
+
+            &:hover,
+            &:focus,
+            &.show {
+                background: #d9edf2 !important;
+                color: #075c72 !important;
+            }
+        }
+    }
+
+    .o_menu_systray {
+        height: 56px;
+        padding-right: 10px;
+        color: #244452;
+
+        &, *,
+        .dropdown-toggle,
+        button,
+        a {
+            color: #234656;
+        }
+
+        .dropdown-toggle:hover,
+        .dropdown-toggle:focus,
+        button:hover,
+        button:focus,
+        a:hover,
+        a:focus {
+            color: #075d75;
+            background-color: #d9edf2;
+        }
+
+        .o_user_avatar {
+            border: 1px solid #7d9eaa;
+        }
+
+        .badge {
+            background-color: #4383a0;
+            color: #fff !important;
+            text-shadow: none;
+        }
+    }
+}
+
+.o-dropdown--menu.dropdown-menu {
+    border: 1px solid #85a8b5;
+    border-radius: 0;
+    box-shadow: 0 3px 10px rgba(8, 43, 57, .2);
+
+    .dropdown-item {
+        min-width: 230px;
+        color: #243f4b;
+        font-size: 13px;
+
+        &:hover,
+        &:focus {
+            background: #0b7190;
+            color: #fff;
+        }
+    }
+
+    .dropdown-header.dropdown-menu_group {
+        color: #09637d;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_main_navbar {
+        .zsl_vat_navbar_brand {
+            width: 170px;
+            min-width: 170px;
+            padding-left: 14px;
+        }
+
+        .zsl_vat_navbar_zencore {
+            font-size: 16px;
+        }
+    }
+}

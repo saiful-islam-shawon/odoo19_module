@@ -1,0 +1,21 @@
+{
+    "name": "Zencore HS Code",
+    "version": "19.0.1.3.0",
+    "summary": "Manage HS Codes and assign them to products",
+    "description": "HS Code management with tariff description and CD, SD, VAT, AIT, AT, RD rates.",
+    "author": "Zencore Solutions Limited",
+    "website": "https://zencoreltd.com",
+    "category": "Inventory",
+    "license": "LGPL-3",
+    "depends": ["base", "product", "stock_delivery", "purchase"],
+    "data": [
+        "security/ir.model.access.csv",
+        "views/zencore_hs_code_views.xml",
+        "views/product_template_views.xml",
+        "views/purchase_order_views.xml",
+        "report/purchase_hs_report_template.xml",
+        "report/purchase_hs_report_action.xml",
+    ],
+    "installable": True,
+    "application": True,
+}

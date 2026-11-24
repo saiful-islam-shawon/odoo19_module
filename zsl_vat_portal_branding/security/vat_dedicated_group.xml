@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_zsl_vat_dedicated" model="res.groups">
+        <field name="name">VAT Dedicated Workspace</field>
+        <field name="privilege_id" ref="zsl_vat.privilege_zsl_vat"/>
+        <field name="sequence">40</field>
+        <field name="implied_ids" eval="[(4, ref('zsl_vat.group_vat_user'))]"/>
+    </record>
+</odoo>

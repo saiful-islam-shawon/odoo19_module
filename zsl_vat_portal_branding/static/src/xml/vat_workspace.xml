@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="zsl_vat_portal_branding.VATNavBar" t-inherit="web.NavBar" t-inherit-mode="extension">
+        <xpath expr="//t[@t-call='web.NavBar.AppsMenu']" position="before">
+            <a class="zsl_vat_navbar_brand" href="/odoo" aria-label="Zencore VAT Dashboard">
+                <span class="zsl_vat_navbar_zencore">ZENCORE</span>
+                <span class="zsl_vat_navbar_subtitle">VAT Management System</span>
+            </a>
+        </xpath>
+    </t>
+</templates>

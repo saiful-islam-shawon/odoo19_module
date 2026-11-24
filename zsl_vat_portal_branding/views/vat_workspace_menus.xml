@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_vat_company_profile" model="ir.actions.act_window">
+        <field name="name">VAT Company Profile</field>
+        <field name="res_model">res.company</field>
+        <field name="view_mode">form</field>
+        <field name="res_id" ref="base.main_company"/>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Group the existing VAT setup records into the reference-style Settings menu. -->
+    <menuitem id="menu_vat_settings_company" name="Company" parent="zsl_vat.menu_vat_settings" sequence="10" groups="zsl_vat.group_vat_manager"/>
+    <menuitem id="menu_vat_settings_accounting" name="Accounting" parent="zsl_vat.menu_vat_settings" sequence="20" groups="zsl_vat.group_vat_manager"/>
+    <menuitem id="menu_vat_settings_user" name="User" parent="zsl_vat.menu_vat_settings" sequence="30" groups="base.group_system"/>
+    <menuitem id="menu_vat_settings_configuration" name="Configuration" parent="zsl_vat.menu_vat_settings" sequence="40" groups="zsl_vat.group_vat_manager"/>
+
+    <menuitem id="menu_vat_settings_company_profile" name="Company Profile &amp; VAT Registration" parent="menu_vat_settings_company" action="action_vat_company_profile" sequence="10" groups="zsl_vat.group_vat_manager"/>
+    <record id="zsl_vat.menu_vat_units" model="ir.ui.menu"><field name="parent_id" ref="menu_vat_settings_company"/><field name="sequence">20</field></record>
+
+    <record id="zsl_vat.menu_vat_periods" model="ir.ui.menu"><field name="parent_id" ref="menu_vat_settings_accounting"/><field name="sequence">10</field></record>
+    <record id="zsl_vat.menu_vat_period_generate" model="ir.ui.menu"><field name="parent_id" ref="menu_vat_settings_accounting"/><field name="sequence">20</field></record>
+    <record id="zsl_vat.menu_vat_holidays" model="ir.ui.menu"><field name="parent_id" ref="menu_vat_settings_accounting"/><field name="sequence">30</field></record>
+    <record id="zsl_vat.menu_vat_series" model="ir.ui.menu"><field name="parent_id" ref="menu_vat_settings_accounting"/><field name="sequence">40</field></record>
+
+    <menuitem id="menu_vat_settings_users" name="Users" parent="menu_vat_settings_user" action="base.action_res_users" sequence="10" groups="base.group_system"/>
+
+    <record id="zsl_vat.menu_vat_registration_application" model="ir.ui.menu"><field name="parent_id" ref="menu_vat_settings_configuration"/><field name="sequence">10</field></record>
+    <record id="zsl_vat.menu_vat_registration_certificate" model="ir.ui.menu"><field name="parent_id" ref="menu_vat_settings_configuration"/><field name="sequence">20</field></record>
+
+</odoo>

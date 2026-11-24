@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_purchase_hs_duty_document">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+                <div class="page">
+                        <div class="oe_structure"/>
+                        <div style="border-bottom: 2px solid #9f8097; padding-bottom: 10px; margin-bottom: 18px;">
+                            <div style="display: table; width: 100%;">
+                                <div style="display: table-cell; width: 65%; vertical-align: middle;">
+                                    <h2 style="color: #964d83; margin: 0; font-size: 28px;">Purchase HS Duty Report</h2>
+                                    <div style="color: #666; margin-top: 4px;">Customs duty and purchase cost summary</div>
+                                </div>
+                                <div style="display: table-cell; width: 35%; text-align: right; vertical-align: middle;">
+                                    <div style="font-size: 20px; font-weight: bold;"><span t-field="o.name"/></div>
+                                    <div style="margin-top: 5px; color: #666;">
+                                        <span t-field="o.state"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 18px; font-size: 15px;">
+                            <tr>
+                                <td style="width: 25%; background: #f4f1f3; padding: 10px; border: 1px solid #ddd;"><strong>Vendor</strong><br/><span t-field="o.partner_id"/></td>
+                                <td style="width: 25%; padding: 10px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;"><strong>Vendor Reference</strong><br/><span t-esc="o.partner_ref or '-'"/></td>
+                                <td style="width: 25%; background: #f4f1f3; padding: 10px; border: 1px solid #ddd;"><strong>Order Date</strong><br/><span t-field="o.date_order" t-options='{"date_only": true}'/></td>
+                                <td style="width: 25%; padding: 10px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; border-right: 1px solid #ddd;"><strong>Expected Arrival</strong><br/><span t-if="o.date_planned" t-field="o.date_planned" t-options='{"date_only": true}'/><span t-else="">-</span></td>
+                            </tr>
+                        </table>
+
+                        <table class="table table-sm" style="width: 100%; border-collapse: collapse; font-size: 15px;">
+                            <thead>
+                                <tr style="background: #9f8097; color: white; text-align: center;">
+                                    <th style="padding: 9px; ">#</th>
+                                    <th style="padding: 9px; text-align: left;">HS Code</th>
+                                    <th style="padding: 9px; text-align: left; min-width: 210px;">Product Description</th>
+                                    <th style="padding: 9px; text-align: right;">Qty</th>
+                                    <th style="padding: 9px; text-align: right;">Unit Price</th>
+                                    <th style="padding: 9px; text-align: right;">CD</th>
+                                    <th style="padding: 9px; text-align: right;">SD</th>
+                                    <th style="padding: 9px; text-align: right;">VAT</th>
+                                    <th style="padding: 9px; text-align: right;">AIT</th>
+                                    <th style="padding: 9px; text-align: right;">AT</th>
+                                    <th style="padding: 9px; text-align: right;">RD</th>
+                                    <th style="padding: 9px; text-align: right;">Total Duty</th>
+                                    <th style="padding: 9px; text-align: right;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="grand_duty" t-value="0.0"/>
+                                <t t-set="grand_amount" t-value="0.0"/>
+                                <t t-set="line_number" t-value="0"/>
+                                <t t-foreach="o.order_line.filtered(lambda l: not l.display_type and l.product_qty != 0)" t-as="line">
+                                    <t t-set="line_number" t-value="line_number + 1"/>
+                                    <t t-set="line_duty" t-value="line._get_hs_total_duty()"/>
+                                    <t t-set="line_amount" t-value="line.price_unit * line.product_qty"/>
+                                    <t t-set="grand_duty" t-value="grand_duty + line_duty"/>
+                                    <t t-set="grand_amount" t-value="grand_amount + line_amount"/>
+                                    <tr t-att-style="'background: #fafafa;' if line_number % 2 == 0 else ''" style="border-bottom: 1px solid #ddd;">
+                                        <td style="padding: 9px; text-align: center;"><span t-out="line_number"/></td>
+                                        <td style="padding: 9px; text-align: left;"><span t-esc="line.product_id.product_tmpl_id.hs_code_id.hscode or '-'"/></td>
+                                        <td style="padding: 9px; text-align: left;"><span t-field="line.name"/></td>
+                                        <td style="padding: 9px; text-align: right;"><span t-field="line.product_qty"/></td>
+                                        <td style="padding: 9px; text-align: right;"><span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                        <td style="padding: 9px; text-align: right;"><span t-field="line.hs_cd"/></td>
+                                        <td style="padding: 9px; text-align: right;"><span t-field="line.hs_sd"/></td>
+                                        <td style="padding: 9px; text-align: right;"><span t-field="line.hs_vat"/></td>
+                                        <td style="padding: 9px; text-align: right;"><span t-field="line.hs_ait"/></td>
+                                        <td style="padding: 9px; text-align: right;"><span t-field="line.hs_at"/></td>
+                                        <td style="padding: 9px; text-align: right;"><span t-field="line.hs_rd"/></td>
+                                        <td style="padding: 9px; text-align: right; font-weight: bold;"><span t-out="line_duty" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                        <td style="padding: 9px; text-align: right; font-weight: bold;"><span t-out="line_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background: #f4f1f3; border-top: 2px solid #9f8097; font-weight: bold;">
+                                    <td colspan="11" style="padding: 10px; text-align: right;">Line Totals</td>
+                                    <td style="padding: 10px; text-align: right;"><span t-out="grand_duty" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                    <td style="padding: 10px; text-align: right;"><span t-out="grand_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <div style="margin-top: 18px; display: table; width: 100%;">
+                            <div style="display: table-cell; width: 55%; vertical-align: bottom; font-size: 11px; color: #666;">
+                                <t t-if="o.note"><strong>Notes:</strong><div t-field="o.note"/></t>
+                            </div>
+                            <div style="display: table-cell; width: 45%;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
+                                    <tr><td style="padding: 5px; text-align: right;">Untaxed Amount</td><td style="padding: 5px; text-align: right; width: 110px;"><span t-field="o.amount_untaxed"/></td></tr>
+                                    <tr><td style="padding: 5px; text-align: right;">Total Duty</td><td style="padding: 5px; text-align: right;"><span t-field="o.total_duty"/></td></tr>
+                                    <tr style="border-top: 2px solid #9f8097; font-size: 15px; font-weight: bold;"><td style="padding: 8px 5px; text-align: right;">Purchase Total</td><td style="padding: 8px 5px; text-align: right;"><span t-field="o.amount_total"/></td></tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="oe_structure"/>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
