@@ -1,11 +1,268 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <record id="action_print_official_mushak_63" model="ir.actions.server">
-    <field name="name">Mushak 6.3 — QWeb Print</field>
-    <field name="model_id" ref="account.model_account_move"/>
-    <field name="binding_model_id" eval="False"/><field name="state">code</field>
-    <field name="code">action = records.action_print_mushak_63()</field>
-  </record>
-  <record id="action_report_mushak_63" model="ir.actions.report"><field name="name">Mushak 6.3 — Tax Invoice</field><field name="model">account.move</field><field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_63</field><field name="report_file">zsl_vat.report_mushak_63</field><field name="binding_model_id" ref="account.model_account_move"/><field name="binding_type">report</field></record>
-  <template id="report_mushak_63"><t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-set="form_code" t-value="'Mushak 6.3'"/><t t-set="form_title" t-value="'Tax Invoice'"/><t t-call="zsl_vat.mushak_qweb_layout"><div class="zsl-mushak-section"><h4>Supplier and recipient information</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Invoice / Mushak no.</td><td><span t-field="o.name"/> / <span t-field="o.vat_mushak_number"/></td><td class="zsl-mushak-label">Issue date</td><td><span t-field="o.invoice_date"/></td></tr><tr><td class="zsl-mushak-label">Supplier</td><td><span t-field="o.company_id.name"/><br/><span t-field="o.company_id.vat_bin"/></td><td class="zsl-mushak-label">Recipient</td><td><span t-field="o.partner_id"/><br/><span t-field="o.partner_id.vat_bin"/></td></tr><tr><td class="zsl-mushak-label">VAT unit</td><td><span t-field="o.vat_unit_id"/></td><td class="zsl-mushak-label">Supply type</td><td><span t-field="o.vat_supply_type"/></td></tr></table></div><div class="zsl-mushak-section"><h4>Goods / service details</h4><table class="zsl-mushak-table"><tr><th>SL</th><th>Description</th><th>HS / service code</th><th>UoM</th><th>Qty</th><th>Rate</th><th>Taxable value</th><th>VAT</th><th>SD</th></tr><tr t-foreach="o.invoice_line_ids" t-as="line" t-if="not line.display_type"><td><span t-esc="line_index + 1"/></td><td><span t-field="line.name"/></td><td><span t-field="line.product_id.product_tmpl_id.vat_hs_code_id"/></td><td><span t-field="line.product_uom_id"/></td><td class="zsl-mushak-number"><span t-field="line.quantity"/></td><td class="zsl-mushak-number"><span t-field="line.price_unit"/></td><td class="zsl-mushak-number"><span t-field="line.price_subtotal"/></td><td class="zsl-mushak-number"><span t-esc="line.price_total - line.price_subtotal"/></td><td class="zsl-mushak-number">—</td></tr><tr><th colspan="6">Total</th><th class="zsl-mushak-number"><span t-field="o.vat_taxable_amount"/></th><th class="zsl-mushak-number"><span t-field="o.vat_output_amount"/></th><th class="zsl-mushak-number"><span t-field="o.vat_sd_amount"/></th></tr></table></div></t></t></t></template>
+
+    <record id="paperformat_mushak_63_portrait" model="report.paperformat">
+        <field name="name">Mushak 6.3 Portrait</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">34</field>
+        <field name="margin_bottom">24</field>
+        <field name="margin_left">32</field>
+        <field name="margin_right">32</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="action_print_official_mushak_63" model="ir.actions.server">
+        <field name="name">Mushak 6.3 — QWeb Print</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" eval="False"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_print_mushak_63()</field>
+    </record>
+
+    <record id="action_report_mushak_63" model="ir.actions.report">
+        <field name="name">Mushak 6.3 — Tax Invoice</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">zsl_vat.report_mushak_63</field>
+        <field name="report_file">zsl_vat.report_mushak_63</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_mushak_63_portrait"/>
+    </record>
+
+    <template id="report_mushak_63">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
+                    <div class="page mushak-63-page">
+                        <style type="text/css">
+                            * {
+                                box-sizing: border-box;
+                            }
+                            @page {
+                                size: A4 portrait;
+                                margin: 34mm 32mm 24mm 32mm;
+                            }
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
+                            .mushak-63-page {
+                                font-family: 'Nikosh', 'Noto Sans Bengali', Arial, sans-serif !important;
+                                color: #000;
+                                width: 100%;
+                                line-height: 1.3;
+                                font-size: 9pt;
+                            }
+                            .mushak-63-header {
+                                text-align: center;
+                                position: relative;
+                                margin-bottom: 12px;
+                            }
+                            .mushak-63-emblem {
+                                position: absolute;
+                                left: 32px;
+                                top: 0px;
+                                width: 48px;
+                                height: 48px;
+                            }
+                            .mushak-63-badge {
+                                position: absolute;
+                                right: 20px;
+                                top: 10px;
+                                border: 1.5px solid #000;
+                                padding: 3px 12px;
+                                font-weight: bold;
+                                font-size: 10.5pt;
+                                background: #fff;
+                            }
+                            .mushak-63-supplier-wrap {
+                                width: 100%;
+                                margin-bottom: 10px;
+                            }
+                            .mushak-63-supplier-box {
+                                margin-left: 34%;
+                                line-height: 1.45;
+                                font-size: 9pt;
+                            }
+                            .mushak-63-info-grid {
+                                width: 100%;
+                                border-collapse: collapse;
+                                border: none;
+                                margin-bottom: 14px;
+                                font-size: 9pt;
+                                line-height: 1.45;
+                            }
+                            .mushak-63-info-grid td {
+                                border: none;
+                                padding: 1px 0;
+                                vertical-align: top;
+                            }
+                            .mushak-63-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                border: 1px solid #000;
+                                table-layout: fixed;
+                                font-size: 8.5pt;
+                                line-height: 1.2;
+                            }
+                            .mushak-63-table th,
+                            .mushak-63-table td {
+                                border: 1px solid #000;
+                                padding: 3px 3px;
+                                vertical-align: middle;
+                                word-wrap: break-word;
+                            }
+                            .mushak-63-table th {
+                                text-align: center;
+                                font-weight: normal;
+                                background-color: #fff;
+                            }
+                            .mushak-63-data-row td {
+                                height: 17px;
+                            }
+                            .mushak-63-total-row td {
+                                height: 17px;
+                            }
+                            .mushak-63-signatory {
+                                margin-top: 16px;
+                                line-height: 1.5;
+                                font-size: 9pt;
+                            }
+                            .mushak-63-asterisk-note {
+                                margin-top: 14px;
+                                line-height: 1.4;
+                                font-size: 9pt;
+                            }
+                            .mushak-63-bottom-rule {
+                                width: 26%;
+                                border: none;
+                                border-top: 1px solid #000;
+                                margin: 110px 0 4px 0;
+                            }
+                            .mushak-63-bottom-note {
+                                font-size: 8pt;
+                                line-height: 1.3;
+                            }
+                            .text-center { text-align: center; }
+                            .text-right { text-align: right; }
+                            .text-left { text-align: left; }
+                        </style>
+
+                        <!-- Header with Monochrome Emblem, Gov Title, and মূসক-৬.৩ Badge -->
+                        <div class="mushak-63-header">
+                            <img class="mushak-63-emblem" src="data:image/png;base64,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" alt="BD Emblem"/>
+                            <div style="font-size: 10.5pt; font-weight: normal; margin-bottom: 1px;">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
+                            <div style="font-size: 11pt; font-weight: bold; margin-bottom: 8px;">জাতীয় রাজস্ব বোর্ড</div>
+                            <div class="mushak-63-badge">মূসক-৬.৩</div>
+                            <div style="font-size: 10.5pt; font-weight: bold; margin-bottom: 4px;">কর চালানপত্র</div>
+                            <div style="font-size: 9.5pt; font-weight: bold;">[ বিধি ৪০ এর উপ-বিধি (১) এর দফা (গ) ও দফা (চ) দ্রষ্টব্য ]</div>
+                        </div>
+
+                        <!-- Supplier Block -->
+                        <div class="mushak-63-supplier-wrap">
+                            <div class="mushak-63-supplier-box">
+                                <div>নিবন্ধিত ব্যক্তির নাম:</div>
+                                <div>নিবন্ধিত ব্যক্তির বিআইএন:</div>
+                                <div>চালানপত্র ইস্যুর ঠিকানা:</div>
+                            </div>
+                        </div>
+
+                        <!-- Buyer & Challan Info -->
+                        <table class="mushak-63-info-grid">
+                            <colgroup>
+                                <col style="width: 67%;"/>
+                                <col style="width: 33%;"/>
+                            </colgroup>
+                            <tr>
+                                <td>ক্রেতার নাম:</td>
+                                <td>চালানপত্র নম্বর:</td>
+                            </tr>
+                            <tr>
+                                <td>ক্রেতার বিআইএন:</td>
+                                <td>ইস্যুর তারিখ:</td>
+                            </tr>
+                            <tr>
+                                <td>সরবরাহের গন্তব্যস্থল:</td>
+                                <td>ইস্যুর সময়:</td>
+                            </tr>
+                        </table>
+
+                        <!-- 10-Column Table -->
+                        <table class="mushak-63-table">
+                            <colgroup>
+                                <col style="width: 5.5%;"/>
+                                <col style="width: 10.5%;"/>
+                                <col style="width: 10.0%;"/>
+                                <col style="width: 7.5%;"/>
+                                <col style="width: 9.0%;"/>
+                                <col style="width: 9.0%;"/>
+                                <col style="width: 11.0%;"/>
+                                <col style="width: 12.5%;"/>
+                                <col style="width: 13.5%;"/>
+                                <col style="width: 11.5%;"/>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>ক্রমিক</th>
+                                    <th>পণ্য বা<br/>সেবার<br/>বর্ণনা<br/>(প্রযোজ্য<br/>ক্ষেত্রে<br/>ব্র্যান্ড<br/>নামসহ)</th>
+                                    <th>সরবরাহের<br/>একক</th>
+                                    <th>পরিমাণ</th>
+                                    <th>একক<br/>মূল্য<sup>১</sup><br/>(টাকায়)</th>
+                                    <th>মোট<br/>মূল্য<sup>১</sup><br/>(টাকায়)</th>
+                                    <th>সম্পূরক<br/>শুল্কের<br/>পরিমাণ<br/>(টাকায়)</th>
+                                    <th>মূল্য<br/>সংযোজন<br/>করের<br/>হার/<br/>সুনির্দিষ্ট<br/>কর</th>
+                                    <th>মূল্য<br/>সংযোজন<br/>কর/<br/>সুনির্দিষ্ট<br/>কর এর<br/>পরিমাণ<br/>(টাকায়)</th>
+                                    <th>সকল<br/>প্রকার<br/>শুল্ক ও<br/>করসহ<br/>মূল্য</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="mushak-63-data-row">
+                                    <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                    <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                </tr>
+                                <tr class="mushak-63-data-row">
+                                    <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                    <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                </tr>
+                                <tr class="mushak-63-data-row">
+                                    <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                    <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                </tr>
+                                <tr class="mushak-63-total-row">
+                                    <td colspan="5" class="text-right" style="padding-right: 6px;">সর্বমোট</td>
+                                    <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Signatory Block -->
+                        <div class="mushak-63-signatory">
+                            <div>প্রতিষ্ঠান কর্তৃপক্ষের দায়িত্বপ্রাপ্ত ব্যক্তির নাম:</div>
+                            <div>পদবী :</div>
+                            <div>স্বাক্ষর:</div>
+                            <div>সীল:</div>
+                        </div>
+
+                        <!-- Asterisk Note -->
+                        <div class="mushak-63-asterisk-note">
+                            * উৎসে কর্তনযোগ্য সরবরাহের ক্ষেত্রে ফরমটি সমন্বিত কর চালানপত্র ও উৎসে কর কর্তন সনদপত্র হিসেবে বিবেচিত হইবে এবং উহা উৎসে কর কর্তনযোগ্য সরবরাহের ক্ষেত্রে প্রযোজ্য হইবে।
+                        </div>
+
+                        <!-- Bottom Rule and Footnote -->
+                        <hr class="mushak-63-bottom-rule"/>
+                        <div class="mushak-63-bottom-note">
+                            <sup>১</sup> সকল প্রকার কর ব্যতীত মূল্য” ;
+                        </div>
+
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
 </odoo>
