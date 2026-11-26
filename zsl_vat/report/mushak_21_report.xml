@@ -1,26 +1,1119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <record id="action_print_official_mushak_21" model="ir.actions.server">
-    <field name="name">Mushak 2.1 — QWeb Print</field>
-    <field name="model_id" ref="zsl_vat.model_vat_registration_application"/>
-    <field name="binding_model_id" eval="False"/>
-    <field name="state">code</field>
-    <field name="code">action = records.action_print_application()</field>
-  </record>
-  <record id="action_report_mushak_21" model="ir.actions.report">
-    <field name="name">Mushak 2.1 — Registration Application</field><field name="model">vat.registration.application</field>
-    <field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_21</field><field name="report_file">zsl_vat.report_mushak_21</field>
-    <field name="binding_model_id" ref="model_vat_registration_application"/><field name="binding_type">report</field>
-  </record>
-  <template id="report_mushak_21">
-    <t t-call="web.html_container"><t t-foreach="docs" t-as="o">
-      <t t-set="form_code" t-value="'Mushak 2.1'"/><t t-set="form_title" t-value="'VAT / Turnover Tax Registration Application'"/>
-      <t t-call="zsl_vat.mushak_qweb_layout">
-        <div class="zsl-mushak-section"><h4>করদাতার পরিচিতি / Applicant details</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Application no. / Version</td><td><span t-field="o.name"/> / <span t-field="o.version"/></td><td class="zsl-mushak-label">Registration type</td><td><span t-field="o.registration_type"/></td></tr><tr><td class="zsl-mushak-label">Legal name</td><td><span t-field="o.legal_name"/></td><td class="zsl-mushak-label">Trade name</td><td><span t-field="o.trade_name"/></td></tr><tr><td class="zsl-mushak-label">Applicant type</td><td><span t-field="o.applicant_type"/></td><td class="zsl-mushak-label">e-TIN / NID</td><td><span t-field="o.tin"/> / <span t-field="o.nid_or_passport"/></td></tr><tr><td class="zsl-mushak-label">Trade licence / RJSC</td><td><span t-field="o.trade_license_no"/> / <span t-field="o.rjsc_no"/></td><td class="zsl-mushak-label">BIDA</td><td><span t-field="o.bida_no"/></td></tr></table></div>
-        <div class="zsl-mushak-section"><h4>ঠিকানা, ব্যবসা ও আর্থিক তথ্য / Address, business and finance</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Registered address</td><td><span t-field="o.registered_address"/></td></tr><tr><td class="zsl-mushak-label">Contact address / Phone / Email</td><td><span t-field="o.contact_address"/> | <span t-field="o.phone"/> | <span t-field="o.email"/></td></tr><tr><td class="zsl-mushak-label">Business nature / activity</td><td><span t-field="o.business_nature"/> — <span t-field="o.business_activity"/></td></tr><tr><td class="zsl-mushak-label">Bank details</td><td><span t-field="o.bank_name"/> | <span t-field="o.bank_branch"/> | <span t-field="o.bank_account_no"/></td></tr><tr><td class="zsl-mushak-label">Historical / projected turnover</td><td><span t-field="o.historical_turnover"/> / <span t-field="o.projected_turnover"/></td></tr></table></div>
-        <div class="zsl-mushak-section"><h4>শাখা ও অনুমোদিত ব্যক্তি / Branches and authorised persons</h4><table class="zsl-mushak-table"><tr><th>VAT Unit / Branch</th><th>BIN</th><th>Address</th></tr><tr t-foreach="o.branch_unit_ids" t-as="unit"><td><span t-field="unit.name"/></td><td><span t-field="unit.bin"/></td><td><span t-field="unit.address"/></td></tr><tr t-if="not o.branch_unit_ids"><td colspan="3" class="zsl-mushak-muted">No branch entered</td></tr></table><table class="zsl-mushak-table"><tr><th>Name</th><th>Designation</th><th>NID / Phone</th><th>Address</th></tr><tr t-foreach="o.authorised_person_ids" t-as="person"><td><span t-field="person.name"/></td><td><span t-field="person.designation"/></td><td><span t-field="person.nid_or_passport"/> / <span t-field="person.phone"/></td><td><span t-field="person.address"/></td></tr></table></div>
-        <div class="zsl-mushak-section"><h4>Declaration</h4><table class="zsl-mushak-table"><tr><td>I declare that the information in this application is true and complete.</td></tr><tr><td>Declarant: <strong t-field="o.declaration_name"/>    Date: <strong t-field="o.declaration_date"/></td></tr></table></div>
-      </t>
-    </t></t>
-  </template>
+
+    <record id="paperformat_mushak_21_portrait" model="report.paperformat">
+        <field name="name">Mushak 2.1 Portrait</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">28</field>
+        <field name="margin_bottom">22</field>
+        <field name="margin_left">34</field>
+        <field name="margin_right">34</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="action_print_official_mushak_21" model="ir.actions.server">
+        <field name="name">Mushak 2.1 — QWeb Print</field>
+        <field name="model_id" ref="zsl_vat.model_vat_registration_application"/>
+        <field name="binding_model_id" eval="False"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_print_application()</field>
+    </record>
+
+    <record id="action_report_mushak_21" model="ir.actions.report">
+        <field name="name">Mushak 2.1 — Registration Application</field>
+        <field name="model">vat.registration.application</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">zsl_vat.report_mushak_21</field>
+        <field name="report_file">zsl_vat.report_mushak_21</field>
+        <field name="binding_model_id" ref="model_vat_registration_application"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_mushak_21_portrait"/>
+    </record>
+
+    <template id="report_mushak_21">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
+                    <div class="page mushak-21-page">
+                        <style type="text/css">
+                            * {
+                                box-sizing: border-box;
+                            }
+                            @page {
+                                size: A4 portrait;
+                                margin: 28mm 34mm 22mm 34mm;
+                            }
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
+                            .mushak-21-page {
+                                font-family: 'Liberation Serif', 'Times New Roman', Times, serif !important;
+                                color: #000;
+                                width: 100%;
+                                line-height: 1.25;
+                                font-size: 9.5pt;
+                            }
+                            .page-start {
+                                page-break-before: always;
+                            }
+                            .m21-title {
+                                text-align: center;
+                                font-weight: bold;
+                                font-size: 10.5pt;
+                                line-height: 1.45;
+                                margin-bottom: 4px;
+                            }
+                            .m21-badge {
+                                text-align: right;
+                                font-weight: bold;
+                                font-size: 10pt;
+                                margin-bottom: 2px;
+                            }
+                            .m21-notice-box {
+                                border: 1.5px solid #000;
+                                padding: 4px 6px;
+                                font-weight: bold;
+                                font-size: 9.5pt;
+                                line-height: 1.22;
+                                margin-bottom: 14px;
+                            }
+                            .sec-banner {
+                                background-color: #dce6f1 !important;
+                                font-weight: bold;
+                                font-size: 9.5pt;
+                                padding: 2px 6px;
+                                margin: 8px 0 4px 0;
+                            }
+                            .m21-grid {
+                                width: 100%;
+                                border-collapse: collapse;
+                                border: none;
+                                font-size: 9.5pt;
+                            }
+                            .m21-grid td {
+                                border: none;
+                                padding: 4px 2px;
+                                vertical-align: middle;
+                            }
+                            .chk-box {
+                                display: inline-block;
+                                background-color: #c5d9f1 !important;
+                                border: 1px solid #000;
+                                vertical-align: middle;
+                            }
+                            .chk-sm { width: 18px; height: 18px; }
+                            .chk-md { width: 28px; height: 18px; }
+                            .chk-lg { width: 32px; height: 26px; }
+                            .chk-tall { width: 22px; height: 26px; }
+                            .chk-v-tall { width: 26px; height: 50px; }
+                            .chk-v-tall-sm { width: 18px; height: 50px; }
+                            .input-box {
+                                background-color: #fde9d9 !important;
+                                border: 1px solid #000;
+                                height: 22px;
+                                width: 100%;
+                            }
+                            .input-box-tall {
+                                background-color: #fde9d9 !important;
+                                border: 1px solid #000;
+                                height: 34px;
+                                width: 100%;
+                            }
+                            .input-box-xtall {
+                                background-color: #fde9d9 !important;
+                                border: 1px solid #000;
+                                height: 52px;
+                                width: 100%;
+                            }
+                            .split-table {
+                                width: 100%;
+                                border-collapse: separate;
+                                border-spacing: 14px 10px;
+                                margin-left: -14px;
+                                font-size: 9pt;
+                            }
+                            .green-hdr {
+                                background-color: #9bbb59 !important;
+                                font-weight: bold;
+                                text-align: center;
+                                padding: 4px 4px;
+                                vertical-align: middle;
+                            }
+                            .green-cell {
+                                background-color: #ebf1de !important;
+                                padding: 4px 6px;
+                                height: 22px;
+                            }
+                            .green-cell-b {
+                                background-color: #ebf1de !important;
+                                border: 1px solid #000;
+                                padding: 4px 6px;
+                                height: 22px;
+                            }
+                            .tan-hdr {
+                                background-color: #c4bd97 !important;
+                                font-weight: bold;
+                                text-align: center;
+                                padding: 4px 4px;
+                                vertical-align: middle;
+                            }
+                            .tan-cell {
+                                background-color: #ddd9c3 !important;
+                                border: 1px solid #000;
+                                padding: 3px 6px;
+                                height: 22px;
+                            }
+                            .peach-hdr-table {
+                                border-collapse: collapse;
+                                width: 100%;
+                                font-size: 9pt;
+                            }
+                            .peach-hdr-table th,
+                            .peach-hdr-table td {
+                                border: 1px solid #000;
+                                padding: 4px 4px;
+                                vertical-align: middle;
+                            }
+                            .peach-hdr-table th {
+                                background-color: #fabf8f !important;
+                                font-weight: bold;
+                                text-align: center;
+                            }
+                            .peach-hdr-table td {
+                                background-color: #fde9d9 !important;
+                                height: 20px;
+                            }
+                            .orange-tbl {
+                                border-collapse: collapse;
+                                width: 100%;
+                                font-size: 9pt;
+                            }
+                            .orange-tbl th,
+                            .orange-tbl td {
+                                border: 1px solid #000;
+                                padding: 3px 4px;
+                                vertical-align: middle;
+                            }
+                            .orange-tbl th {
+                                background-color: #fabf8f !important;
+                                font-weight: bold;
+                                text-align: center;
+                            }
+                            .orange-tbl td {
+                                background-color: #ffffff !important;
+                                height: 19px;
+                            }
+                            .italic-note {
+                                font-style: italic;
+                                font-size: 9pt;
+                                margin-top: 2px;
+                            }
+                        </style>
+
+                        <!-- ================= PAGE 1 ================= -->
+                        <div class="mushak-21-p1">
+                            <div class="m21-title">
+                                <div>Government of the People's Republic of Bangladesh</div>
+                                <div style="margin-top: 4px;">National Board of Revenue</div>
+                                <div style="margin-top: 4px;">VAT/Turnover Tax Registration Form</div>
+                            </div>
+                            <div class="m21-badge">Mushak-2.1</div>
+                            <div class="m21-notice-box">
+                                This form will be used for the taxpayers required/willing to get registered/enlistment under the Value Added Tax and Supplementary Duty Act, 2012. Please read the instructions pages at the end of this form carefully and fill ALL applicable fields correctly. Please contact our help-desk at 16555 if you need any assistance.
+                            </div>
+
+                            <div class="sec-banner">A. REGISTRATION BASICS</div>
+                            <table class="m21-grid" style="margin-bottom: 6px;">
+                                <colgroup>
+                                    <col style="width: 24%;"/>
+                                    <col style="width: 14%;"/>
+                                    <col style="width: 14%;"/>
+                                    <col style="width: 20%;"/>
+                                    <col style="width: 28%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td style="vertical-align: top; padding-top: 2px;">A1. Registration<br/>Category</td>
+                                    <td style="text-align: right; padding-right: 8px; vertical-align: bottom;">New</td>
+                                    <td style="vertical-align: bottom;"><span class="chk-box chk-md">&#160;</span></td>
+                                    <td style="text-align: right; padding-right: 8px; vertical-align: bottom;">Re-registration</td>
+                                    <td style="vertical-align: bottom;"><span class="chk-box chk-sm">&#160;</span></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">&#160;</td>
+                                    <td style="text-align: right; padding-right: 8px; line-height: 1.15;">Old 11 Digit<br/>BIN</td>
+                                    <td><div class="input-box" style="height: 26px;">&#160;</div></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">&#160;</td>
+                                    <td style="text-align: right; padding-right: 8px; line-height: 1.15; vertical-align: top; padding-top: 6px;">Name of<br/>Company</td>
+                                    <td>
+                                        <div class="input-box" style="height: 24px;">&#160;</div>
+                                        <div style="background-color: #fde9d9 !important; height: 14px; width: 100%;">&#160;</div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <div class="sec-banner" style="margin-top: 2px;">B. BUSINESS<br/>&#160;&#160;&#160;&#160;INFORMATION</div>
+                            <div style="margin-bottom: 10px;">B1. Type of<br/>ownership:</div>
+
+                            <table class="m21-grid" style="margin-bottom: 16px;">
+                                <colgroup>
+                                    <col style="width: 25%;"/>
+                                    <col style="width: 24%;"/>
+                                    <col style="width: 22%;"/>
+                                    <col style="width: 29%;"/>
+                                </colgroup>
+                                <tr style="height: 44px;">
+                                    <td>(a) Proprietorship:</td>
+                                    <td><span class="chk-box chk-lg">&#160;</span></td>
+                                    <td>(b)<br/>Partnership:</td>
+                                    <td><span class="chk-box chk-tall">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 44px;">
+                                    <td>(c) Private Limited</td>
+                                    <td><span class="chk-box chk-lg">&#160;</span></td>
+                                    <td>(d) Public<br/>Limited</td>
+                                    <td><span class="chk-box chk-tall">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 44px;">
+                                    <td>(e) International<br/>Organization</td>
+                                    <td><span class="chk-box chk-lg">&#160;</span></td>
+                                    <td>(f) Diplomatic<br/>Mission</td>
+                                    <td><span class="chk-box chk-tall">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 40px;">
+                                    <td>(g) Government</td>
+                                    <td><span class="chk-box chk-lg">&#160;</span></td>
+                                    <td>(h) NGO</td>
+                                    <td><span class="chk-box chk-sm">&#160;</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: middle;">(i) Educational<br/>Inst.</td>
+                                    <td style="vertical-align: top;"><span class="chk-box" style="width: 32px; height: 38px;">&#160;</span></td>
+                                    <td style="vertical-align: middle;">(j) Other</td>
+                                    <td style="vertical-align: top;">
+                                        <table style="width: 100%; border-collapse: collapse; border: none;">
+                                            <tr>
+                                                <td style="border: none; padding: 0; width: 22px; vertical-align: top;"><span class="chk-box" style="width: 20px; height: 42px;">&#160;</span></td>
+                                                <td style="border: none; padding: 0 0 0 8px; font-style: italic; text-align: center; font-size: 9pt; vertical-align: top;">[Please specify<br/>in the field<br/>below]</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="border: none; padding: 2px 0 0 0;"><div class="input-box" style="height: 18px;">&#160;</div></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <div style="margin-top: 14px;">B2. Are you a</div>
+                        </div>
+
+                        <!-- ================= PAGE 2 ================= -->
+                        <div class="mushak-21-p2 page-start">
+                            <div style="margin-bottom: 4px;">Withholding<br/>Entity:</div>
+                            <table class="m21-grid" style="margin-bottom: 12px;">
+                                <colgroup>
+                                    <col style="width: 26%;"/>
+                                    <col style="width: 36%;"/>
+                                    <col style="width: 10%;"/>
+                                    <col style="width: 28%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td style="text-align: right; padding-right: 8px;">Yes</td>
+                                    <td><span class="chk-box chk-lg" style="height: 18px;">&#160;</span></td>
+                                    <td style="text-align: right; padding-right: 8px;">No</td>
+                                    <td><span class="chk-box chk-sm">&#160;</span></td>
+                                </tr>
+                            </table>
+
+                            <div class="sec-banner">C. General<br/>Information</div>
+                            <table class="m21-grid" style="margin-bottom: 10px;">
+                                <colgroup>
+                                    <col style="width: 26%;"/>
+                                    <col style="width: 45%;"/>
+                                    <col style="width: 16%;"/>
+                                    <col style="width: 13%;"/>
+                                </colgroup>
+                                <tr style="height: 36px;">
+                                    <td>C1. Trade License<br/>No (if applicable)</td>
+                                    <td><div class="input-box" style="height: 26px;">&#160;</div></td>
+                                    <td style="text-align: right; padding-right: 8px;">Issue<br/>Date</td>
+                                    <td><div class="input-box" style="height: 28px;">&#160;</div></td>
+                                </tr>
+                                <tr style="height: 44px;">
+                                    <td>C2. RJSC<br/>Incorporation<br/>number <i>(if any)</i></td>
+                                    <td><div class="input-box" style="height: 30px;">&#160;</div></td>
+                                    <td style="text-align: right; padding-right: 8px;">Issue<br/>Date</td>
+                                    <td><div class="input-box" style="height: 38px;">&#160;</div></td>
+                                </tr>
+                                <tr style="height: 36px;">
+                                    <td>C3. e-TIN <i>(if<br/>applicable)</i></td>
+                                    <td><div class="input-box" style="height: 24px;">&#160;</div></td>
+                                    <td colspan="2">&#160;</td>
+                                </tr>
+                                <tr style="height: 46px;">
+                                    <td>C4. Name of the<br/>Company<br/><div style="margin-top: 6px;">(As in e-TIN)</div></td>
+                                    <td style="vertical-align: top; padding-top: 6px;"><div class="input-box" style="height: 24px;">&#160;</div></td>
+                                    <td colspan="2">&#160;</td>
+                                </tr>
+                                <tr style="height: 48px;">
+                                    <td>C5. Name of the<br/>Company<br/><i>(If different than in<br/>e-TIN)</i></td>
+                                    <td style="vertical-align: top; padding-top: 6px;"><div class="input-box" style="height: 22px;">&#160;</div></td>
+                                    <td colspan="2" style="padding-left: 16px; font-style: italic; vertical-align: top; padding-top: 8px;">(Where<br/>applicable)</td>
+                                </tr>
+                                <tr style="height: 40px;">
+                                    <td>C6. Trading Brand<br/>Name <i>(if any)</i></td>
+                                    <td><div class="input-box" style="height: 24px;">&#160;</div></td>
+                                    <td colspan="2">&#160;</td>
+                                </tr>
+                            </table>
+
+                            <div style="margin-bottom: 4px;">C7. Registration<br/>Type</div>
+                            <table class="m21-grid" style="margin-bottom: 6px;">
+                                <colgroup>
+                                    <col style="width: 26%;"/>
+                                    <col style="width: 24%;"/>
+                                    <col style="width: 22%;"/>
+                                    <col style="width: 28%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td style="text-align: right; padding-right: 8px;">VAT</td>
+                                    <td><span class="chk-box chk-lg" style="height: 18px;">&#160;</span></td>
+                                    <td style="text-align: right; padding-right: 8px;">Turnover Tax</td>
+                                    <td><span class="chk-box chk-sm">&#160;</span></td>
+                                </tr>
+                            </table>
+
+                            <div style="margin-bottom: 2px;">C8. Equity<br/>Information</div>
+                            <table class="m21-grid" style="margin-bottom: 12px;">
+                                <colgroup>
+                                    <col style="width: 25%;"/>
+                                    <col style="width: 11%;"/>
+                                    <col style="width: 8%;"/>
+                                    <col style="width: 10%;"/>
+                                    <col style="width: 16%;"/>
+                                    <col style="width: 30%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td style="text-align: right; padding-right: 6px; vertical-align: bottom;">100% Local</td>
+                                    <td style="vertical-align: top;"><span class="chk-box chk-v-tall">&#160;</span></td>
+                                    <td style="text-align: center; vertical-align: middle; font-size: 8.5pt; line-height: 1.15;">100<br/>%<br/>Fore<br/>ign</td>
+                                    <td style="vertical-align: top;"><span class="chk-box chk-v-tall">&#160;</span></td>
+                                    <td style="text-align: right; padding-right: 4px; vertical-align: bottom; font-size: 9pt;">Joint Venture<br/>Local Share<br/>(%)</td>
+                                    <td style="vertical-align: top;">
+                                        <div><span class="chk-box chk-v-tall-sm">&#160;</span></div>
+                                        <div class="input-box" style="height: 24px; width: 65px; margin-top: 2px;">&#160;</div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table class="m21-grid" style="margin-bottom: 14px;">
+                                <colgroup>
+                                    <col style="width: 26%;"/>
+                                    <col style="width: 45%;"/>
+                                    <col style="width: 16%;"/>
+                                    <col style="width: 13%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td>C9. BIDA<br/>Registration<br/>Number <i>(if any)</i></td>
+                                    <td><div class="input-box" style="width: 115px; height: 38px;">&#160;</div></td>
+                                    <td style="text-align: right; padding-right: 8px;">Issue<br/>Date</td>
+                                    <td><div class="input-box" style="height: 38px;">&#160;</div></td>
+                                </tr>
+                            </table>
+
+                            <div class="sec-banner" style="text-decoration: underline;">D. CONTACT<br/>INFORMATION</div>
+                        </div>
+
+                        <!-- ================= PAGE 3 ================= -->
+                        <div class="mushak-21-p3 page-start">
+                            <table class="m21-grid">
+                                <colgroup>
+                                    <col style="width: 26%;"/>
+                                    <col style="width: 46%;"/>
+                                    <col style="width: 28%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td style="vertical-align: top;">D1.<br/>Factory/Business<br/>Operations<br/>Address</td>
+                                    <td style="vertical-align: top;">
+                                        <div class="input-box-xtall" style="border-bottom: none;">&#160;</div>
+                                        <div style="background-color: #fde9d9 !important; height: 14px; width: 100%;">&#160;</div>
+                                    </td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr style="height: 30px;">
+                                    <td>D2. District</td>
+                                    <td><div class="input-box" style="height: 18px;">&#160;</div></td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr style="height: 30px;">
+                                    <td>D3. Police Station</td>
+                                    <td><div class="input-box" style="height: 18px;">&#160;</div></td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr style="height: 30px;">
+                                    <td>D4. Post Code</td>
+                                    <td><div class="input-box" style="height: 18px;">&#160;</div></td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: top; padding-top: 6px;">D5. Land<br/>Telephone Number<br/>(if any)</td>
+                                    <td style="vertical-align: top; padding-top: 6px;">
+                                        <div class="input-box" style="height: 32px;">&#160;</div>
+                                        <div style="font-size: 8.8pt; line-height: 1.15; margin-top: 2px;">(District<br/>code+phone<br/>number)</div>
+                                    </td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: top; padding-top: 6px;">D6. Mobile<br/>Telephone Number</td>
+                                    <td style="vertical-align: top; padding-top: 6px;">
+                                        <div class="input-box" style="height: 26px;">&#160;</div>
+                                        <div style="font-size: 8.8pt; line-height: 1.15; margin-top: 2px;">(e.g.<br/>01XXXX<br/>XXXXX)</div>
+                                    </td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr style="height: 30px;">
+                                    <td>D7. e-Mail</td>
+                                    <td><div class="input-box" style="height: 18px;">&#160;</div></td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: top; padding-top: 6px;">D8. Fax Number (<br/>if any)</td>
+                                    <td style="vertical-align: top; padding-top: 6px;">
+                                        <div class="input-box" style="height: 26px;">&#160;</div>
+                                        <div style="font-size: 8.8pt; line-height: 1.15; margin-top: 2px;">(District<br/>code+phone<br/>number)</div>
+                                    </td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr style="height: 36px;">
+                                    <td>D9. Web address<br/>(if any)</td>
+                                    <td><div class="input-box" style="height: 24px;">&#160;</div></td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: top; padding-top: 6px;">D10. Registered<br/>HQ Address <i>[If<br/>different than<br/>address of D1] (if<br/>any)</i></td>
+                                    <td style="vertical-align: top; padding-top: 6px;"><div class="input-box-xtall" style="height: 58px;">&#160;</div></td>
+                                    <td>&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: top; padding-top: 6px;">D11. Registered<br/>HQ Address<br/>outside Bangladesh<br/><i>[for 100% foreign<br/>ownership] (if any)</i></td>
+                                    <td style="vertical-align: top; padding-top: 6px;"><div class="input-box-xtall" style="height: 58px;">&#160;</div></td>
+                                    <td>&#160;</td>
+                                </tr>
+                            </table>
+
+                            <div class="sec-banner" style="margin-top: 12px;">E. LIST OF BRANCH UNITS YOU WISH TO BRING UNDER<br/>CENTRAL REGISTRATION</div>
+                        </div>
+
+                        <!-- ================= PAGE 4 ================= -->
+                        <div class="mushak-21-p4 page-start">
+                            <table class="split-table">
+                                <colgroup>
+                                    <col style="width: 28%;"/>
+                                    <col style="width: 12%;"/>
+                                    <col style="width: 22%;"/>
+                                    <col style="width: 12%;"/>
+                                    <col style="width: 12%;"/>
+                                </colgroup>
+                                <tr>
+                                    <th class="green-hdr" style="vertical-align: bottom;">Branch Address</th>
+                                    <th class="green-hdr">Branc<br/>h<br/>Name</th>
+                                    <th class="green-hdr" style="vertical-align: bottom;">Category</th>
+                                    <th class="green-hdr">Annual<br/>Turnove<br/>r</th>
+                                    <th class="green-hdr" style="vertical-align: bottom;">BIN (if<br/>any)</th>
+                                </tr>
+                                <tr>
+                                    <td class="green-cell">1.</td>
+                                    <td class="green-cell">&#160;</td>
+                                    <td class="green-cell">&#160;</td>
+                                    <td class="green-cell">&#160;</td>
+                                    <td class="green-cell">&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td class="green-cell">2.</td>
+                                    <td class="green-cell">&#160;</td>
+                                    <td class="green-cell">&#160;</td>
+                                    <td class="green-cell">&#160;</td>
+                                    <td class="green-cell">&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td class="green-cell">3.</td>
+                                    <td class="green-cell">&#160;</td>
+                                    <td class="green-cell">&#160;</td>
+                                    <td class="green-cell">&#160;</td>
+                                    <td class="green-cell">&#160;</td>
+                                </tr>
+                            </table>
+                            <div class="italic-note" style="margin-bottom: 6px;">[Use separate sheet to add more branch information]</div>
+
+                            <div class="sec-banner">F. MAJOR AREA<br/>OF ECONOMIC<br/>ACTIVITY</div>
+                            <table class="m21-grid" style="margin-bottom: 12px;">
+                                <colgroup>
+                                    <col style="width: 26%;"/>
+                                    <col style="width: 10%;"/>
+                                    <col style="width: 10%;"/>
+                                    <col style="width: 30%;"/>
+                                    <col style="width: 11%;"/>
+                                    <col style="width: 13%;"/>
+                                </colgroup>
+                                <tr style="height: 34px;">
+                                    <td>F1. Manufacturing</td>
+                                    <td><span class="chk-box chk-lg" style="height: 18px;">&#160;</span></td>
+                                    <td colspan="4">&#160;</td>
+                                </tr>
+                                <tr style="height: 34px;">
+                                    <td>F2. Services</td>
+                                    <td><span class="chk-box chk-lg" style="height: 18px;">&#160;</span></td>
+                                    <td colspan="4">&#160;</td>
+                                </tr>
+                                <tr style="height: 52px;">
+                                    <td>F3. Imports</td>
+                                    <td><span class="chk-box chk-lg" style="height: 36px;">&#160;</span></td>
+                                    <td style="padding-left: 6px; line-height: 1.15;">IRC<br/>Num<br/>ber</td>
+                                    <td><div class="input-box" style="height: 38px;">&#160;</div></td>
+                                    <td style="text-align: right; padding-right: 6px;">Issue<br/>Date</td>
+                                    <td><div class="input-box" style="height: 38px;">&#160;</div></td>
+                                </tr>
+                                <tr style="height: 52px;">
+                                    <td>F4. Exports</td>
+                                    <td><span class="chk-box chk-lg" style="height: 36px;">&#160;</span></td>
+                                    <td style="padding-left: 6px; line-height: 1.15;">ERC<br/>Num<br/>ber</td>
+                                    <td><div class="input-box" style="height: 38px;">&#160;</div></td>
+                                    <td style="text-align: right; padding-right: 6px;">Issue<br/>Date</td>
+                                    <td><div class="input-box" style="height: 38px;">&#160;</div></td>
+                                </tr>
+                                <tr style="height: 56px;">
+                                    <td>F5. Other</td>
+                                    <td><span class="chk-box chk-lg" style="height: 48px;">&#160;</span></td>
+                                    <td style="padding-left: 6px; line-height: 1.15;">Plea<br/>se<br/>Spec<br/>ify</td>
+                                    <td><div class="input-box" style="height: 48px;">&#160;</div></td>
+                                    <td colspan="2">&#160;</td>
+                                </tr>
+                            </table>
+
+                            <div class="sec-banner">G. AREAS OF MANUFACTURING<br/>[MANDATORY IF TAXPAYER SELECT<br/>"MANUFACTURING" IN FIELD F1]</div>
+                            <table class="m21-grid">
+                                <colgroup>
+                                    <col style="width: 26%;"/>
+                                    <col style="width: 24%;"/>
+                                    <col style="width: 22%;"/>
+                                    <col style="width: 28%;"/>
+                                </colgroup>
+                                <tr style="height: 42px;">
+                                    <td>1.<br/>Agriculture/Forestr<br/>y/Fisheries</td>
+                                    <td><span class="chk-box chk-lg" style="height: 36px;">&#160;</span></td>
+                                    <td>2. Edible Oil</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 34px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 40px;">
+                                    <td>3. Food &amp;<br/>Beverage</td>
+                                    <td><span class="chk-box chk-lg" style="height: 22px;">&#160;</span></td>
+                                    <td>4. Tobacco</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 22px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 40px;">
+                                    <td>5. Ores &amp; Minerals</td>
+                                    <td><span class="chk-box chk-lg" style="height: 22px;">&#160;</span></td>
+                                    <td>6. Chemical<br/>Products</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 22px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 34px;">
+                                    <td>7. Plastic &amp; Rubber</td>
+                                    <td><span class="chk-box chk-lg" style="height: 18px;">&#160;</span></td>
+                                    <td>8. Leather &amp;</td>
+                                    <td><span class="chk-box chk-sm">&#160;</span></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- ================= PAGE 5 ================= -->
+                        <div class="mushak-21-p5 page-start">
+                            <table class="m21-grid" style="margin-bottom: 12px;">
+                                <colgroup>
+                                    <col style="width: 26%;"/>
+                                    <col style="width: 24%;"/>
+                                    <col style="width: 22%;"/>
+                                    <col style="width: 28%;"/>
+                                </colgroup>
+                                <tr style="height: 38px;">
+                                    <td>Products</td>
+                                    <td><span class="chk-box chk-lg" style="height: 22px;">&#160;</span></td>
+                                    <td>Leather<br/>Products</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 26px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 46px;">
+                                    <td>9. Wood, Wooden<br/>Products &amp;<br/>Furniture</td>
+                                    <td><span class="chk-box chk-lg" style="height: 36px;">&#160;</span></td>
+                                    <td>10. Paper &amp;<br/>Paper Products</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 34px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 44px;">
+                                    <td>11. Textiles &amp;<br/>Apparels</td>
+                                    <td><span class="chk-box chk-lg" style="height: 26px;">&#160;</span></td>
+                                    <td>12. Glass,<br/>Ceramic &amp;<br/>Stone Articles</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 36px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 44px;">
+                                    <td>13. Jewelry</td>
+                                    <td><span class="chk-box chk-lg" style="height: 22px;">&#160;</span></td>
+                                    <td>14. Iron, Steel<br/>&amp; Other Metal<br/>Products</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 36px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 40px;">
+                                    <td>15. Machinery &amp;<br/>equipment</td>
+                                    <td><span class="chk-box chk-lg" style="height: 26px;">&#160;</span></td>
+                                    <td>16. Electrical<br/>&amp; Electronics</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 26px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 36px;">
+                                    <td>17. Automobiles</td>
+                                    <td><span class="chk-box chk-lg" style="height: 24px;">&#160;</span></td>
+                                    <td>18. Cycles &amp;<br/>Motorcycles</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 26px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 34px;">
+                                    <td>19. Watercraft</td>
+                                    <td><span class="chk-box chk-lg" style="height: 18px;">&#160;</span></td>
+                                    <td>20. Aviation</td>
+                                    <td><span class="chk-box chk-sm">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 42px;">
+                                    <td>21. Optical<br/>Instruments (e.g.<br/>spectacles, camera)</td>
+                                    <td><span class="chk-box chk-lg" style="height: 26px;">&#160;</span></td>
+                                    <td>22. Others</td>
+                                    <td><span class="chk-box chk-sm">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 36px;">
+                                    <td colspan="2">&#160;</td>
+                                    <td>(Please<br/>specify)</td>
+                                    <td><div class="input-box" style="height: 24px;">&#160;</div></td>
+                                </tr>
+                            </table>
+
+                            <div class="sec-banner">H. AREAS OF SERVICE [MANDATORY IF<br/>TAXPAYER SELECT "SERVICES" IN FIELD F2]</div>
+                            <table class="m21-grid">
+                                <colgroup>
+                                    <col style="width: 26%;"/>
+                                    <col style="width: 24%;"/>
+                                    <col style="width: 22%;"/>
+                                    <col style="width: 28%;"/>
+                                </colgroup>
+                                <tr style="height: 44px;">
+                                    <td>1. Construction</td>
+                                    <td><span class="chk-box chk-lg" style="height: 36px;">&#160;</span></td>
+                                    <td>2. Trading<br/>including e-<br/>Commerce</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 36px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 36px;">
+                                    <td>3. Real Estate</td>
+                                    <td><span class="chk-box chk-lg" style="height: 18px;">&#160;</span></td>
+                                    <td>4. Transport</td>
+                                    <td><span class="chk-box chk-sm">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 44px;">
+                                    <td>5.<br/>Electricity/Gas/Wa<br/>ter Supply</td>
+                                    <td><span class="chk-box chk-lg" style="height: 36px;">&#160;</span></td>
+                                    <td>6. Financial<br/>Institution</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 36px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 40px;">
+                                    <td>7. Hotel &amp; Guest<br/>Houses</td>
+                                    <td><span class="chk-box chk-lg" style="height: 24px;">&#160;</span></td>
+                                    <td>8. Restaurants</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 24px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 34px;">
+                                    <td>9. Rental &amp;</td>
+                                    <td><span class="chk-box chk-lg" style="height: 18px;">&#160;</span></td>
+                                    <td>10. Research &amp;</td>
+                                    <td><span class="chk-box chk-sm">&#160;</span></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- ================= PAGE 6 ================= -->
+                        <div class="mushak-21-p6 page-start">
+                            <table class="m21-grid" style="margin-bottom: 10px;">
+                                <colgroup>
+                                    <col style="width: 26%;"/>
+                                    <col style="width: 24%;"/>
+                                    <col style="width: 22%;"/>
+                                    <col style="width: 28%;"/>
+                                </colgroup>
+                                <tr style="height: 34px;">
+                                    <td>Leasing Service</td>
+                                    <td><span class="chk-box chk-lg" style="height: 18px;">&#160;</span></td>
+                                    <td>Consultancy</td>
+                                    <td><span class="chk-box chk-sm">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 40px;">
+                                    <td>11. Healthcare</td>
+                                    <td><span class="chk-box chk-lg" style="height: 24px;">&#160;</span></td>
+                                    <td>12. Education<br/>&amp; Training</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 26px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 46px;">
+                                    <td>13.<br/>Telecommunicatio<br/>n &amp; Internet</td>
+                                    <td><span class="chk-box chk-lg" style="height: 36px;">&#160;</span></td>
+                                    <td>14. Software &amp;<br/>ITES</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 34px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 44px;">
+                                    <td>15. Sports &amp;<br/>entertainment</td>
+                                    <td><span class="chk-box chk-lg" style="height: 26px;">&#160;</span></td>
+                                    <td>16. Event<br/>Management<br/>&amp; Catering</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 36px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 44px;">
+                                    <td>17. Workshop &amp;<br/>Engineering</td>
+                                    <td><span class="chk-box chk-lg" style="height: 26px;">&#160;</span></td>
+                                    <td>18. Tour<br/>Operator &amp;<br/>Travel Agent</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 36px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 46px;">
+                                    <td>19. Advertising &amp;<br/>Promotion</td>
+                                    <td><span class="chk-box chk-lg" style="height: 26px;">&#160;</span></td>
+                                    <td>20. Customs<br/>Brokerage &amp;<br/>Freight<br/>Forwarding</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 26px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 40px;">
+                                    <td>21. Radio &amp; TV<br/>Operations</td>
+                                    <td><span class="chk-box chk-lg" style="height: 26px;">&#160;</span></td>
+                                    <td>22.<br/>Consultancy</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 26px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 34px;">
+                                    <td>23. Others</td>
+                                    <td><span class="chk-box chk-lg" style="height: 18px;">&#160;</span></td>
+                                    <td colspan="2">&#160;</td>
+                                </tr>
+                                <tr style="height: 34px;">
+                                    <td>(Please specify)</td>
+                                    <td colspan="3"><div class="input-box" style="width: 65%; height: 20px;">&#160;</div></td>
+                                </tr>
+                            </table>
+
+                            <div class="sec-banner">I. BUSINESS CLASSIFICATION CODE [MANDATORY IF<br/>TAXPAYER SELECT "MANUFACTURING" IN FIELD F1 AND/OR<br/>"SERVICES" IN FIELD F2]</div>
+                            <table class="m21-grid" style="margin-top: 8px; margin-bottom: 4px;">
+                                <colgroup>
+                                    <col style="width: 72%;"/>
+                                    <col style="width: 28%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td style="vertical-align: top; padding: 0;">
+                                        <table class="peach-hdr-table">
+                                            <colgroup>
+                                                <col style="width: 38%;"/>
+                                                <col style="width: 24%;"/>
+                                                <col style="width: 38%;"/>
+                                            </colgroup>
+                                            <tr>
+                                                <th>Commercial<br/>Description of<br/>Supply</th>
+                                                <th>H.S/Servi<br/>ce Code</th>
+                                                <th>Description of<br/>H.S/Service Code</th>
+                                            </tr>
+                                            <tr><td>1.</td><td>&#160;</td><td>&#160;</td></tr>
+                                            <tr><td>2.</td><td>&#160;</td><td>&#160;</td></tr>
+                                            <tr><td>3.</td><td>&#160;</td><td>&#160;</td></tr>
+                                        </table>
+                                        <div style="font-size: 9pt; line-height: 1.15; margin-top: 2px;">[Use separate sheet<br/>to add more<br/>information]</div>
+                                    </td>
+                                    <td style="vertical-align: top; padding: 4px 4px 0 12px; text-align: center; font-style: italic; font-size: 7.8pt; line-height: 1.25;">
+                                        [USE SEPARATE<br/>CODE FOR EACH<br/>SUPPLY<br/>ACCORDING TO<br/>YOUR SELECTION<br/>IN SECTION "G'<br/>AND/OR "H"<br/>ABOVE]
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <div class="sec-banner" style="margin-top: 6px;">J. BANK ACCOUNT DETAILS</div>
+                            <table class="split-table" style="margin-top: 6px;">
+                                <colgroup>
+                                    <col style="width: 27%;"/>
+                                    <col style="width: 10%;"/>
+                                    <col style="width: 25%;"/>
+                                    <col style="width: 25%;"/>
+                                </colgroup>
+                                <tr>
+                                    <th class="green-hdr">Account Name</th>
+                                    <th class="green-hdr">Bank<br/>Name</th>
+                                    <th class="green-hdr">Account<br/>Number</th>
+                                    <th class="green-hdr">Branch</th>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- ================= PAGE 7 ================= -->
+                        <div class="mushak-21-p7 page-start">
+                            <table class="split-table" style="margin-bottom: 2px;">
+                                <colgroup>
+                                    <col style="width: 27%;"/>
+                                    <col style="width: 10%;"/>
+                                    <col style="width: 25%;"/>
+                                    <col style="width: 25%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td class="green-cell-b">1.</td>
+                                    <td class="green-cell-b">&#160;</td>
+                                    <td class="green-cell-b">&#160;</td>
+                                    <td class="green-cell-b">&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td class="green-cell-b">2.</td>
+                                    <td class="green-cell-b">&#160;</td>
+                                    <td class="green-cell-b">&#160;</td>
+                                    <td class="green-cell-b">&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td class="green-cell-b">3.</td>
+                                    <td class="green-cell-b">&#160;</td>
+                                    <td class="green-cell-b">&#160;</td>
+                                    <td class="green-cell-b">&#160;</td>
+                                </tr>
+                            </table>
+                            <div class="italic-note" style="margin-bottom: 14px;">[Add separate sheet for more bank accounts]</div>
+
+                            <div class="sec-banner" style="margin-bottom: 0;">K. INFORMATION ABOUT OWNERS/DIRECTORS/Head of Entity</div>
+                            <table class="split-table" style="margin-top: 0; margin-bottom: 2px;">
+                                <colgroup>
+                                    <col style="width: 27%;"/>
+                                    <col style="width: 10%;"/>
+                                    <col style="width: 25%;"/>
+                                    <col style="width: 25%;"/>
+                                </colgroup>
+                                <tr>
+                                    <th class="tan-hdr">Full Name</th>
+                                    <th class="tan-hdr">Share<br/>(%)</th>
+                                    <th class="tan-hdr">NID/Passport<br/>Number &amp;<br/>Issuing Country</th>
+                                    <th class="tan-hdr">e-TIN</th>
+                                </tr>
+                                <tr>
+                                    <td class="tan-cell">1.</td>
+                                    <td class="tan-cell">&#160;</td>
+                                    <td class="tan-cell">&#160;</td>
+                                    <td class="tan-cell">&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td class="tan-cell">2.</td>
+                                    <td class="tan-cell">&#160;</td>
+                                    <td class="tan-cell">&#160;</td>
+                                    <td class="tan-cell">&#160;</td>
+                                </tr>
+                                <tr>
+                                    <td class="tan-cell">3.</td>
+                                    <td class="tan-cell">&#160;</td>
+                                    <td class="tan-cell">&#160;</td>
+                                    <td class="tan-cell">&#160;</td>
+                                </tr>
+                            </table>
+                            <div class="italic-note" style="margin-bottom: 14px;">[Add separate sheet for more owners/directors. For foreign nationals use Passport Number and issuing country]</div>
+
+                            <div class="sec-banner">L. BUSINESS OPERATIONS</div>
+                            <table class="m21-grid" style="margin-top: 8px;">
+                                <colgroup>
+                                    <col style="width: 42%;"/>
+                                    <col style="width: 30%;"/>
+                                    <col style="width: 12%;"/>
+                                    <col style="width: 16%;"/>
+                                </colgroup>
+                                <tr style="height: 44px;">
+                                    <td>L1. Taxable turnover in past 12<br/>months period <i>(if applicable)</i></td>
+                                    <td><div class="input-box" style="height: 26px; padding: 3px 6px;">BDT</div></td>
+                                    <td colspan="2">&#160;</td>
+                                </tr>
+                                <tr style="height: 44px;">
+                                    <td>L2. Projected turnover in<br/>next 12 months period</td>
+                                    <td><div class="input-box" style="height: 26px; padding: 3px 6px;">BDT</div></td>
+                                    <td colspan="2">&#160;</td>
+                                </tr>
+                                <tr style="height: 36px;">
+                                    <td>L3. No of employees</td>
+                                    <td><div class="input-box" style="width: 48px; height: 20px;">&#160;</div></td>
+                                    <td colspan="2">&#160;</td>
+                                </tr>
+                                <tr style="height: 44px;">
+                                    <td>L4. Are you making any<br/>zero rated supply</td>
+                                    <td><span style="padding-right: 12px;">Yes</span><span class="chk-box chk-lg" style="height: 26px;">&#160;</span></td>
+                                    <td style="text-align: right; padding-right: 8px;">No</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 26px;">&#160;</span></td>
+                                </tr>
+                                <tr style="height: 44px;">
+                                    <td>L5. Are you making any<br/>VAT exempted supply</td>
+                                    <td><span style="padding-right: 12px;">Yes</span><span class="chk-box chk-lg" style="height: 26px;">&#160;</span></td>
+                                    <td style="text-align: right; padding-right: 8px;">No</td>
+                                    <td><span class="chk-box chk-tall" style="width: 18px; height: 26px;">&#160;</span></td>
+                                </tr>
+                            </table>
+
+                            <div style="margin: 8px 0 4px 0;">L6. Major Capital<br/>Machinery (IF<br/>APPLICABLE) :</div>
+                            <table class="m21-grid" style="margin-bottom: 0;">
+                                <colgroup>
+                                    <col style="width: 44%;"/>
+                                    <col style="width: 6%;"/>
+                                    <col style="width: 50%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td style="padding: 0; vertical-align: top;">
+                                        <table class="orange-tbl">
+                                            <colgroup>
+                                                <col style="width: 42%;"/>
+                                                <col style="width: 30%;"/>
+                                                <col style="width: 28%;"/>
+                                            </colgroup>
+                                            <tr style="height: 44px;">
+                                                <th>Description</th>
+                                                <th>Quantity</th>
+                                                <th>H.S.<br/>Code</th>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td style="padding: 0;">&#160;</td>
+                                    <td style="padding: 0; vertical-align: top;">
+                                        <table class="orange-tbl">
+                                            <colgroup>
+                                                <col style="width: 44%;"/>
+                                                <col style="width: 28%;"/>
+                                                <col style="width: 28%;"/>
+                                            </colgroup>
+                                            <tr style="height: 44px;">
+                                                <th>Value in BDT</th>
+                                                <th>Producti<br/>on<br/>Capacity</th>
+                                                <th>Physica<br/>l<br/>Conditi<br/>on</th>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- ================= PAGE 8 ================= -->
+                        <div class="mushak-21-p8 page-start">
+                            <table class="m21-grid" style="margin-bottom: 2px;">
+                                <colgroup>
+                                    <col style="width: 44%;"/>
+                                    <col style="width: 6%;"/>
+                                    <col style="width: 50%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td style="padding: 0; vertical-align: top;">
+                                        <table class="orange-tbl">
+                                            <colgroup>
+                                                <col style="width: 42%;"/>
+                                                <col style="width: 30%;"/>
+                                                <col style="width: 28%;"/>
+                                            </colgroup>
+                                            <tr><td style="background-color: #fde9d9 !important;">1</td><td style="background-color: #fde9d9 !important;">&#160;</td><td style="background-color: #fde9d9 !important;">&#160;</td></tr>
+                                            <tr><td style="background-color: #fde9d9 !important;">2.</td><td style="background-color: #fde9d9 !important;">&#160;</td><td style="background-color: #fde9d9 !important;">&#160;</td></tr>
+                                            <tr><td style="background-color: #fde9d9 !important;">3.</td><td style="background-color: #fde9d9 !important;">&#160;</td><td style="background-color: #fde9d9 !important;">&#160;</td></tr>
+                                        </table>
+                                    </td>
+                                    <td style="padding: 0;">&#160;</td>
+                                    <td style="padding: 0; vertical-align: top;">
+                                        <table class="orange-tbl">
+                                            <colgroup>
+                                                <col style="width: 44%;"/>
+                                                <col style="width: 28%;"/>
+                                                <col style="width: 28%;"/>
+                                            </colgroup>
+                                            <tr><td style="background-color: #fde9d9 !important;">&#160;</td><td style="background-color: #fde9d9 !important;">&#160;</td><td style="background-color: #fde9d9 !important;">&#160;</td></tr>
+                                            <tr><td style="background-color: #fde9d9 !important;">&#160;</td><td style="background-color: #fde9d9 !important;">&#160;</td><td style="background-color: #fde9d9 !important;">&#160;</td></tr>
+                                            <tr><td style="background-color: #fde9d9 !important;">&#160;</td><td style="background-color: #fde9d9 !important;">&#160;</td><td style="background-color: #fde9d9 !important;">&#160;</td></tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div style="font-size: 9pt; margin-bottom: 14px;">[Add separate sheets<br/>for more information]</div>
+
+                            <div style="margin-bottom: 4px;">L7. Input-Output data<br/>(IF APPLICABLE) :</div>
+                            <table class="orange-tbl" style="margin-bottom: 2px;">
+                                <colgroup>
+                                    <col style="width: 30%;"/>
+                                    <col style="width: 14%;"/>
+                                    <col style="width: 6%;"/>
+                                    <col style="width: 22%;"/>
+                                    <col style="width: 14%;"/>
+                                    <col style="width: 14%;"/>
+                                </colgroup>
+                                <tr>
+                                    <th>Commercial Description of<br/>Output</th>
+                                    <th>H.S./<br/>Service<br/>Code of<br/>Output</th>
+                                    <th>Se<br/>lli<br/>ng<br/>U<br/>nit</th>
+                                    <th>Description of<br/>Major Inputs</th>
+                                    <th>H.S./<br/>Service<br/>Code of<br/>Input</th>
+                                    <th>Quantit<br/>y of<br/>input<br/>used<br/>per unit<br/>of<br/>output</th>
+                                </tr>
+                                <tr><td>1.</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td></tr>
+                                <tr><td>2.</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td></tr>
+                                <tr><td>3.</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td></tr>
+                            </table>
+                            <div style="font-size: 9pt; margin-bottom: 8px;">[Add separate sheets<br/>for more information]</div>
+
+                            <div class="sec-banner" style="border-right: 1px solid #000; margin-bottom: 4px;">M. Authorized Persons information for Online Activity</div>
+                            <table class="split-table" style="margin-bottom: 6px;">
+                                <colgroup>
+                                    <col style="width: 27%;"/>
+                                    <col style="width: 10%;"/>
+                                    <col style="width: 25%;"/>
+                                    <col style="width: 25%;"/>
+                                </colgroup>
+                                <tr>
+                                    <th class="tan-hdr" style="vertical-align: bottom;">Description</th>
+                                    <th class="tan-hdr">Pers<br/>on-1</th>
+                                    <th class="tan-hdr" style="vertical-align: bottom;">Person-2</th>
+                                    <th class="tan-hdr" style="vertical-align: bottom;">Person-3</th>
+                                </tr>
+                                <tr><td class="tan-cell">1. Name</td><td class="tan-cell">&#160;</td><td class="tan-cell">&#160;</td><td class="tan-cell">&#160;</td></tr>
+                                <tr><td class="tan-cell">2. Designation</td><td class="tan-cell">&#160;</td><td class="tan-cell">&#160;</td><td class="tan-cell">&#160;</td></tr>
+                                <tr><td class="tan-cell">3. NID</td><td class="tan-cell">&#160;</td><td class="tan-cell">&#160;</td><td class="tan-cell">&#160;</td></tr>
+                                <tr><td class="tan-cell">4. Mobile No</td><td class="tan-cell">&#160;</td><td class="tan-cell">&#160;</td><td class="tan-cell">&#160;</td></tr>
+                                <tr><td class="tan-cell">5. E-mail</td><td class="tan-cell">&#160;</td><td class="tan-cell">&#160;</td><td class="tan-cell">&#160;</td></tr>
+                                <tr><td class="tan-cell">6. Purpose</td><td class="tan-cell">&#160;</td><td class="tan-cell">&#160;</td><td class="tan-cell">&#160;</td></tr>
+                            </table>
+
+                            <div class="sec-banner" style="margin-bottom: 10px;">N. Declaration</div>
+                            <div style="border: 1.5px solid #000; padding: 4px 6px; font-weight: bold; font-size: 9.5pt; line-height: 1.25;">
+                                All the details and information provided in this form are true and complete. I am aware that any untrue/incomplete statement may result in delay in BIN issuance and I may be subjected to full penalty under The Value Added Tax and Supplementary Duty Act, 2012 or any other applicable Act prevailing at present.
+                            </div>
+                        </div>
+
+                        <!-- ================= PAGE 9 ================= -->
+                        <div class="mushak-21-p9 page-start">
+                            <table class="m21-grid">
+                                <colgroup>
+                                    <col style="width: 44%;"/>
+                                    <col style="width: 6%;"/>
+                                    <col style="width: 50%;"/>
+                                </colgroup>
+                                <tr>
+                                    <td style="vertical-align: top; padding: 0;">
+                                        <div style="background-color: #ebf1de !important; border: 1px solid #000; height: 54px; width: 100%;">&#160;</div>
+                                        <div style="text-align: center; font-weight: bold; font-size: 9.5pt; margin-top: 18px; line-height: 1.25;">
+                                            SIGNATURE OF<br/>AUTHORIZED PERSON
+                                        </div>
+                                        <div style="text-align: center; font-style: italic; font-size: 9.5pt; margin-top: 6px;">
+                                            (For manual submission only)
+                                        </div>
+                                    </td>
+                                    <td>&#160;</td>
+                                    <td style="vertical-align: top; padding: 0;">
+                                        <div style="background-color: #dbeef4 !important; border: 1px solid #000; border-bottom: none; height: 36px; padding: 6px 6px; font-weight: bold; font-size: 9.5pt;">
+                                            FULL NAME:
+                                        </div>
+                                        <div style="background-color: #dbeef4 !important; border: 1px solid #000; border-bottom: none; height: 36px; padding: 6px 6px; font-weight: bold; font-size: 9.5pt; margin-top: 20px;">
+                                            DESIGNATION:
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
 </odoo>

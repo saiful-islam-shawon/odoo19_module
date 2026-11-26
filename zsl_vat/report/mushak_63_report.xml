@@ -140,8 +140,11 @@
                             }
                             .mushak-63-bottom-rule {
                                 width: 26%;
-                                border: none;
-                                border-top: 1px solid #000;
+                                height: 0;
+                                font-size: 0;
+                                line-height: 0;
+                                border: none !important;
+                                border-top: 1px solid #000 !important;
                                 margin: 110px 0 4px 0;
                             }
                             .mushak-63-bottom-note {
@@ -254,7 +257,7 @@
                         </div>
 
                         <!-- Bottom Rule and Footnote -->
-                        <hr class="mushak-63-bottom-rule"/>
+                        <div class="mushak-63-bottom-rule"></div>
                         <div class="mushak-63-bottom-note">
                             <sup>১</sup> সকল প্রকার কর ব্যতীত মূল্য” ;
                         </div>
