@@ -1,11 +1,257 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-  <record id="action_print_official_mushak_23" model="ir.actions.server">
-    <field name="name">Mushak 2.3 — QWeb Print</field>
-    <field name="model_id" ref="zsl_vat.model_vat_registration_certificate"/>
-    <field name="binding_model_id" eval="False"/><field name="state">code</field>
-    <field name="code">action = records.action_print_certificate()</field>
-  </record>
-  <record id="action_report_mushak_23" model="ir.actions.report"><field name="name">Mushak 2.3 — Registration Certificate</field><field name="model">vat.registration.certificate</field><field name="report_type">qweb-pdf</field><field name="report_name">zsl_vat.report_mushak_23</field><field name="report_file">zsl_vat.report_mushak_23</field><field name="binding_model_id" ref="model_vat_registration_certificate"/><field name="binding_type">report</field></record>
-  <template id="report_mushak_23"><t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-set="form_code" t-value="'Mushak 2.3'"/><t t-set="form_title" t-value="'VAT / Turnover Tax Registration Certificate'"/><t t-call="zsl_vat.mushak_qweb_layout"><div class="zsl-mushak-section"><h4>Registration / Enlistment Certificate</h4><table class="zsl-mushak-table"><tr><td class="zsl-mushak-label">Certificate no.</td><td><span t-field="o.certificate_reference"/></td><td class="zsl-mushak-label">Issue / effective date</td><td><span t-field="o.issue_date"/> / <span t-field="o.effective_date"/></td></tr><tr><td class="zsl-mushak-label">Taxpayer name</td><td><span t-field="o.taxpayer_name"/></td><td class="zsl-mushak-label">BIN</td><td><span t-field="o.bin"/></td></tr><tr><td class="zsl-mushak-label">Registration type</td><td><span t-field="o.registration_type"/></td><td class="zsl-mushak-label">Issuing authority</td><td><span t-field="o.issuing_authority"/></td></tr><tr><td class="zsl-mushak-label">Registered address</td><td colspan="3"><span t-field="o.registered_address"/></td></tr></table></div><p class="zsl-mushak-muted">This is a system-generated reference copy. The uploaded NBR-issued original remains the legal certificate.</p></t></t></t></template>
+
+    <record id="paperformat_mushak_23_portrait" model="report.paperformat">
+        <field name="name">Mushak 2.3 Portrait</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">30</field>
+        <field name="margin_bottom">24</field>
+        <field name="margin_left">34</field>
+        <field name="margin_right">34</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="action_print_official_mushak_23" model="ir.actions.server">
+        <field name="name">Mushak 2.3 — QWeb Print</field>
+        <field name="model_id" ref="zsl_vat.model_vat_registration_certificate"/>
+        <field name="binding_model_id" eval="False"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_print_certificate()</field>
+    </record>
+
+    <record id="action_report_mushak_23" model="ir.actions.report">
+        <field name="name">Mushak 2.3 — Registration Certificate</field>
+        <field name="model">vat.registration.certificate</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">zsl_vat.report_mushak_23</field>
+        <field name="report_file">zsl_vat.report_mushak_23</field>
+        <field name="binding_model_id" ref="model_vat_registration_certificate"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_mushak_23_portrait"/>
+    </record>
+
+    <template id="report_mushak_23">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
+                    <div class="page mushak-23-page">
+                        <style type="text/css">
+                            * {
+                                box-sizing: border-box;
+                            }
+                            @page {
+                                size: A4 portrait;
+                                margin: 30mm 34mm 24mm 34mm;
+                            }
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
+                            .mushak-23-page {
+                                font-family: 'Nikosh', 'Noto Sans Bengali', Arial, sans-serif !important;
+                                color: #000;
+                                width: 100%;
+                                line-height: 1.35;
+                                font-size: 9.5pt;
+                            }
+                            .mushak-23-header {
+                                text-align: center;
+                                position: relative;
+                                margin-bottom: 22px;
+                            }
+                            .mushak-23-emblem {
+                                position: absolute;
+                                left: 8px;
+                                top: 2px;
+                                width: 52px;
+                                height: 52px;
+                            }
+                            .mushak-23-badge {
+                                position: absolute;
+                                right: 0px;
+                                top: 24px;
+                                border: 1px solid #000;
+                                padding: 4px 16px;
+                                font-weight: bold;
+                                font-size: 9.5pt;
+                                background: #fff;
+                            }
+                            .mushak-23-green-title {
+                                text-align: center;
+                                font-weight: bold;
+                                font-size: 10pt;
+                                color: #008000;
+                                text-decoration: underline;
+                                margin-bottom: 22px;
+                            }
+                            .mushak-23-intro {
+                                font-size: 9.5pt;
+                                line-height: 1.45;
+                                margin-bottom: 20px;
+                                text-align: left;
+                            }
+                            .mushak-23-subhead {
+                                text-align: center;
+                                font-weight: bold;
+                                text-decoration: underline;
+                                font-size: 9.5pt;
+                                margin-bottom: 18px;
+                            }
+                            .mushak-23-info-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                border: none;
+                                font-size: 9.5pt;
+                            }
+                            .mushak-23-info-table td {
+                                border: none;
+                                padding: 3.5px 2px;
+                                vertical-align: middle;
+                            }
+                            .digit-grid {
+                                border-collapse: collapse;
+                                display: inline-table;
+                                vertical-align: middle;
+                            }
+                            .digit-grid td {
+                                border: 1px solid #000 !important;
+                                width: 16px;
+                                height: 22px;
+                                padding: 0 !important;
+                                text-align: center;
+                            }
+                            .mushak-23-notice {
+                                margin: 24px 0 24px 14px;
+                                font-size: 9.5pt;
+                            }
+                            .mushak-23-qr-box {
+                                margin: 0 auto;
+                                width: 118px;
+                                height: 42px;
+                                border: 1px solid #000;
+                                text-align: center;
+                                line-height: 40px;
+                                font-size: 9.5pt;
+                            }
+                        </style>
+
+                        <!-- Header with Color Emblem, Authority Info, and মূসক-২.৩ Badge -->
+                        <div class="mushak-23-header">
+                            <img class="mushak-23-emblem" src="data:image/jpeg;base64,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"/>
+                            <div style="font-size: 9.5pt; line-height: 1.35;">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
+                            <div style="font-size: 9.5pt; line-height: 1.35;">জাতীয় রাজস্ব বোর্ড</div>
+                            <div style="font-size: 9.5pt; line-height: 1.35;">কাস্টমস, এক্সাইজ ও ভ্যাট কমিশনারেট, .....</div>
+                            <div style="font-size: 9.5pt; line-height: 1.35;">......বিভাগ</div>
+                            <div style="font-size: 9.5pt; line-height: 1.35;">[ বিধি ৪ এর উপ-বিধি (৪) দ্রষ্টব্য]</div>
+                            <div class="mushak-23-badge">মূসক-২.৩</div>
+                        </div>
+
+                        <!-- Green Underlined Title -->
+                        <div class="mushak-23-green-title">
+                            মূল্য সংযোজন কর নিবন্ধন সনদপত্র/টার্নওভার কর তালিকাভুক্তি সনদপত্র
+                        </div>
+
+                        <!-- Certification Paragraph -->
+                        <div class="mushak-23-intro">
+                            প্রত্যয়ন করা যাইতেছে যে, নিম্নে বর্ণিত করদাতা মূল্য সংযোজন কর ও সম্পূরক শুল্ক আইন, ২০১২ (২০১২ সনের ৪৭ নং আইন) এর অধীন নিবন্ধিত/তালিকাভুক্ত।
+                        </div>
+
+                        <!-- Subheading -->
+                        <div class="mushak-23-subhead">
+                            নিবন্ধিত/তালিকাভুক্ত করদাতার সংক্ষিপ্তবিবরণ
+                        </div>
+
+                        <!-- 10-Row Taxpayer Summary -->
+                        <table class="mushak-23-info-table">
+                            <colgroup>
+                                <col style="width: 36%;"/>
+                                <col style="width: 4%;"/>
+                                <col style="width: 60%;"/>
+                            </colgroup>
+                            <tr>
+                                <td style="padding-left: 14px;">নাম</td>
+                                <td style="text-align: center;">:</td>
+                                <td>&#160;</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 14px;">বিআইএন</td>
+                                <td style="text-align: center;">:</td>
+                                <td style="padding-left: 62px;">
+                                    <table class="digit-grid" style="margin-left: 8px;">
+                                        <tr>
+                                            <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 14px;">পুরাতন বিআইএন (যদি থাকে)</td>
+                                <td style="text-align: center;">:</td>
+                                <td style="padding-left: 62px;">
+                                    <table class="digit-grid">
+                                        <tr>
+                                            <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 14px;">e-TIN (যদি থাকে)</td>
+                                <td style="text-align: center;">:</td>
+                                <td style="padding-left: 62px;">
+                                    <table class="digit-grid">
+                                        <tr>
+                                            <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 14px;">ঠিকানা</td>
+                                <td style="text-align: center;">:</td>
+                                <td>&#160;</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 14px;">ইস্যুর তারিখ</td>
+                                <td style="text-align: center;">:</td>
+                                <td>&#160;</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 14px;">কার্যকারিতার তারিখ</td>
+                                <td style="text-align: center;">:</td>
+                                <td>&#160;</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 14px;">ব্যবসার প্রকৃতি</td>
+                                <td style="text-align: center;">:</td>
+                                <td>&#160;</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 14px;">অর্থনৈতিক কার্যক্রমের প্রকৃতি</td>
+                                <td style="text-align: center;">:</td>
+                                <td>&#160;</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 14px;">অর্থনৈতিক কার্যক্রমকোড ও বিবরণ</td>
+                                <td style="text-align: center;">:</td>
+                                <td>&#160;</td>
+                            </tr>
+                        </table>
+
+                        <!-- System Notice & QR Code Box -->
+                        <div class="mushak-23-notice">
+                            This is a system generated certificate and requires no signature
+                        </div>
+                        <div class="mushak-23-qr-box">QR Code</div>
+
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
 </odoo>

@@ -139,6 +139,7 @@
                             }
                             .green-hdr {
                                 background-color: #9bbb59 !important;
+                                border: 1px solid #000;
                                 font-weight: bold;
                                 text-align: center;
                                 padding: 4px 4px;
@@ -146,6 +147,7 @@
                             }
                             .green-cell {
                                 background-color: #ebf1de !important;
+                                border: 1px solid #000;
                                 padding: 4px 6px;
                                 height: 22px;
                             }
@@ -157,6 +159,7 @@
                             }
                             .tan-hdr {
                                 background-color: #c4bd97 !important;
+                                border: 1px solid #000;
                                 font-weight: bold;
                                 text-align: center;
                                 padding: 4px 4px;
@@ -252,8 +255,7 @@
                                     <td colspan="3">&#160;</td>
                                     <td style="text-align: right; padding-right: 8px; line-height: 1.15; vertical-align: top; padding-top: 6px;">Name of<br/>Company</td>
                                     <td>
-                                        <div class="input-box" style="height: 24px;">&#160;</div>
-                                        <div style="background-color: #fde9d9 !important; height: 14px; width: 100%;">&#160;</div>
+                                        <div class="input-box" style="height: 38px;">&#160;</div>
                                     </td>
                                 </tr>
                             </table>
@@ -441,8 +443,7 @@
                                 <tr>
                                     <td style="vertical-align: top;">D1.<br/>Factory/Business<br/>Operations<br/>Address</td>
                                     <td style="vertical-align: top;">
-                                        <div class="input-box-xtall" style="border-bottom: none;">&#160;</div>
-                                        <div style="background-color: #fde9d9 !important; height: 14px; width: 100%;">&#160;</div>
+                                        <div class="input-box-xtall" style="height: 66px;">&#160;</div>
                                     </td>
                                     <td>&#160;</td>
                                 </tr>
@@ -1051,7 +1052,7 @@
                             </table>
                             <div style="font-size: 9pt; margin-bottom: 8px;">[Add separate sheets<br/>for more information]</div>
 
-                            <div class="sec-banner" style="border-right: 1px solid #000; margin-bottom: 4px;">M. Authorized Persons information for Online Activity</div>
+                            <div class="sec-banner" style="margin-bottom: 4px;">M. Authorized Persons information for Online Activity</div>
                             <table class="split-table" style="margin-bottom: 6px;">
                                 <colgroup>
                                     <col style="width: 27%;"/>
@@ -1099,10 +1100,10 @@
                                     </td>
                                     <td>&#160;</td>
                                     <td style="vertical-align: top; padding: 0;">
-                                        <div style="background-color: #dbeef4 !important; border: 1px solid #000; border-bottom: none; height: 36px; padding: 6px 6px; font-weight: bold; font-size: 9.5pt;">
+                                        <div style="background-color: #dbeef4 !important; border: 1px solid #000; height: 36px; padding: 6px 6px; font-weight: bold; font-size: 9.5pt;">
                                             FULL NAME:
                                         </div>
-                                        <div style="background-color: #dbeef4 !important; border: 1px solid #000; border-bottom: none; height: 36px; padding: 6px 6px; font-weight: bold; font-size: 9.5pt; margin-top: 20px;">
+                                        <div style="background-color: #dbeef4 !important; border: 1px solid #000; height: 36px; padding: 6px 6px; font-weight: bold; font-size: 9.5pt; margin-top: 20px;">
                                             DESIGNATION:
                                         </div>
                                     </td>

@@ -199,8 +199,6 @@ class VatRegistrationCertificate(models.Model):
             raise UserError(_('Only a VAT Manager may upload or replace an NBR certificate.'))
         records = super().create(vals_list)
         for record in records:
-            if not record.bin.isdigit() or len(record.bin) != 13:
-                raise ValidationError(_('Certificate BIN must contain exactly 13 digits.'))
             if record.name == _('New'):
                 record.name = self.env['ir.sequence'].next_by_code('zsl_vat.mushak_23') or _('New')
             if record.replaces_id:
