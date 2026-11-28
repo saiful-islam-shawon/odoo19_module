@@ -239,26 +239,27 @@
                                     <th>সকল<br/>প্রকার<br/>শুল্ক ও<br/>করসহ<br/>মূল্য</th>
                                 </tr>
                             </thead>
+                            <t t-set="m63_data" t-value="o._mushak_63_report_data()"/>
                             <tbody>
-                                <tr class="mushak-63-data-row" t-foreach="o.invoice_line_ids.filtered(lambda line: line.display_type == 'product')" t-as="line">
-                                    <td class="text-center"><span t-esc="line_index + 1"/></td>
-                                    <td><span t-esc="line.product_id.display_name or line.name"/></td>
-                                    <td class="text-center"><span t-esc="line.product_uom_id.name or ''"/></td>
-                                    <td class="text-right"><span t-esc="'%.2f' % line.quantity"/></td>
-                                    <td class="text-right"><span t-esc="'%.2f' % line.price_unit"/></td>
-                                    <td class="text-right"><span t-esc="'%.2f' % line.price_subtotal"/></td>
-                                    <td class="text-right"><span t-esc="'%.2f' % line._vat_tax_components()[1]"/></td>
-                                    <td class="text-center"><span t-esc="', '.join(line.tax_ids.mapped('name')) or '-'"/></td>
-                                    <td class="text-right"><span t-esc="'%.2f' % (line.price_total - line.price_subtotal)"/></td>
-                                    <td class="text-right"><span t-esc="'%.2f' % line.price_total"/></td>
+                                <tr class="mushak-63-data-row" t-foreach="m63_data['rows']" t-as="row">
+                                    <td class="text-center"><span t-esc="row['sl']"/></td>
+                                    <td><span t-esc="row['description']"/></td>
+                                    <td class="text-center"><span t-esc="row['uom']"/></td>
+                                    <td class="text-right"><span t-esc="'%.2f' % row['quantity']"/></td>
+                                    <td class="text-right"><span t-esc="'%.2f' % row['price_unit']"/></td>
+                                    <td class="text-right"><span t-esc="'%.2f' % row['price_subtotal']"/></td>
+                                    <td class="text-right"><span t-esc="'%.2f' % row['sd_amount']"/></td>
+                                    <td class="text-center"><span t-esc="row['vat_rate_display']"/></td>
+                                    <td class="text-right"><span t-esc="'%.2f' % row['vat_amount']"/></td>
+                                    <td class="text-right"><span t-esc="'%.2f' % row['total_inclusive']"/></td>
                                 </tr>
                                 <tr class="mushak-63-total-row">
                                     <td colspan="5" class="text-right" style="padding-right: 6px;">সর্বমোট</td>
-                                    <td class="text-right"><span t-esc="'%.2f' % o.amount_untaxed"/></td>
-                                    <td class="text-right"><span t-esc="'%.2f' % o.vat_sd_amount"/></td>
+                                    <td class="text-right"><span t-esc="'%.2f' % m63_data['totals']['price_subtotal']"/></td>
+                                    <td class="text-right"><span t-esc="'%.2f' % m63_data['totals']['sd_amount']"/></td>
                                     <td class="text-center">-</td>
-                                    <td class="text-right"><span t-esc="'%.2f' % o.amount_tax"/></td>
-                                    <td class="text-right"><span t-esc="'%.2f' % o.amount_total"/></td>
+                                    <td class="text-right"><span t-esc="'%.2f' % m63_data['totals']['vat_amount']"/></td>
+                                    <td class="text-right"><span t-esc="'%.2f' % m63_data['totals']['total_inclusive']"/></td>
                                 </tr>
                             </tbody>
                         </table>

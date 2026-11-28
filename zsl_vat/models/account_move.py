@@ -205,6 +205,58 @@ class AccountMove(models.Model):
             self.with_context(vat_copy=is_copy), form_code,
         )
 
+    @staticmethod
+    def _format_hs_vat_rate(rate):
+        """Format decimal HS VAT ratio (e.g. 0.03 -> '3%'), or '-' if zero."""
+        if not rate or rate <= 0:
+            return '-'
+        formatted = ('%.4f' % (rate * 100.0)).rstrip('0').rstrip('.')
+        return f'{formatted}%'
+
+    def _mushak_63_report_data(self):
+        """Return precomputed product rows and summary totals for Mushak 6.3."""
+        self.ensure_one()
+        currency = self.currency_id or self.company_id.currency_id
+        round_amt = currency.round if currency else (lambda amount: round(amount, 2))
+        rows = []
+        total_subtotal = 0.0
+        total_sd = 0.0
+        total_vat = 0.0
+        total_inclusive = 0.0
+        product_lines = self.invoice_line_ids.filtered(lambda line: line.display_type == 'product')
+        for index, line in enumerate(product_lines, start=1):
+            base_amount = line.price_subtotal or 0.0
+            sd_amount = line._vat_tax_components()[1] or 0.0
+            hs_code = line.product_id.product_tmpl_id.hs_code_id
+            vat_rate = hs_code.vat if (hs_code and hs_code.vat and hs_code.vat > 0) else 0.0
+            vat_amount = round_amt((base_amount + sd_amount) * vat_rate) if vat_rate else 0.0
+            total_inclusive_line = round_amt(base_amount + sd_amount + vat_amount)
+            rows.append({
+                'sl': index,
+                'description': line.product_id.display_name or line.name or '',
+                'uom': line.product_uom_id.name or '',
+                'quantity': line.quantity,
+                'price_unit': line.price_unit,
+                'price_subtotal': base_amount,
+                'sd_amount': sd_amount,
+                'vat_rate_display': self._format_hs_vat_rate(vat_rate),
+                'vat_amount': vat_amount,
+                'total_inclusive': total_inclusive_line,
+            })
+            total_subtotal += base_amount
+            total_sd += sd_amount
+            total_vat += vat_amount
+            total_inclusive += total_inclusive_line
+        return {
+            'rows': rows,
+            'totals': {
+                'price_subtotal': round_amt(total_subtotal),
+                'sd_amount': round_amt(total_sd),
+                'vat_amount': round_amt(total_vat),
+                'total_inclusive': round_amt(total_inclusive),
+            },
+        }
+
     def write(self, vals):
         if ({'vat_mushak_number', 'vat_qr_payload'} & set(vals)
                 and not self.env.context.get('vat_issue_number')):
