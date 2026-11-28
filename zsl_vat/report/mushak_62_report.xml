@@ -337,8 +337,9 @@
                             <tbody>
                                 <t t-if="grp_rows">
                                     <t t-foreach="grp_rows" t-as="row">
+                                        <t t-set="col_2_date" t-value="row.get('opening_effective_date') if row_index == 0 else row.get('date')"/>
                                         <t t-set="txt" t-value="{
-                                            'date': row['date'].strftime('%d-%m-%Y') if row.get('date') else '',
+                                            'date': col_2_date.strftime('%d-%m-%Y') if col_2_date else '',
                                             'partner': str(row.get('partner') or '').strip(),
                                             'address': str(row.get('address') or '').strip(),
                                             'tax_id': str(row.get('supplier_tax_id') or '').strip(),

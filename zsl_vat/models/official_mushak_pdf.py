@@ -681,6 +681,7 @@ class OfficialMushakPdf(models.AbstractModel):
                 balance.update({'quantity': closing_qty, 'value': closing_value})
             rows.append({
                 **event,
+                'opening_effective_date': base.effective_date if base else False,
                 'opening_qty': opening_qty, 'opening_value': opening_value,
                 'total_qty': total_qty, 'total_value': total_value,
                 'closing_qty': closing_qty, 'closing_value': closing_value,
