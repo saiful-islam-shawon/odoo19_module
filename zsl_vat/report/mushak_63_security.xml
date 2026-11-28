@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="action_report_mushak_63" model="ir.actions.report">
+    <field name="binding_model_id" eval="False"/>
+  </record>
+  <record id="action_report_mushak_67" model="ir.actions.report">
+    <field name="binding_model_id" eval="False"/>
+  </record>
+  <record id="action_report_mushak_68" model="ir.actions.report">
+    <field name="binding_model_id" eval="False"/>
+  </record>
+</odoo>

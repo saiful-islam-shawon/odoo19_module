@@ -17,6 +17,8 @@ class ResCompany(models.Model):
     vat_commissionerate = fields.Char(string='VAT Commissionerate')
     vat_business_nature = fields.Selection([('trading', 'Trading'), ('manufacturing', 'Manufacturing'), ('service', 'Service'), ('mixed', 'Mixed Business')], string='Business Nature')
     vat_registered_address = fields.Text(string='VAT Registered Address')
+    vat_authorised_person_name = fields.Char(string='Authorised Person (Mushak Signatory)')
+    vat_authorised_person_designation = fields.Char(string='Authorised Person Designation')
     vat_registration_date = fields.Date()
     vat_registration_type = fields.Selection([('standard', 'Standard VAT'), ('turnover', 'Turnover Tax'), ('other', 'Other')], default='standard')
     vat_return_due_day = fields.Integer(string='Monthly Return Due Day', default=15,
@@ -73,6 +75,35 @@ class VatVdsCertificate(models.Model):
     certificate_received = fields.Boolean(string='Certificate Received')
     attachment_ids = fields.Many2many('ir.attachment', string='Certificate / Evidence')
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        if any(vals.get('state', 'draft') != 'draft' or vals.get('name') not in (False, None, _('New')) for vals in vals_list):
+            raise UserError(_('VDS certificates must be created as drafts and issued through the workflow.'))
+        return super().create(vals_list)
+
+    _immutable_fields = {
+        'name', 'company_id', 'unit_id', 'partner_id', 'move_id', 'direction',
+        'certificate_date', 'base_amount', 'rate', 'amount',
+    }
+
+    def write(self, vals):
+        if 'name' in vals and not self.env.context.get('vat_vds_issue_number'):
+            raise UserError(_('VDS certificate numbers are assigned only by the document numbering sequence.'))
+        if not self.env.context.get('vat_vds_workflow') and self.filtered(
+            lambda record: record.state != 'draft'
+        ) and self._immutable_fields.intersection(vals):
+            raise UserError(_('An issued VDS certificate is immutable. Issue a corrected certificate instead.'))
+        if not self.env.context.get('vat_vds_workflow') and 'state' in vals and self.filtered(
+            lambda record: record.state != 'draft'
+        ):
+            raise UserError(_('The state of an issued VDS certificate can only change through its workflow.'))
+        return super().write(vals)
+
+    def unlink(self):
+        if self.filtered(lambda record: record.state != 'draft'):
+            raise UserError(_('An issued VDS certificate cannot be deleted.'))
+        return super().unlink()
+
     @api.depends('base_amount', 'rate')
     def _compute_amount(self):
         for record in self:
@@ -81,16 +112,18 @@ class VatVdsCertificate(models.Model):
     def action_confirm(self):
         for record in self:
             if record.name == _('New'):
-                record.name = self.env['vat.document.series'].next_number(
-                    '66', record.company_id, record.unit_id, record.certificate_date,
-                )
-            record.state = 'confirmed'
+                record.with_context(vat_vds_issue_number=True).write({
+                    'name': self.env['vat.document.series'].next_number(
+                        '66', record.company_id, record.unit_id, record.certificate_date,
+                    ),
+                })
+            record.with_context(vat_vds_workflow=True).write({'state': 'confirmed'})
 
     def action_reconcile(self):
         for record in self:
             if record.direction != 'suffered' or not record.certificate_received:
                 raise UserError(_('A received customer certificate is required before reconciling VDS suffered.'))
-            record.state = 'reconciled'
+            record.with_context(vat_vds_workflow=True).write({'state': 'reconciled'})
 
     def action_print_mushak_vds(self):
         self.ensure_one()
@@ -123,6 +156,28 @@ class VatTreasuryPayment(models.Model):
         'Challan number must be unique per company.',
     )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        if any(vals.get('state', 'draft') != 'draft' for vals in vals_list):
+            raise UserError(_('Treasury challans must be created as drafts and confirmed through the workflow.'))
+        return super().create(vals_list)
+
+    def write(self, vals):
+        protected_fields = {
+            'company_id', 'unit_id', 'return_id', 'payment_date', 'challan_number',
+            'bank', 'economic_code', 'payment_type', 'amount', 'vds_certificate_ids',
+        }
+        if self.filtered(lambda payment: payment.state == 'confirmed') and protected_fields.intersection(vals):
+            raise UserError(_('A confirmed treasury challan cannot be edited. Record a correcting entry.'))
+        if 'state' in vals and self.filtered(lambda payment: payment.state == 'confirmed') and not self.env.context.get('vat_payment_workflow'):
+            raise UserError(_('A confirmed treasury challan state can only change through its workflow.'))
+        return super().write(vals)
+
+    def unlink(self):
+        if self.filtered(lambda payment: payment.state == 'confirmed'):
+            raise UserError(_('A confirmed treasury challan cannot be deleted.'))
+        return super().unlink()
+
     def action_confirm(self):
         for payment in self:
             if payment.amount <= 0:
@@ -131,8 +186,10 @@ class VatTreasuryPayment(models.Model):
                 raise ValidationError(_('A treasury challan reference is required.'))
             if payment.return_id and payment.return_id.company_id != payment.company_id:
                 raise ValidationError(_('The treasury payment and VAT return must belong to the same company.'))
-            payment.state = 'confirmed'
-            payment.vds_certificate_ids.filtered(lambda c: c.direction == 'deducted').write({'state': 'deposited'})
+            payment.with_context(vat_payment_workflow=True).write({'state': 'confirmed'})
+            payment.vds_certificate_ids.filtered(lambda c: c.direction == 'deducted').with_context(
+                vat_vds_workflow=True,
+            ).write({'state': 'deposited'})
 
     def action_print_treasury_challan(self):
         self.ensure_one()
@@ -176,6 +233,24 @@ class VatReturn(models.Model):
         'UNIQUE(company_id, unit_id, period_id, return_type)',
         'A return already exists for this period, unit and return type.',
     )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        if any(vals.get('state', 'draft') == 'submitted' for vals in vals_list):
+            raise UserError(_('A VAT return must be submitted through the approval and submission workflow.'))
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if vals.get('state') == 'submitted' and not self.env.context.get('vat_return_workflow'):
+            raise UserError(_('A VAT return can only be submitted through the approved submission workflow.'))
+        if self.filtered(lambda record: record.state == 'submitted') and not self.env.context.get('vat_return_workflow'):
+            raise UserError(_('A submitted VAT return is immutable. Create an amended return version.'))
+        return super().write(vals)
+
+    def unlink(self):
+        if self.filtered(lambda record: record.state == 'submitted'):
+            raise UserError(_('A submitted VAT return cannot be deleted.'))
+        return super().unlink()
 
     @api.depends('company_id', 'unit_id', 'period_id')
     def _compute_vds_suffered(self):
@@ -252,7 +327,7 @@ class VatReturn(models.Model):
             for move in record._period_moves():
                 if move.move_type.startswith('out_') and not move.vat_mushak_number:
                     issues.append(_('%s: missing Mushak number') % move.display_name)
-                for line in move.invoice_line_ids.filtered(lambda l: not l.display_type):
+                for line in move.invoice_line_ids.filtered(lambda l: l.display_type == 'product'):
                     if line.product_id and not line.product_id.product_tmpl_id.vat_hs_code_id:
                         issues.append(_('%s: %s has no HS / service code') % (move.display_name, line.product_id.display_name))
                 if move.partner_id.vat_registration_status == 'registered' and not move.partner_id.vat_bin:
@@ -294,7 +369,9 @@ class VatReturn(models.Model):
                 record.name = self.env['vat.document.series'].next_number(
                     '91', record.company_id, record.unit_id, record.period_id.date_end,
                 )
-            record.write({'state': 'submitted', 'nbr_submission_date': fields.Date.context_today(self)})
+            record.with_context(vat_return_workflow=True).write({
+                'state': 'submitted', 'nbr_submission_date': fields.Date.context_today(self),
+            })
             record.period_id.action_lock()
 
     def action_export_nbr(self):
@@ -401,6 +478,23 @@ class VatReturnLine(models.Model):
     capital_credit_line_id = fields.Many2one('vat.capital.credit.schedule.line', readonly=True, ondelete='restrict')
     currency_id = fields.Many2one(related='return_id.currency_id')
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        return_ids = [vals.get('return_id') for vals in vals_list if vals.get('return_id')]
+        if self.env['vat.return'].browse(return_ids).filtered(lambda record: record.state == 'submitted'):
+            raise UserError(_('Lines cannot be added to a submitted VAT return.'))
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if self.filtered(lambda line: line.return_id.state == 'submitted'):
+            raise UserError(_('Lines on a submitted VAT return are immutable.'))
+        return super().write(vals)
+
+    def unlink(self):
+        if self.filtered(lambda line: line.return_id.state == 'submitted'):
+            raise UserError(_('Lines on a submitted VAT return cannot be deleted.'))
+        return super().unlink()
+
 
 class VatAdjustment(models.Model):
     _name = 'vat.adjustment'
@@ -418,6 +512,23 @@ class VatAdjustment(models.Model):
     attachment_ids = fields.Many2many('ir.attachment', string='Evidence')
     state = fields.Selection([('draft', 'Draft'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='draft')
     currency_id = fields.Many2one(related='return_id.currency_id')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        return_ids = [vals.get('return_id') for vals in vals_list if vals.get('return_id')]
+        if self.env['vat.return'].browse(return_ids).filtered(lambda record: record.state == 'submitted'):
+            raise UserError(_('Adjustments cannot be added to a submitted VAT return.'))
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if self.filtered(lambda adjustment: adjustment.return_id.state == 'submitted'):
+            raise UserError(_('Adjustments on a submitted VAT return are immutable.'))
+        return super().write(vals)
+
+    def unlink(self):
+        if self.filtered(lambda adjustment: adjustment.return_id.state == 'submitted'):
+            raise UserError(_('Adjustments on a submitted VAT return cannot be deleted.'))
+        return super().unlink()
 
     @api.depends('amount', 'adjustment_type', 'state')
     def _compute_signed_amount(self):

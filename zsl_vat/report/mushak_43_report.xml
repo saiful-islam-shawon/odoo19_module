@@ -181,6 +181,7 @@
 
                         <!-- Statutory Header & Metadata Box -->
                         <div class="mushak-43-header-box">
+                            <t t-set="company" t-value="o.env.company"/>
                             <div class="mushak-43-badge-container">
                                 <div class="mushak-43-badge">মূসক-৪.৩</div>
                             </div>
@@ -189,11 +190,11 @@
                                 <div class="mushak-43-title-2">(বিধি ২১ দ্রষ্টব্য)</div>
                             </div>
                             <div class="mushak-43-meta-block">
-                                <div class="mushak-43-meta-item"><strong>প্রতিষ্ঠানের নাম:</strong></div>
-                                <div class="mushak-43-meta-item"><strong>ঠিকানা:</strong></div>
-                                <div class="mushak-43-meta-item"><strong>বিন:</strong></div>
-                                <div class="mushak-43-meta-item"><strong>দাখিলের তারিখ :</strong></div>
-                                <div class="mushak-43-meta-item"><strong>ঘোষিত সহগ অনুযায়ী পণ্য/সেবার প্রথম সরবরাহের তারিখ :</strong></div>
+                                <div class="mushak-43-meta-item"><strong>প্রতিষ্ঠানের নাম:</strong> <span t-esc="company.vat_legal_name or company.name"/></div>
+                                <div class="mushak-43-meta-item"><strong>ঠিকানা:</strong> <span t-esc="company.vat_registered_address or company.partner_id.contact_address or ''"/></div>
+                                <div class="mushak-43-meta-item"><strong>বিন:</strong> <span t-esc="company.vat_bin or ''"/></div>
+                                <div class="mushak-43-meta-item"><strong>দাখিলের তারিখ :</strong> <span t-esc="context_timestamp(o.create_date).strftime('%d-%m-%Y') if o.create_date else ''"/></div>
+                                <div class="mushak-43-meta-item"><strong>ঘোষিত সহগ অনুযায়ী পণ্য/সেবার প্রথম সরবরাহের তারিখ :</strong> <span t-esc="o.effective_date.strftime('%d-%m-%Y') if o.effective_date else ''"/></div>
                             </div>
                         </div>
 
@@ -254,29 +255,29 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Exact single blank row matching the statutory template -->
-                                <tr class="mushak-43-data-row">
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
+                                <tr class="mushak-43-data-row" t-foreach="o.line_ids" t-as="line">
+                                    <td><span t-esc="line_index + 1"/></td>
+                                    <td><span t-esc="o.product_tmpl_id.vat_hs_code_id.code or o.product_tmpl_id.hs_code_id.display_name or ''"/></td>
+                                    <td><span t-esc="o.product_tmpl_id.display_name or ''"/></td>
+                                    <td><span t-esc="(o.product_tmpl_id.vat_uom_id or o.product_tmpl_id.uom_id).name or ''"/></td>
+                                    <td><span t-esc="line.product_id.display_name or ''"/></td>
+                                    <td><span t-esc="'%.2f' % (line.quantity * (1.0 + (o.wastage_percent or 0.0) / 100.0))"/></td>
+                                    <td><span t-esc="'%.2f' % (line.subtotal or 0.0)"/></td>
+                                    <td><span t-esc="'%.2f' % (line.quantity * (o.wastage_percent or 0.0) / 100.0)"/></td>
+                                    <td><span t-esc="'%.2f' % (o.wastage_percent or 0.0)"/></td>
+                                    <td><span t-if="line_index == 0">মূল্য সংযোজন</span></td>
+                                    <td><span t-if="line_index == 0" t-esc="'%.2f' % (o.value_addition or 0.0)"/></td>
                                     <td>&#160;</td>
                                 </tr>
+                                <tr class="mushak-43-data-row" t-if="not o.line_ids"><td colspan="12">&#160;</td></tr>
                             </tbody>
                         </table>
 
                         <!-- Signature Block (Right-Aligned) -->
                         <div class="mushak-43-sign-container">
                             <div class="mushak-43-sign-block">
-                                <div class="mushak-43-sign-item">প্রতিষ্ঠান কর্তৃপক্ষের দায়িত্বপ্রাপ্ত ব্যক্তির নাম :</div>
-                                <div class="mushak-43-sign-item">পদবী :</div>
+                                <div class="mushak-43-sign-item">প্রতিষ্ঠান কর্তৃপক্ষের দায়িত্বপ্রাপ্ত ব্যক্তির নাম : <span t-esc="company.vat_authorised_person_name or ''"/></div>
+                                <div class="mushak-43-sign-item">পদবী : <span t-esc="company.vat_authorised_person_designation or ''"/></div>
                                 <div class="mushak-43-sign-item">স্বাক্ষর :</div>
                                 <div class="mushak-43-sign-item">সীল :</div>
                             </div>

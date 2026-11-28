@@ -79,6 +79,8 @@
               <field name="vat_circle"/>
               <field name="vat_commissionerate"/>
               <field name="vat_registered_address"/>
+              <field name="vat_authorised_person_name"/>
+              <field name="vat_authorised_person_designation"/>
               <field name="vat_enforce_declared_price"/>
               <field name="vat_high_value_threshold"/>
               <field name="vat_late_interest_rate"/>

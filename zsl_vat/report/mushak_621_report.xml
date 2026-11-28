@@ -294,35 +294,36 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Exact single blank row matching the statutory template -->
-                                <tr class="mushak-621-data-row">
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                </tr>
+                                <t t-foreach="o._mushak_621_rows()" t-as="row">
+                                    <tr class="mushak-621-data-row">
+                                        <td t-esc="row['serial']"/>
+                                        <td t-esc="row['date']"/>
+                                        <td t-esc="row.get('opening_qty') if row.get('opening_qty') is not None else ''"/>
+                                        <td t-esc="'%.2f' % row['opening_value'] if row.get('opening_value') is not None else ''"/>
+                                        <td t-esc="row.get('purchase_qty') if row.get('purchase_qty') is not None else ''"/>
+                                        <td t-esc="'%.2f' % row['purchase_value'] if row.get('purchase_value') is not None else ''"/>
+                                        <td t-esc="row.get('total_qty', '')"/>
+                                        <td t-esc="'%.2f' % row['total_value'] if row.get('total_value') is not None else ''"/>
+                                        <td t-esc="row.get('seller', {}).get('name', '')"/>
+                                        <td t-esc="row.get('seller', {}).get('address', '')"/>
+                                        <td t-esc="row.get('seller', {}).get('identifier', '')"/>
+                                        <td t-esc="row.get('purchase_reference', '')"/>
+                                        <td t-esc="row.get('purchase_date', '')"/>
+                                        <td t-esc="row.get('description', '')"/>
+                                        <td t-esc="row.get('sale_qty') if row.get('sale_qty') is not None else ''"/>
+                                        <td t-esc="'%.2f' % row['sale_value'] if row.get('sale_value') is not None else ''"/>
+                                        <td t-esc="'%.2f' % row['sd'] if row.get('sd') is not None else ''"/>
+                                        <td t-esc="'%.2f' % row['vat'] if row.get('vat') is not None else ''"/>
+                                        <td t-esc="row.get('buyer', {}).get('name', '')"/>
+                                        <td t-esc="row.get('buyer', {}).get('address', '')"/>
+                                        <td t-esc="row.get('buyer', {}).get('identifier', '')"/>
+                                        <td t-esc="row.get('sale_reference', '')"/>
+                                        <td t-esc="row.get('sale_date', '')"/>
+                                        <td t-esc="row.get('closing_qty', '')"/>
+                                        <td t-esc="'%.2f' % row['closing_value'] if row.get('closing_value') is not None else ''"/>
+                                        <td/>
+                                    </tr>
+                                </t>
                             </tbody>
                         </table>
 

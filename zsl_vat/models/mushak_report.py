@@ -30,10 +30,10 @@ REPORT_XMLIDS = {
 }
 
 
-def mushak_report_action(record, form_code):
+def mushak_report_action(record, form_code, data=None):
     """Return Odoo's native QWeb report action for one statutory form."""
     record.ensure_one()
-    return record.env.ref(REPORT_XMLIDS[form_code]).report_action(record)
+    return record.env.ref(REPORT_XMLIDS[form_code]).report_action(record, data=data)
 
 
 class MushakReport(models.AbstractModel):

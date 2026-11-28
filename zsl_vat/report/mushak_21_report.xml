@@ -249,13 +249,13 @@
                                 <tr>
                                     <td colspan="3">&#160;</td>
                                     <td style="text-align: right; padding-right: 8px; line-height: 1.15;">Old 11 Digit<br/>BIN</td>
-                                    <td><div class="input-box" style="height: 26px;">&#160;</div></td>
+                                    <td><div class="input-box" style="height: 26px;"><span t-esc="o.company_id.vat_legacy_bin or ''"/></div></td>
                                 </tr>
                                 <tr>
                                     <td colspan="3">&#160;</td>
                                     <td style="text-align: right; padding-right: 8px; line-height: 1.15; vertical-align: top; padding-top: 6px;">Name of<br/>Company</td>
                                     <td>
-                                        <div class="input-box" style="height: 38px;">&#160;</div>
+                                        <div class="input-box" style="height: 38px;"><span t-esc="o.legal_name or ''"/></div>
                                     </td>
                                 </tr>
                             </table>
@@ -343,34 +343,34 @@
                                 </colgroup>
                                 <tr style="height: 36px;">
                                     <td>C1. Trade License<br/>No (if applicable)</td>
-                                    <td><div class="input-box" style="height: 26px;">&#160;</div></td>
+                                    <td><div class="input-box" style="height: 26px;"><span t-esc="o.trade_license_no or ''"/></div></td>
                                     <td style="text-align: right; padding-right: 8px;">Issue<br/>Date</td>
                                     <td><div class="input-box" style="height: 28px;">&#160;</div></td>
                                 </tr>
                                 <tr style="height: 44px;">
                                     <td>C2. RJSC<br/>Incorporation<br/>number <i>(if any)</i></td>
-                                    <td><div class="input-box" style="height: 30px;">&#160;</div></td>
+                                    <td><div class="input-box" style="height: 30px;"><span t-esc="o.rjsc_no or ''"/></div></td>
                                     <td style="text-align: right; padding-right: 8px;">Issue<br/>Date</td>
                                     <td><div class="input-box" style="height: 38px;">&#160;</div></td>
                                 </tr>
                                 <tr style="height: 36px;">
                                     <td>C3. e-TIN <i>(if<br/>applicable)</i></td>
-                                    <td><div class="input-box" style="height: 24px;">&#160;</div></td>
+                                    <td><div class="input-box" style="height: 24px;"><span t-esc="o.tin or ''"/></div></td>
                                     <td colspan="2">&#160;</td>
                                 </tr>
                                 <tr style="height: 46px;">
                                     <td>C4. Name of the<br/>Company<br/><div style="margin-top: 6px;">(As in e-TIN)</div></td>
-                                    <td style="vertical-align: top; padding-top: 6px;"><div class="input-box" style="height: 24px;">&#160;</div></td>
+                                    <td style="vertical-align: top; padding-top: 6px;"><div class="input-box" style="height: 24px;"><span t-esc="o.legal_name or ''"/></div></td>
                                     <td colspan="2">&#160;</td>
                                 </tr>
                                 <tr style="height: 48px;">
                                     <td>C5. Name of the<br/>Company<br/><i>(If different than in<br/>e-TIN)</i></td>
-                                    <td style="vertical-align: top; padding-top: 6px;"><div class="input-box" style="height: 22px;">&#160;</div></td>
+                                    <td style="vertical-align: top; padding-top: 6px;"><div class="input-box" style="height: 22px;"><span t-esc="o.trade_name or ''"/></div></td>
                                     <td colspan="2" style="padding-left: 16px; font-style: italic; vertical-align: top; padding-top: 8px;">(Where<br/>applicable)</td>
                                 </tr>
                                 <tr style="height: 40px;">
                                     <td>C6. Trading Brand<br/>Name <i>(if any)</i></td>
-                                    <td><div class="input-box" style="height: 24px;">&#160;</div></td>
+                                    <td><div class="input-box" style="height: 24px;"><span t-esc="o.trade_name or ''"/></div></td>
                                     <td colspan="2">&#160;</td>
                                 </tr>
                             </table>
@@ -443,7 +443,7 @@
                                 <tr>
                                     <td style="vertical-align: top;">D1.<br/>Factory/Business<br/>Operations<br/>Address</td>
                                     <td style="vertical-align: top;">
-                                        <div class="input-box-xtall" style="height: 66px;">&#160;</div>
+                                        <div class="input-box-xtall" style="height: 66px;"><span t-esc="o.registered_address or ''"/></div>
                                     </td>
                                     <td>&#160;</td>
                                 </tr>
@@ -473,14 +473,14 @@
                                 <tr>
                                     <td style="vertical-align: top; padding-top: 6px;">D6. Mobile<br/>Telephone Number</td>
                                     <td style="vertical-align: top; padding-top: 6px;">
-                                        <div class="input-box" style="height: 26px;">&#160;</div>
+                                        <div class="input-box" style="height: 26px;"><span t-esc="o.phone or ''"/></div>
                                         <div style="font-size: 8.8pt; line-height: 1.15; margin-top: 2px;">(e.g.<br/>01XXXX<br/>XXXXX)</div>
                                     </td>
                                     <td>&#160;</td>
                                 </tr>
                                 <tr style="height: 30px;">
                                     <td>D7. e-Mail</td>
-                                    <td><div class="input-box" style="height: 18px;">&#160;</div></td>
+                                    <td><div class="input-box" style="height: 18px;"><span t-esc="o.email or ''"/></div></td>
                                     <td>&#160;</td>
                                 </tr>
                                 <tr>

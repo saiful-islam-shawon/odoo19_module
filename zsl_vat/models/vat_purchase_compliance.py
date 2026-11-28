@@ -14,6 +14,16 @@ INPUT_CREDIT_STATUS = [
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
+    # These are a snapshot of the HS-code import calculation.  They are
+    # written when the vendor bill is posted, so a later HS tariff amendment
+    # cannot alter an already-issued VAT book.
+    vat_import_cd_amount = fields.Monetary(string='Import CD', currency_field='currency_id', copy=False, readonly=True)
+    vat_import_rd_amount = fields.Monetary(string='Import RD', currency_field='currency_id', copy=False, readonly=True)
+    vat_import_sd_amount = fields.Monetary(string='Import SD', currency_field='currency_id', copy=False, readonly=True)
+    vat_import_vat_amount = fields.Monetary(string='Import VAT', currency_field='currency_id', copy=False, readonly=True)
+    vat_import_ait_amount = fields.Monetary(string='Import AIT', currency_field='currency_id', copy=False, readonly=True)
+    vat_import_at_amount = fields.Monetary(string='Import AT', currency_field='currency_id', copy=False, readonly=True)
+
     vat_input_credit_status = fields.Selection(
         INPUT_CREDIT_STATUS, string='Input VAT Eligibility', default='creditable',
         help='Only the eligible part is included in the VAT return input-tax rebate.'
@@ -26,6 +36,50 @@ class AccountMoveLine(models.Model):
         ('full', 'Full Credit'), ('deferred', 'Deferred Credit'), ('non_creditable', 'Non-creditable'),
     ], string='Capital Asset Credit Treatment', default='full')
     vat_deferred_months = fields.Integer(string='Deferred Credit Months', default=1)
+
+    def _uses_hs_tariff_assessment(self):
+        """Whether this purchase line carries an import-duty assessment.
+
+        A purchase order can show CD/RD/SD/VAT from its product HS code even
+        when the bill was created before the user selected ``Import`` on the
+        VAT tab.  Those assessed lines must still carry their SD and VAT into
+        the purchase book; otherwise the PO screen and Mushak 6.1 disagree.
+        """
+        self.ensure_one()
+        code = self.product_id.product_tmpl_id.hs_code_id
+        return bool(code and any((
+            code.cd, code.rd, code.sd, code.vat, code.ait, code.at,
+        )))
+
+    def _vat_import_duty_values(self):
+        """Return the tariff assessment for one bill line.
+
+        The calculation mirrors the HS-duty preview on the purchase order:
+        each configured rate is assessed on the line's basic value.  This
+        keeps vendor bill and Mushak 6.1 values identical to the PO.
+        """
+        self.ensure_one()
+        code = self.product_id.product_tmpl_id.hs_code_id
+        base = self.price_subtotal if self.display_type == 'product' else 0.0
+        cd = base * (code.cd or 0.0)
+        rd = base * (code.rd or 0.0)
+        return {
+            'vat_import_cd_amount': cd,
+            'vat_import_rd_amount': rd,
+            'vat_import_sd_amount': base * (code.sd or 0.0),
+            'vat_import_vat_amount': base * (code.vat or 0.0),
+            'vat_import_ait_amount': base * (code.ait or 0.0),
+            'vat_import_at_amount': base * (code.at or 0.0),
+        }
+
+    @api.onchange('product_id', 'quantity', 'price_unit', 'discount')
+    def _onchange_vat_import_duty_values(self):
+        for line in self:
+            if line.product_id and (
+                line.move_id.vat_supply_type == 'import'
+                or line._uses_hs_tariff_assessment()
+            ):
+                line.update(line._vat_import_duty_values())
 
     @api.onchange('product_id')
     def _onchange_vat_product_credit_policy(self):
@@ -46,23 +100,55 @@ class AccountMoveLine(models.Model):
     def _vat_tax_components(self):
         """Return VAT-input and SD amounts from the taxes of one invoice line."""
         self.ensure_one()
-        if self.display_type or not self.product_id:
+        if self.display_type != 'product' or not self.product_id:
             return 0.0, 0.0
         move = self.move_id
+        # Import VAT and SD are customs-assessed values, not ordinary vendor
+        # invoice taxes.  Use the posted tariff snapshot; while the bill is
+        # still a draft, calculate a live preview from its product HS code.
+        if move.vat_supply_type == 'import' or self._uses_hs_tariff_assessment():
+            # A non-zero posted snapshot is authoritative.  Old posted bills
+            # created before this integration have no snapshot, so calculate
+            # from the linked HS code as a backward-compatible fallback.
+            has_snapshot = any((
+                self.vat_import_cd_amount, self.vat_import_rd_amount,
+                self.vat_import_sd_amount, self.vat_import_vat_amount,
+                self.vat_import_ait_amount, self.vat_import_at_amount,
+            ))
+            values = (
+                {
+                    'vat_import_vat_amount': self.vat_import_vat_amount,
+                    'vat_import_sd_amount': self.vat_import_sd_amount,
+                }
+                if move.state == 'posted' and has_snapshot
+                else self._vat_import_duty_values()
+            )
+            return values['vat_import_vat_amount'], values['vat_import_sd_amount']
         results = self.tax_ids.compute_all(
-            self.price_unit, currency=move.currency_id, quantity=self.quantity,
+            self.price_unit * (1 - (self.discount or 0.0) / 100.0), currency=move.currency_id, quantity=self.quantity,
             product=self.product_id, partner=move.partner_id,
         ).get('taxes', [])
         input_tax = sd = 0.0
         product = self.product_id.product_tmpl_id
         for result in results:
             tax = self.env['account.tax'].browse(result['id'])
+            tax_date = move.invoice_date or move.date or fields.Date.context_today(self)
+            code_domain = []
+            if product.vat_hs_code_id:
+                code_domain.append(('hs_code_id', '=', product.vat_hs_code_id.id))
+            if product.hs_code_id:
+                code_domain.append(('zencore_hs_code_id', '=', product.hs_code_id.id))
+            if not code_domain:
+                continue
+            if len(code_domain) == 2:
+                code_domain = ['|', *code_domain]
             rules = self.env['vat.tax.rule'].search([
                 ('account_tax_id', '=', tax.id),
-                ('date_from', '<=', move.invoice_date or fields.Date.context_today(self)),
-                '|', ('date_to', '=', False), ('date_to', '>=', move.invoice_date or fields.Date.context_today(self)),
-                '|', ('hs_code_id', '=', product.vat_hs_code_id.id),
-                ('zencore_hs_code_id', '=', product.hs_code_id.id),
+                ('active', '=', True),
+                ('purchase_applicable' if move.move_type.startswith('in_') else 'sale_applicable', '=', True),
+                ('date_from', '<=', tax_date),
+                '|', ('date_to', '=', False), ('date_to', '>=', tax_date),
+                *code_domain,
             ])
             heads = set(rules.mapped('tax_head'))
             # Only explicitly mapped VAT and SD belong in these two figures.
@@ -106,7 +192,7 @@ class AccountMovePurchaseCompliance(models.Model):
             move.vat_is_unregistered_purchase = bool(is_purchase and move.partner_id.vat_registration_status == 'unregistered')
             move.vat_is_imported_service = bool(
                 is_purchase and move.partner_id.vat_registration_status == 'foreign'
-                and any(line.product_id.type == 'service' for line in move.invoice_line_ids if not line.display_type)
+                and any(line.product_id.type == 'service' for line in move.invoice_line_ids if line.display_type == 'product')
             )
 
     @api.depends('vat_taxable_amount', 'vat_vds_reverse_charge', 'vat_reverse_charge_rate')
@@ -126,12 +212,37 @@ class AccountMovePurchaseCompliance(models.Model):
                     tax_rates = move.invoice_line_ids.mapped('tax_ids').mapped('amount')
                     move.vat_reverse_charge_rate = max(tax_rates) if tax_rates else 0.0
 
+    @api.onchange('vat_supply_type')
+    def _onchange_vat_import_duties(self):
+        for move in self:
+            if move.vat_supply_type == 'import':
+                for line in move.invoice_line_ids.filtered(lambda item: item.display_type == 'product' and item.product_id):
+                    line.update(line._vat_import_duty_values())
+
+    def _snapshot_vat_import_duties(self):
+        for move in self.filtered(lambda item: item.move_type in ('in_invoice', 'in_refund')):
+            assessed_lines = move.invoice_line_ids.filtered(
+                lambda item: item.display_type == 'product' and item.product_id and (
+                    move.vat_supply_type == 'import' or item._uses_hs_tariff_assessment()
+                )
+            )
+            for line in assessed_lines:
+                line.write(line._vat_import_duty_values())
+
+    def action_post(self):
+        # Freeze the assessed duty values before the parent posting flow
+        # computes VAT totals and makes the accounting document immutable.
+        self._snapshot_vat_import_duties()
+        return super().action_post()
+
     def _vat_validate_purchase_compliance(self):
         for move in self.filtered(lambda item: item.move_type in ('in_invoice', 'in_refund')):
-            taxable_lines = move.invoice_line_ids.filtered(lambda line: not line.display_type and line.product_id)
+            taxable_lines = move.invoice_line_ids.filtered(lambda line: line.display_type == 'product' and line.product_id)
             if not taxable_lines:
                 continue
-            if move.partner_id.vat_registration_status == 'registered':
+            if move.vat_supply_type == 'import' and not (move.vat_import_bill_of_entry and move.vat_import_bill_date):
+                raise ValidationError(_('Enter the Bill of Entry number and date before posting an import purchase bill.'))
+            if move.partner_id.vat_registration_status == 'registered' and move.vat_supply_type != 'import':
                 if not move.partner_id.vat_bin:
                     raise ValidationError(_('A registered supplier must have a VAT BIN before its bill can be posted.'))
                 if not move.vat_supplier_document_number or not move.vat_supplier_document_date:
@@ -140,7 +251,10 @@ class AccountMovePurchaseCompliance(models.Model):
                 product = line.product_id.product_tmpl_id
                 if not (product.hs_code_id or product.vat_hs_code_id):
                     raise ValidationError(_('%s has no HS/service code.') % product.display_name)
-                if line.vat_input_credit_status in ('creditable', 'partial') and not move.vat_supplier_document_id and move.partner_id.vat_registration_status == 'registered':
+                if (line.vat_input_credit_status in ('creditable', 'partial')
+                        and not move.vat_supplier_document_id
+                        and move.partner_id.vat_registration_status == 'registered'
+                        and move.vat_supply_type != 'import'):
                     raise ValidationError(_('Attach the supplier Mushak/challan copy before claiming input VAT.'))
             if move.move_type == 'in_refund':
                 if not (move.reversed_entry_id or move.vat_original_move_id):
@@ -154,7 +268,7 @@ class AccountMovePurchaseCompliance(models.Model):
     def _vat_create_capital_credit_schedules(self):
         Schedule = self.env['vat.capital.credit.schedule']
         for move in self.filtered(lambda item: item.move_type == 'in_invoice' and item.state == 'posted'):
-            for line in move.invoice_line_ids.filtered(lambda item: not item.display_type and item.vat_is_capital_good and item.vat_capital_credit_treatment == 'deferred'):
+            for line in move.invoice_line_ids.filtered(lambda item: item.display_type == 'product' and item.vat_is_capital_good and item.vat_capital_credit_treatment == 'deferred'):
                 if not Schedule.search_count([('move_line_id', '=', line.id)]):
                     tax_amount, _sd = line._vat_tax_components()
                     credit = tax_amount * (line.vat_partial_credit_percent / 100.0 if line.vat_input_credit_status == 'partial' else 1.0)

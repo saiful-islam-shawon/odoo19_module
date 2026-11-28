@@ -179,7 +179,7 @@ class VatInputApportionment(models.Model):
                 domain.append(('vat_unit_id', '=', record.unit_id.id))
             common = 0.0
             for move in self.env['account.move'].search(domain):
-                for line in move.invoice_line_ids.filtered(lambda item: not item.display_type and item.vat_input_credit_status != 'non_creditable'):
+                for line in move.invoice_line_ids.filtered(lambda item: item.display_type == 'product' and item.vat_input_credit_status != 'non_creditable'):
                     common += line._vat_eligible_input_amount()
             record.total_common_input = common
             record.eligible_input = common * record.eligible_percent / 100.0

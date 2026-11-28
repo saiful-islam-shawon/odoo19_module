@@ -8,7 +8,7 @@
       @page { size: A4; margin: 8mm; }
       .zsl-mushak-form { color: #111; font-family: 'Noto Sans Bengali', 'Noto Sans', Arial, sans-serif; font-size: 9px; line-height: 1.32; }
       .zsl-mushak-title { align-items: center; background: #edf4f8; border: 1px solid #202020; display: flex; font-size: 12px; justify-content: space-between; padding: 6px 8px; }
-      .zsl-mushak-title-separator { margin: 0 7px; }.zsl-mushak-copy { font-size: 8px; font-weight: 600; }
+      .zsl-mushak-title-separator { margin: 0 7px; }.zsl-mushak-copy { font-size: 8px; font-weight: 600; }.zsl-mushak-qr { float: right; margin: 4px; text-align: center; }
       .zsl-government-heading { line-height: 1.5; padding: 8px 0 6px; text-align: center; }.zsl-government-heading span { font-size: 8px; }
       .zsl-mushak-section { border: 1px solid #222; margin: 7px 0; }.zsl-mushak-section &gt; h4 { background: #e6e6e6; border-bottom: 1px solid #222; font-size: 9px; margin: 0; padding: 4px 6px; }
       .zsl-mushak-table { border-collapse: collapse; margin: 0; width: 100%; }.zsl-mushak-table td, .zsl-mushak-table th { border: 1px solid #333; padding: 3px 4px; vertical-align: top; }.zsl-mushak-table th { background: #f2f2f2; font-weight: 700; text-align: center; }
@@ -22,7 +22,7 @@
           <span class="zsl-mushak-title-separator">|</span>
           <span t-esc="form_title"/>
         </div>
-        <div class="zsl-mushak-copy">Original Copy</div>
+        <div class="zsl-mushak-copy"><t t-if="data and data.get('vat_copy')">COPY</t><t t-else="">Original Copy</t></div>
       </div>
       <div class="zsl-government-heading">
         <strong>গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</strong><br/>

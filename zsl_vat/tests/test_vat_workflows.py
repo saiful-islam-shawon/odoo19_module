@@ -1,5 +1,6 @@
 from datetime import date
 
+from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
 
 
@@ -18,6 +19,11 @@ class TestVatWorkflows(TransactionCase):
             'company_id': cls.company.id,
             'date_start': date(2026, 1, 1),
             'date_end': date(2026, 1, 31),
+        })
+        cls.unit = cls.env['vat.unit'].create({
+            'name': 'VAT Workflow Unit', 'code': 'VAT-WORKFLOW',
+            'company_id': cls.company.id, 'registration_scope': 'sub_location',
+            'address': 'Test address',
         })
 
     def test_cross_application_models_and_fields_exist(self):
@@ -74,3 +80,73 @@ class TestVatWorkflows(TransactionCase):
         })
         checklist.action_evaluate()
         self.assertEqual(checklist.state, 'passed')
+
+    def test_issued_invoice_is_immutable_and_cancellation_is_approved(self):
+        income_account = self.env['account.account'].search([
+            ('company_ids', 'in', self.company.id), ('account_type', '=', 'income'),
+        ], limit=1)
+        self.assertTrue(income_account, 'The test company needs an income account.')
+        self.service.product_tmpl_id.property_account_income_id = income_account
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice', 'partner_id': self.partner.id,
+            'invoice_date': date(2026, 1, 15),
+            'invoice_line_ids': [(0, 0, {
+                'product_id': self.service.id, 'name': self.service.name,
+                'quantity': 1, 'price_unit': 1000, 'account_id': income_account.id,
+            })],
+        })
+        invoice.action_post()
+        self.assertEqual(invoice.vat_taxable_amount, 1000)
+        self.assertFalse(invoice.vat_is_high_value)
+        mushak_number = invoice.vat_mushak_number
+        self.assertTrue(mushak_number)
+        self.assertTrue(invoice.vat_qr_payload)
+        with self.assertRaises(UserError):
+            invoice.write({'invoice_date': date(2026, 1, 16)})
+        with self.assertRaises(UserError):
+            invoice.invoice_line_ids.write({'price_unit': 900})
+        with self.assertRaises(UserError):
+            invoice.unlink()
+        with self.assertRaises(UserError):
+            invoice.button_cancel()
+        invoice.write({'vat_cancellation_reason': 'Duplicate invoice issued.'})
+        invoice.button_cancel()
+        self.assertEqual(invoice.vat_cancellation_state, 'requested')
+        manager = self.env.ref('base.user_admin')
+        invoice.with_user(manager).action_approve_vat_cancellation()
+        self.assertEqual(invoice.state, 'cancel')
+        self.assertEqual(invoice.vat_cancellation_state, 'approved')
+        self.assertEqual(invoice.vat_mushak_number, mushak_number)
+
+    def test_locked_vat_records_cannot_be_edited_or_deleted(self):
+        coefficient = self.env['vat.io.coefficient'].create({
+            'product_tmpl_id': self.service.product_tmpl_id.id,
+        })
+        manager = self.env.ref('base.user_admin')
+        coefficient.with_user(manager).action_approve()
+        with self.assertRaises(UserError):
+            coefficient.write({'value_addition': 10})
+        with self.assertRaises(UserError):
+            coefficient.unlink()
+
+        opening = self.env['vat.stock.opening'].create({
+            'company_id': self.company.id, 'unit_id': self.unit.id,
+            'product_id': self.service.id, 'effective_date': date(2026, 1, 1),
+            'quantity': 1, 'value': 100, 'source_reference': 'Opening test',
+        })
+        opening.with_user(manager).action_approve()
+        with self.assertRaises(UserError):
+            opening.write({'quantity': 2})
+        with self.assertRaises(UserError):
+            opening.unlink()
+
+        vat_return = self.env['vat.return'].create({
+            'company_id': self.company.id, 'period_id': self.period.id,
+            'nbr_acknowledgement': 'TEST-ACK-001',
+        })
+        vat_return.write({'state': 'approved'})
+        vat_return.with_user(manager).action_submit()
+        with self.assertRaises(UserError):
+            vat_return.write({'opening_balance': 50})
+        with self.assertRaises(UserError):
+            vat_return.unlink()

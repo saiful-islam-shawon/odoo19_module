@@ -139,9 +139,11 @@
       <form string="Print VAT Book">
         <group>
           <field name="company_id" invisible="1"/>
-          <field name="period_id"/>
-          <field name="unit_id"/>
           <field name="book_type"/>
+          <field name="date_mode" widget="radio" options="{'horizontal': true}"/>
+          <field name="period_id" invisible="date_mode != 'period'" required="date_mode == 'period'"/>
+          <field name="report_date" invisible="date_mode != 'single'" required="date_mode == 'single'"/>
+          <field name="warehouse_id" options="{'no_create': true}"/>
         </group>
         <footer>
           <button name="action_print" type="object" string="Print" class="btn-primary"/>

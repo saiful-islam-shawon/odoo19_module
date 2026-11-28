@@ -45,6 +45,8 @@
         <field name="quantity"/>
         <field name="value"/>
         <field name="source_reference"/>
+        <field name="inventory_applied" optional="show"/>
+        <field name="state"/>
       </list>
     </field>
   </record>
@@ -53,16 +55,27 @@
     <field name="model">vat.stock.opening</field>
     <field name="arch" type="xml">
       <form>
+        <header>
+          <button name="action_approve" type="object" string="Approve &amp; Lock" class="btn-primary" invisible="state != 'draft'" groups="zsl_vat.group_vat_manager"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,locked"/>
+        </header>
         <sheet>
           <group>
-            <field name="company_id"/>
-            <field name="unit_id"/>
-            <field name="effective_date"/>
-            <field name="product_id"/>
+            <field name="company_id" readonly="state == 'locked'"/>
+            <field name="unit_id" readonly="state == 'locked'"/>
+            <field name="effective_date" readonly="state == 'locked'"/>
+            <field name="product_id" readonly="state == 'locked'"/>
             <field name="vat_uom_id" readonly="1"/>
-            <field name="quantity"/>
-            <field name="value"/>
-            <field name="source_reference"/>
+            <field name="quantity" readonly="state == 'locked'"/>
+            <field name="value" readonly="state == 'locked'"/>
+            <field name="source_reference" readonly="state == 'locked'"/>
+          </group>
+          <group string="Inventory Adjustment">
+            <field name="apply_to_stock" readonly="state == 'locked'"/>
+            <field name="location_id" readonly="state == 'locked'" required="apply_to_stock" invisible="not apply_to_stock"/>
+            <field name="onhand_before" invisible="not inventory_applied"/>
+            <field name="inventory_applied" invisible="1"/>
+            <field name="inventory_applied_date" invisible="not inventory_applied"/>
           </group>
         </sheet>
       </form>

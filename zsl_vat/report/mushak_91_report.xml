@@ -230,22 +230,22 @@
                                 <tr style="height: 25px;">
                                     <td style="padding: 1.5px 6px;">(২) করদাতার নাম</td>
                                     <td class="text-center" style="padding: 1.5px 6px;">:</td>
-                                    <td style="padding: 1.5px 6px;"><span t-field="o.company_id.name"/></td>
+                                    <td style="padding: 1.5px 6px;"><span t-esc="o.company_id.vat_legal_name or o.company_id.name or ''"/></td>
                                 </tr>
                                 <tr style="height: 25px;">
                                     <td style="padding: 1.5px 6px;">(৩) করদাতার ঠিকানা</td>
                                     <td class="text-center" style="padding: 1.5px 6px;">:</td>
-                                    <td style="padding: 1.5px 6px;"><span t-field="o.company_id.street"/></td>
+                                    <td style="padding: 1.5px 6px;"><span t-esc="o.company_id.vat_registered_address or o.company_id.partner_id.contact_address or ''"/></td>
                                 </tr>
                                 <tr style="height: 25px;">
                                     <td style="padding: 1.5px 6px;">(৪) ব্যবসার প্রকৃতি</td>
                                     <td class="text-center" style="padding: 1.5px 6px;">:</td>
-                                    <td style="padding: 1.5px 6px;"><span t-field="o.unit_id.name"/></td>
+                                    <td style="padding: 1.5px 6px;"><span t-esc="dict(o.company_id._fields['vat_business_nature'].selection).get(o.company_id.vat_business_nature, '') if o.company_id.vat_business_nature else o.unit_id.name or ''"/></td>
                                 </tr>
                                 <tr style="height: 25px;">
                                     <td style="padding: 1.5px 6px;">(৫) অর্থনৈতিক কার্যক্রম এর প্রকৃতি</td>
                                     <td class="text-center" style="padding: 1.5px 6px;">:</td>
-                                    <td style="padding: 1.5px 6px;">&#160;</td>
+                                    <td style="padding: 1.5px 6px;"><span t-esc="o.unit_id.name or ''"/></td>
                                 </tr>
                             </table>
 
@@ -302,9 +302,7 @@
                                     <td style="padding: 4px 6px; vertical-align: middle;">(৪) পেশের তারিখ</td>
                                     <td class="text-center" style="padding: 4px 6px; vertical-align: middle;">:</td>
                                     <td style="padding: 4px 8px; vertical-align: middle;">
-                                        <span class="date-char-box">D</span><span class="date-char-box">D</span> / 
-                                        <span class="date-char-box">M</span><span class="date-char-box">M</span> / 
-                                        <span class="date-char-box">Y</span><span class="date-char-box">Y</span><span class="date-char-box">Y</span><span class="date-char-box">Y</span>
+                                        <span t-esc="(o.nbr_submission_date or o.create_date.date()).strftime('%d/%m/%Y') if (o.nbr_submission_date or o.create_date) else ''"/>
                                     </td>
                                 </tr>
                             </table>

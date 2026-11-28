@@ -19,6 +19,22 @@
               </group>
             </group>
           </page>
+          <page name="zsl_vat_tax_rules" string="VAT Tax Rules">
+            <field name="tax_rule_ids" context="{'default_zencore_hs_code_id': id}">
+              <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="tax_head"/>
+                <field name="calculation"/>
+                <field name="rate"/>
+                <field name="account_tax_id"/>
+                <field name="purchase_applicable"/>
+                <field name="sale_applicable"/>
+                <field name="creditable"/>
+                <field name="active"/>
+              </list>
+            </field>
+          </page>
         </notebook>
       </xpath>
     </field>

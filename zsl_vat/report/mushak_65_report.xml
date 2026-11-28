@@ -178,15 +178,15 @@
                         <!-- Metadata Section -->
                         <div class="mushak-65-meta-container">
                             <div class="mushak-65-meta-left">
-                                <div>নিবন্ধিত ব্যক্তির নাম :</div>
-                                <div>নিবন্ধিত ব্যক্তির বিআইএন :</div>
-                                <div>প্রেরণকারী ইউনিট/শাখা/পণ্যাগারের নাম ও ঠিকানা :</div>
-                                <div style="margin-top: 14px;">গ্রহীতা ইউনিট/শাখা/পণ্যাগারের নাম ও ঠিকানা :</div>
+                                <div>নিবন্ধিত ব্যক্তির নাম : <span t-esc="o.company_id.vat_legal_name or o.company_id.name"/></div>
+                                <div>নিবন্ধিত ব্যক্তির বিআইএন : <span t-esc="o.company_id.vat_bin or ''"/></div>
+                                <div>প্রেরণকারী ইউনিট/শাখা/পণ্যাগারের নাম ও ঠিকানা : <span t-esc="(o.vat_unit_id.name or '') + (' - ' + o.vat_unit_id.address if o.vat_unit_id.address else '')"/></div>
+                                <div style="margin-top: 14px;">গ্রহীতা ইউনিট/শাখা/পণ্যাগারের নাম ও ঠিকানা : <span t-esc="(o.vat_receiving_unit_id.name or '') + (' - ' + o.vat_receiving_unit_id.address if o.vat_receiving_unit_id.address else '')"/></div>
                             </div>
                             <div class="mushak-65-meta-right">
-                                <div>চালান নম্বর :</div>
-                                <div>ইস্যুর তারিখ :</div>
-                                <div>ইস্যুর সময় :</div>
+                                <div>চালান নম্বর : <span t-esc="o.vat_challan_number or o.name"/></div>
+                                <div>ইস্যুর তারিখ : <span t-esc="context_timestamp(o.vat_challan_date).strftime('%d-%m-%Y') if o.vat_challan_date else ''"/></div>
+                                <div>ইস্যুর সময় : <span t-esc="context_timestamp(o.vat_challan_date).strftime('%I:%M %p') if o.vat_challan_date else ''"/></div>
                             </div>
                             <div class="mushak-65-clear"/>
                         </div>
@@ -220,14 +220,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Exact single blank row matching the statutory template -->
-                                <tr class="mushak-65-data-row">
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
-                                    <td>&#160;</td>
+                                <tr class="mushak-65-data-row" t-foreach="o.move_ids.filtered(lambda move: move.quantity)" t-as="move">
+                                    <td><span t-esc="move_index + 1"/></td>
+                                    <td><span t-esc="move.product_id.display_name or ''"/></td>
+                                    <td><span t-esc="'%.2f %s' % (move.quantity, move.product_uom.name or '')"/></td>
+                                    <td><span t-esc="'%.2f' % (move.quantity * move.product_id.standard_price)"/></td>
+                                    <td><span t-esc="'%.2f' % ((o.vat_transfer_tax_amount * (move.quantity * move.product_id.standard_price) / o.vat_transfer_value) if o.vat_transfer_value else 0.0)"/></td>
+                                    <td><span t-esc="o.vat_remarks or ''"/></td>
                                 </tr>
                             </tbody>
                         </table>

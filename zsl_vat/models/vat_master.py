@@ -47,7 +47,11 @@ class VatTaxRule(models.Model):
     _order = 'hs_code_id, date_from desc, sequence, id'
 
     sequence = fields.Integer(default=10)
-    hs_code_id = fields.Many2one('vat.hs.code', required=True, ondelete='cascade')
+    # A rule can belong to either the legacy VAT-code master or the Zencore
+    # HS-code master.  The latter is what Product templates use in this
+    # deployment; requiring the legacy field prevented such rules from being
+    # configured through the normal VAT Tax Rules screen.
+    hs_code_id = fields.Many2one('vat.hs.code', ondelete='cascade')
     name = fields.Char(required=True)
     tax_head = fields.Selection(VAT_HEADS, required=True, default='vat')
     calculation = fields.Selection([('percent', 'Percentage'), ('fixed', 'Fixed per VAT UoM'), ('truncated', 'Truncated Base')], required=True, default='percent')
@@ -72,6 +76,12 @@ class VatTaxRule(models.Model):
             if record.rate < 0 or record.truncated_base_percent < 0:
                 raise ValidationError(_('Rates cannot be negative.'))
 
+    @api.constrains('hs_code_id', 'zencore_hs_code_id')
+    def _check_hs_code_source(self):
+        for record in self:
+            if not record.hs_code_id and not record.zencore_hs_code_id:
+                raise ValidationError(_('Select a VAT HS/Service Code or a Zencore HS/Service Code.'))
+
 
 class VatUnit(models.Model):
     _name = 'vat.unit'
@@ -89,7 +99,15 @@ class VatUnit(models.Model):
     bin = fields.Char(string='Unit BIN', tracking=True)
     legacy_bin = fields.Char(string='Legacy Unit BIN', tracking=True)
     address = fields.Text(string='VAT Registered / Sub-location Address', required=True)
+    annual_turnover = fields.Monetary(string='Annual Turnover', currency_field='currency_id')
+    currency_id = fields.Many2one(related='company_id.currency_id', store=True)
+    vat_document_count = fields.Integer(compute='_compute_vat_document_count', readonly=True)
     warehouse_ids = fields.Many2many('stock.warehouse', string='Warehouses')
+
+    @api.depends()
+    def _compute_vat_document_count(self):
+        for record in self:
+            record.vat_document_count = self.env['vat.document.series'].search_count([('unit_id', '=', record.id)])
     user_ids = fields.Many2many('res.users', string='Allowed Users')
     business_type_ids = fields.Many2many('vat.business.type', string='Business Types')
     active = fields.Boolean(default=True)
@@ -304,6 +322,26 @@ class VatDocumentSeries(models.Model):
         'Only one series is allowed per company, unit and document type.',
     )
 
+    def _has_issued_numbers(self):
+        self.ensure_one()
+        sequence = self.sequence_id
+        return bool(sequence and (
+            sequence.number_next_actual > 1
+            or self.env['ir.sequence.date_range'].sudo().search_count([
+                ('sequence_id', '=', sequence.id), ('number_next', '>', 1),
+            ])
+        ))
+
+    def write(self, vals):
+        if any(record._has_issued_numbers() for record in self):
+            raise UserError(_('A Mushak numbering series cannot be changed after it has issued a number.'))
+        return super().write(vals)
+
+    def unlink(self):
+        if any(record._has_issued_numbers() for record in self):
+            raise UserError(_('A Mushak numbering series cannot be deleted after it has issued a number.'))
+        return super().unlink()
+
     @api.model
     def _sequence_prefix(self, document_type, unit=False):
         document_number = document_type[:1] + '.' + document_type[1:]
@@ -401,12 +439,32 @@ class VatPriceDeclaration(models.Model):
     approval_reference = fields.Char()
     attachment_ids = fields.Many2many('ir.attachment', string='Supporting Documents')
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        if any(vals.get('state', 'draft') != 'draft' for vals in vals_list):
+            raise UserError(_('Price declarations must be created as drafts and approved through the workflow.'))
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if 'state' in vals and not self.env.context.get('vat_price_workflow') and self.filtered(
+            lambda record: record.state != vals['state']
+        ):
+            raise UserError(_('Price declaration approval state can only change through its workflow.'))
+        if self.filtered(lambda record: record.state in ('approved', 'superseded')) and set(vals) - {'state'}:
+            raise UserError(_('An approved price declaration is immutable. Create a new effective-dated declaration.'))
+        return super().write(vals)
+
+    def unlink(self):
+        if self.filtered(lambda record: record.state in ('approved', 'superseded')):
+            raise UserError(_('An approved price declaration cannot be deleted.'))
+        return super().unlink()
+
     def action_approve(self):
         if not self.env.user.has_group('zsl_vat.group_vat_officer'):
             raise UserError(_('A VAT Officer must approve a price declaration.'))
         for record in self:
-            record.search([('product_tmpl_id', '=', record.product_tmpl_id.id), ('unit_id', '=', record.unit_id.id), ('state', '=', 'approved'), ('id', '!=', record.id)]).write({'state': 'superseded'})
-            record.state = 'approved'
+            record.search([('product_tmpl_id', '=', record.product_tmpl_id.id), ('unit_id', '=', record.unit_id.id), ('state', '=', 'approved'), ('id', '!=', record.id)]).with_context(vat_price_workflow=True).write({'state': 'superseded'})
+            record.with_context(vat_price_workflow=True).write({'state': 'approved'})
 
 
 class VatIoCoefficient(models.Model):
@@ -428,6 +486,26 @@ class VatIoCoefficient(models.Model):
     declared_price = fields.Monetary(compute='_compute_totals', currency_field='currency_id')
     state = fields.Selection([('draft', 'Draft'), ('approved', 'Approved'), ('superseded', 'Superseded')], default='draft', tracking=True)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        if any(vals.get('state', 'draft') != 'draft' for vals in vals_list):
+            raise UserError(_('Mushak 4.3 coefficients must be created as drafts and approved through the workflow.'))
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if 'state' in vals and not self.env.context.get('vat_coefficient_workflow') and self.filtered(
+            lambda record: record.state != vals['state']
+        ):
+            raise UserError(_('Coefficient approval state can only change through its workflow.'))
+        if self.filtered(lambda record: record.state in ('approved', 'superseded')) and set(vals) - {'state'}:
+            raise UserError(_('An approved Mushak 4.3 coefficient is immutable. Create a new version.'))
+        return super().write(vals)
+
+    def unlink(self):
+        if self.filtered(lambda record: record.state in ('approved', 'superseded')):
+            raise UserError(_('An approved Mushak 4.3 coefficient cannot be deleted.'))
+        return super().unlink()
+
     @api.depends('line_ids.subtotal', 'value_addition')
     def _compute_totals(self):
         for record in self:
@@ -444,8 +522,8 @@ class VatIoCoefficient(models.Model):
         if not self.env.user.has_group('zsl_vat.group_vat_officer'):
             raise UserError(_('A VAT Officer must approve a coefficient.'))
         for record in self:
-            record.search([('product_tmpl_id', '=', record.product_tmpl_id.id), ('state', '=', 'approved'), ('id', '!=', record.id)]).write({'state': 'superseded'})
-            record.state = 'approved'
+            record.search([('product_tmpl_id', '=', record.product_tmpl_id.id), ('state', '=', 'approved'), ('id', '!=', record.id)]).with_context(vat_coefficient_workflow=True).write({'state': 'superseded'})
+            record.with_context(vat_coefficient_workflow=True).write({'state': 'approved'})
 
     def action_print_mushak_43(self):
         self.ensure_one()
@@ -463,6 +541,27 @@ class VatIoCoefficientLine(models.Model):
     unit_cost = fields.Monetary(required=True, currency_field='currency_id')
     currency_id = fields.Many2one(related='coefficient_id.currency_id')
     subtotal = fields.Monetary(compute='_compute_subtotal', store=True, currency_field='currency_id')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        coefficient_ids = [vals.get('coefficient_id') for vals in vals_list if vals.get('coefficient_id')]
+        if self.env['vat.io.coefficient'].browse(coefficient_ids).filtered(
+            lambda coefficient: coefficient.state != 'draft'
+        ):
+            raise UserError(_('Inputs cannot be added to an approved Mushak 4.3 coefficient.'))
+        return super().create(vals_list)
+
+    def _check_coefficient_editable(self):
+        if self.filtered(lambda line: line.coefficient_id.state in ('approved', 'superseded')):
+            raise UserError(_('Inputs on an approved Mushak 4.3 coefficient cannot be changed.'))
+
+    def write(self, vals):
+        self._check_coefficient_editable()
+        return super().write(vals)
+
+    def unlink(self):
+        self._check_coefficient_editable()
+        return super().unlink()
 
     @api.depends('quantity', 'unit_cost')
     def _compute_subtotal(self):

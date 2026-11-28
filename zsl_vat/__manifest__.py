@@ -1,7 +1,7 @@
 {
     'name': 'ZSL Bangladesh VAT Management',
     'summary': 'Mushak, VAT books, VDS and monthly VAT return for Bangladesh',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.4.13',
     'category': 'Accounting/Localizations',
     'author': 'Zencore Solutions Ltd.',
     'license': 'LGPL-3',
@@ -47,6 +47,10 @@
         'report/mushak_66_report.xml',
         'report/mushak_67_report.xml',
         'report/mushak_68_report.xml',
+        # This file updates the 6.3, 6.7 and 6.8 report actions.  It must
+        # load only after all three actions exist, otherwise a fresh database
+        # attempts to create an unnamed ir.actions.report record.
+        'report/mushak_63_security.xml',
         'report/mushak_610_report.xml',
         'report/mushak_91_report.xml',
         'report/mushak_92_report.xml',

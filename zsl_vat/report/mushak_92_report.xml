@@ -36,6 +36,7 @@
     <template id="report_mushak_92">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
+                <t t-set="company" t-value="o.company_id"/>
                 <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
                     <div class="page mushak-92-page">
                         <style type="text/css">
@@ -214,27 +215,27 @@
                                     <tr style="height: 22px;">
                                         <td>(১) ব্যবসায় সনাক্তকরণ সংখ্যা</td>
                                         <td class="text-center">:</td>
-                                        <td>&#160;</td>
+                                        <td><span t-esc="company.vat_bin or ''"/></td>
                                     </tr>
                                     <tr style="height: 22px;">
                                         <td>(২) করদাতার নাম</td>
                                         <td class="text-center">:</td>
-                                        <td>&#160;</td>
+                                        <td><span t-esc="company.vat_legal_name or company.name or ''"/></td>
                                     </tr>
                                     <tr style="height: 22px;">
                                         <td>(৩) করদাতার ঠিকানা</td>
                                         <td class="text-center">:</td>
-                                        <td>&#160;</td>
+                                        <td><span t-esc="company.vat_registered_address or company.partner_id.contact_address or ''"/></td>
                                     </tr>
                                     <tr style="height: 22px;">
                                         <td>(৪) ব্যবসার প্রকৃতি</td>
                                         <td class="text-center">:</td>
-                                        <td>&#160;</td>
+                                        <td><span t-esc="dict(company._fields['vat_business_nature'].selection).get(company.vat_business_nature, '') if company.vat_business_nature else ''"/></td>
                                     </tr>
                                     <tr style="height: 22px;">
                                         <td>(৫)অর্থনৈতিক কার্যক্রম এর প্রকৃতি</td>
                                         <td class="text-center">:</td>
-                                        <td>&#160;</td>
+                                        <td><span t-esc="o.unit_id.name or ''"/></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -257,9 +258,9 @@
                                         <td class="text-center">:</td>
                                         <td style="padding-left: 30px;">
                                             <span style="color: #7f7f7f;">মাস</span>
-                                            <span style="display: inline-block; width: 75px;">&#160;</span>
+                                            <span style="display: inline-block; width: 75px;"><span t-esc="o.period_id.date_start.strftime('%B') if o.period_id.date_start else ''"/></span>
                                             <span>/</span>
-                                            <span style="display: inline-block; width: 25px;">&#160;</span>
+                                            <span style="display: inline-block; width: 55px;"><span t-esc="o.period_id.date_start.strftime('%Y') if o.period_id.date_start else ''"/></span>
                                             <span style="color: #7f7f7f;">বৎসর</span>
                                         </td>
                                     </tr>
@@ -274,17 +275,17 @@
                                                 <tr>
                                                     <td style="border: none; padding: 4px 0; font-weight: bold; width: 12%;">(ক)</td>
                                                     <td style="border: none; padding: 4px 0; font-weight: bold; width: 76%;">মূল দাখিলপত্র (ধারা ৬৪)</td>
-                                                    <td style="border: none; padding: 4px 0; text-align: right; width: 12%;"><span class="square-box">&#160;</span></td>
+                                                    <td style="border: none; padding: 4px 0; text-align: right; width: 12%;"><span class="square-box"><t t-if="o.return_type == 'main'">✓</t></span></td>
                                                 </tr>
                                                 <tr>
                                                     <td style="border: none; padding: 6px 0; font-weight: bold;">(খ)</td>
                                                     <td style="border: none; padding: 6px 0; font-weight: bold;">সংশোধিত দাখিলপত্র (ধারা ৬৬)</td>
-                                                    <td style="border: none; padding: 6px 0; text-align: right;"><span class="square-box">&#160;</span></td>
+                                                    <td style="border: none; padding: 6px 0; text-align: right;"><span class="square-box"><t t-if="o.return_type == 'amended'">✓</t></span></td>
                                                 </tr>
                                                 <tr>
                                                     <td style="border: none; padding: 4px 0; font-weight: bold; vertical-align: top;">(গ)</td>
                                                     <td style="border: none; padding: 4px 0; font-weight: bold; vertical-align: top;">পূর্ণ, অতিরিক্ত বা বিকল্প দাখিলপত্র<br/>(ধারা ৬৭)</td>
-                                                    <td style="border: none; padding: 4px 0; text-align: right; vertical-align: middle;"><span class="square-box">&#160;</span></td>
+                                                    <td style="border: none; padding: 4px 0; text-align: right; vertical-align: middle;"><span class="square-box"><t t-if="o.return_type in ('late', 'additional')">✓</t></span></td>
                                                 </tr>
                                             </table>
                                         </td>
@@ -297,9 +298,9 @@
                                         <td class="text-center" style="vertical-align: top; padding-top: 5px;">:</td>
                                         <td style="padding: 5px 10px;">
                                             <div style="margin-bottom: 5px;">
-                                                <span class="yesno-box">&#160;</span> &#160;হ্যাঁ
+                                                <span class="yesno-box"><t t-if="o.line_ids">✓</t></span> &#160;হ্যাঁ
                                                 <span style="display: inline-block; width: 60px;">&#160;</span>
-                                                <span class="yesno-box">&#160;</span> &#160;না
+                                                <span class="yesno-box"><t t-if="not o.line_ids">✓</t></span> &#160;না
                                             </div>
                                             <div style="font-size: 8.5pt;">[যদি 'না' হয় তাহা হইলে অংশ-১, ২ এবং ৮ পূরণ করুন]</div>
                                         </td>
@@ -310,7 +311,7 @@
                                         <td style="padding: 3px 6px;">
                                             <table class="date-grid-table">
                                                 <tr>
-                                                    <td>D</td><td>D</td><td>/</td><td>M</td><td>M</td><td>/</td><td>Y</td><td>Y</td><td>Y</td><td>Y</td>
+                                                    <td colspan="10"><span t-esc="(o.nbr_submission_date or o.create_date.date()).strftime('%d/%m/%Y') if (o.nbr_submission_date or o.create_date) else ''"/></td>
                                                 </tr>
                                             </table>
                                         </td>
@@ -374,8 +375,8 @@
                                     <tr class="fw-bold" style="height: 30px;">
                                         <td colspan="2" style="vertical-align: top;">মোট বিক্রয়মূল্য ও মোট টার্নওভার কর</td>
                                         <td class="text-center" style="vertical-align: top;">৫</td>
-                                        <td>&#160;</td>
-                                        <td>&#160;</td>
+                                        <td class="text-right"><span t-esc="'{:,.2f}'.format(sum(line.base_amount for line in o.line_ids if line.output_vat)) if o.line_ids else ''"/></td>
+                                        <td class="text-right"><span t-esc="'{:,.2f}'.format(o.output_vat) if o.output_vat else ''"/></td>
                                         <td class="no-border-cell">&#160;</td>
                                     </tr>
                                 </tbody>
@@ -442,8 +443,8 @@
                                     <tr class="fw-bold" style="height: 30px;">
                                         <td style="vertical-align: top;">মোট উপকরণ ক্রয় মূল্য ও কর</td>
                                         <td class="text-center" style="vertical-align: top;">১১</td>
-                                        <td>&#160;</td>
-                                        <td>&#160;</td>
+                                        <td class="text-right"><span t-esc="'{:,.2f}'.format(sum(line.base_amount for line in o.line_ids if line.input_vat)) if o.line_ids else ''"/></td>
+                                        <td class="text-right"><span t-esc="'{:,.2f}'.format(o.input_vat) if o.input_vat else ''"/></td>
                                         <td class="no-border-cell">&#160;</td>
                                     </tr>
                                 </tbody>
@@ -470,12 +471,12 @@
                                     <tr>
                                         <td>বর্তমান করমেয়াদে প্রদেয় মোট কর (সমাপনী<br/>জের ব্যতীত) (৫খ)</td>
                                         <td class="text-center">১২</td>
-                                        <td>&#160;</td>
+                                        <td class="text-right"><span t-esc="'{:,.2f}'.format(o.output_vat) if o.output_vat else ''"/></td>
                                     </tr>
                                     <tr>
                                         <td>সমাপনী জের এর সহিত সমন্বয়ের পর বর্তমান<br/>করমেয়াদে প্রদেয় মোট কর (১২-২১)</td>
                                         <td class="text-center">১৩</td>
-                                        <td>&#160;</td>
+                                        <td class="text-right"><span t-esc="'{:,.2f}'.format(o.net_payable) if o.net_payable else ''"/></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -494,12 +495,12 @@
                                     <tr style="height: 22px;">
                                         <td>অপরিশোধিত করের জন্য সুদ</td>
                                         <td class="text-center">১৪</td>
-                                        <td>&#160;</td>
+                                        <td class="text-right"><span t-esc="'{:,.2f}'.format(o.late_interest) if o.late_interest else ''"/></td>
                                     </tr>
                                     <tr style="height: 22px;">
                                         <td>অর্থদন্ড ও জরিমানা</td>
                                         <td class="text-center">১৫</td>
-                                        <td>&#160;</td>
+                                        <td class="text-right"><span t-esc="'{:,.2f}'.format(o.late_fine) if o.late_fine else ''"/></td>
                                     </tr>
                                     <tr style="height: 22px;">
                                         <td>আবগারি শুল্ক</td>
@@ -529,7 +530,7 @@
                                     <tr style="height: 22px;">
                                         <td>শেষ কর মেয়াদের সমাপনী জের (টার্নওভার কর)</td>
                                         <td class="text-center">২১</td>
-                                        <td>&#160;</td>
+                                        <td class="text-right"><span t-esc="'{:,.2f}'.format(o.opening_balance) if o.opening_balance else ''"/></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -561,7 +562,7 @@
                                         <td>বর্তমান করমেয়াদে পরিশোধিত মোট কর</td>
                                         <td class="text-center">২২</td>
                                         <td>১/১১৩৩/অপারেশনাল কোড/০৩১৩</td>
-                                        <td>&#160;</td>
+                                        <td class="text-right"><span t-esc="'{:,.2f}'.format(sum(o.treasury_payment_ids.mapped('amount'))) if o.treasury_payment_ids else ''"/></td>
                                         <td class="subform-cell-white">সাবফর্ম-খ</td>
                                     </tr>
                                     <tr style="height: 22px;">
@@ -637,7 +638,7 @@
                                     <tr style="height: 22px;">
                                         <td>সমাপনী জের (টার্নওভার কর) (২২-১৩)</td>
                                         <td class="text-center">৩০</td>
-                                        <td>&#160;</td>
+                                        <td class="text-right"><span t-esc="'{:,.2f}'.format(o.closing_credit) if o.closing_credit else ''"/></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -660,24 +661,24 @@
                                     </tr>
                                     <tr style="height: 20px;">
                                         <td>নাম</td>
-                                        <td>&#160;</td>
+                                        <td><span t-esc="company.vat_authorised_person_name or o.env.user.name or ''"/></td>
                                         <td rowspan="5" class="text-center" style="vertical-align: bottom; padding-bottom: 4px;">স্বাক্ষর</td>
                                     </tr>
                                     <tr style="height: 20px;">
                                         <td>পদবি</td>
-                                        <td>&#160;</td>
+                                        <td><span t-esc="company.vat_authorised_person_designation or ''"/></td>
                                     </tr>
                                     <tr style="height: 20px;">
                                         <td>তারিখ</td>
-                                        <td>&#160;</td>
+                                        <td><span t-esc="(o.nbr_submission_date or o.create_date.date()).strftime('%d-%m-%Y') if (o.nbr_submission_date or o.create_date) else ''"/></td>
                                     </tr>
                                     <tr style="height: 20px;">
                                         <td>মোবাইল নম্বর</td>
-                                        <td>&#160;</td>
+                                        <td><span t-esc="company.phone or ''"/></td>
                                     </tr>
                                     <tr style="height: 20px;">
                                         <td>ইমেইল</td>
-                                        <td>&#160;</td>
+                                        <td><span t-esc="company.email or ''"/></td>
                                     </tr>
                                 </tbody>
                             </table>

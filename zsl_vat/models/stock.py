@@ -29,6 +29,24 @@ class StockPicking(models.Model):
     vat_challan_date = fields.Datetime(string='Challan Date', readonly=True)
     vat_adjustment_reason = fields.Text(string='Damage / Destruction Reason')
 
+    def write(self, vals):
+        if ({'vat_challan_number', 'vat_challan_date'} & set(vals)
+            and not self.env.context.get('vat_issue_challan')):
+            raise UserError(_('VAT challan numbers and dates are assigned only when the stock transfer is validated.'))
+        protected_fields = {
+            'name', 'picking_type_id', 'partner_id', 'move_ids', 'move_line_ids',
+            'vat_unit_id', 'vat_receiving_unit_id', 'vat_invoice_id', 'vat_tax_document_id',
+            'vat_challan_type', 'vat_challan_number', 'vat_challan_date', 'state',
+        }
+        if self.filtered(lambda picking: picking.vat_challan_number) and protected_fields.intersection(vals) and not self.env.context.get('vat_issue_challan'):
+            raise UserError(_('An issued VAT challan and its stock movement cannot be edited. Use a return or a new challan.'))
+        return super().write(vals)
+
+    def unlink(self):
+        if self.filtered('vat_challan_number'):
+            raise UserError(_('An issued VAT challan cannot be deleted.'))
+        return super().unlink()
+
     def _suggest_vat_challan_type(self):
         self.ensure_one()
         if self.picking_type_id.code == 'internal':
@@ -39,6 +57,20 @@ class StockPicking(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        if any(vals.get('vat_challan_number') or vals.get('vat_challan_date') for vals in vals_list):
+            raise UserError(_('VAT challan numbers are assigned only when the stock transfer is validated.'))
+        # Receipts and deliveries created from purchase/sales orders do not
+        # show the VAT tab before validation.  In a single-unit company their
+        # unit is unambiguous, so populate it here.  Multi-unit companies keep
+        # the field empty and must choose the responsible unit explicitly.
+        VatUnit = self.env['vat.unit']
+        for vals in vals_list:
+            if vals.get('vat_unit_id'):
+                continue
+            company_id = vals.get('company_id') or self.env.company.id
+            units = VatUnit.search([('company_id', '=', company_id)], limit=2)
+            if len(units) == 1:
+                vals['vat_unit_id'] = units.id
         pickings = super().create(vals_list)
         for picking in pickings.filtered(lambda p: not p.vat_challan_type):
             picking.vat_challan_type = picking._suggest_vat_challan_type()
@@ -94,16 +126,21 @@ class StockPicking(models.Model):
         result = super().button_validate()
         for picking in self.filtered(lambda p: p.state == 'done' and not p.vat_challan_number):
             if picking.vat_challan_type == 'transfer':
-                picking.vat_challan_number = self.env['vat.document.series'].next_number(
+                challan_number = self.env['vat.document.series'].next_number(
                     '65', picking.company_id, picking.vat_unit_id, fields.Date.to_date(picking.date_done),
                 )
             elif picking.vat_challan_type == 'contract_send':
-                picking.vat_challan_number = self.env['vat.document.series'].next_number(
+                challan_number = self.env['vat.document.series'].next_number(
                     '64', picking.company_id, picking.vat_unit_id, fields.Date.to_date(picking.date_done),
                 )
             elif picking.vat_challan_type == 'delivery':
-                picking.vat_challan_number = self.env['ir.sequence'].next_by_code('stock.picking') or picking.name
-            picking.vat_challan_date = fields.Datetime.now()
+                challan_number = self.env['ir.sequence'].next_by_code('stock.picking') or picking.name
+            else:
+                continue
+            picking.with_context(vat_issue_challan=True).write({
+                'vat_challan_number': challan_number,
+                'vat_challan_date': fields.Datetime.now(),
+            })
         return result
 
     def action_print_vat_challan(self):
@@ -133,6 +170,30 @@ class StockMove(models.Model):
     vat_source_vendor_bill_ids = fields.Many2many('account.move', compute='_compute_vat_purchase_trace', string='Source Vendor Bills')
     vat_currency_id = fields.Many2one(related='company_id.currency_id')
     vat_source_input_tax = fields.Monetary(compute='_compute_vat_purchase_trace', currency_field='vat_currency_id', string='Traceable Input VAT')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        picking_ids = [vals.get('picking_id') for vals in vals_list if vals.get('picking_id')]
+        if self.env['stock.picking'].browse(picking_ids).filtered('vat_challan_number'):
+            raise UserError(_('Stock movements cannot be added to an issued VAT challan.'))
+        return super().create(vals_list)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        picking_ids = [vals.get('picking_id') for vals in vals_list if vals.get('picking_id')]
+        if self.env['stock.picking'].browse(picking_ids).filtered('vat_challan_number'):
+            raise UserError(_('Stock movements cannot be added to an issued VAT challan.'))
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if self.filtered(lambda move: move.picking_id.vat_challan_number):
+            raise UserError(_('Stock movements on an issued VAT challan cannot be edited.'))
+        return super().write(vals)
+
+    def unlink(self):
+        if self.filtered(lambda move: move.picking_id.vat_challan_number):
+            raise UserError(_('Stock movements on an issued VAT challan cannot be deleted.'))
+        return super().unlink()
 
     def _compute_vat_purchase_trace(self):
         for move in self:

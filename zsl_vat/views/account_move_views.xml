@@ -7,6 +7,7 @@
     <field name="arch" type="xml">
       <xpath expr="//header" position="inside">
         <button name="action_print_mushak_63" type="object" string="Print Mushak" invisible="not vat_mushak_number"/>
+        <button name="action_approve_vat_cancellation" type="object" string="Approve VAT Cancellation" class="btn-primary" invisible="vat_cancellation_state != 'requested'" groups="zsl_vat.group_vat_manager"/>
       </xpath>
       <xpath expr="//notebook" position="inside">
         <page string="Bangladesh VAT" groups="zsl_vat.group_vat_user">
@@ -15,6 +16,9 @@
               <field name="vat_unit_id" readonly="state == 'posted'"/>
               <field name="vat_mushak_number" readonly="1"/>
               <field name="vat_document_type" readonly="1"/>
+              <field name="vat_qr_payload" readonly="1" invisible="not vat_qr_payload"/>
+              <field name="vat_cancellation_state" readonly="1"/>
+              <field name="vat_print_count" readonly="1"/>
               <field name="vat_supply_type" readonly="state == 'posted'"/>
               <field name="vat_original_move_id" readonly="state == 'posted'"/>
               <field name="vat_adjustment_reason" readonly="state == 'posted'"/>
@@ -34,6 +38,11 @@
               <field name="vat_reverse_charge_rate" readonly="state == 'posted'" invisible="not vat_vds_reverse_charge"/>
               <field name="vat_reverse_charge_payment_id" readonly="state == 'posted'" invisible="not vat_vds_reverse_charge"/>
             </group>
+          </group>
+          <group string="Mushak Cancellation" invisible="not vat_mushak_number">
+            <field name="vat_cancellation_reason" readonly="vat_cancellation_state in ('requested', 'approved') or state == 'cancel'"/>
+            <field name="vat_cancellation_approver_id" readonly="1" invisible="not vat_cancellation_approver_id"/>
+            <field name="vat_cancellation_approval_date" readonly="1" invisible="not vat_cancellation_approval_date"/>
           </group>
           <group string="Computed VAT">
             <field name="vat_taxable_amount" readonly="1"/>
@@ -61,6 +70,12 @@
       <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='product_id']" position="after">
         <field name="vat_input_credit_status" optional="hide"/>
         <field name="vat_partial_credit_percent" optional="hide"/>
+        <field name="vat_import_cd_amount" optional="hide"/>
+        <field name="vat_import_rd_amount" optional="hide"/>
+        <field name="vat_import_sd_amount" optional="hide"/>
+        <field name="vat_import_vat_amount" optional="hide"/>
+        <field name="vat_import_ait_amount" optional="hide"/>
+        <field name="vat_import_at_amount" optional="hide"/>
         <field name="vat_is_capital_good" column_invisible="1"/>
         <field name="vat_capital_credit_treatment" optional="hide"/>
         <field name="vat_deferred_months" optional="hide"/>

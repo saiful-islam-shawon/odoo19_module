@@ -175,7 +175,7 @@
                             <tr>
                                 <td style="padding-left: 14px;">নাম</td>
                                 <td style="text-align: center;">:</td>
-                                <td>&#160;</td>
+                                <td><span t-esc="o.taxpayer_name or o.company_id.vat_legal_name or o.company_id.name or ''"/></td>
                             </tr>
                             <tr>
                                 <td style="padding-left: 14px;">বিআইএন</td>
@@ -183,7 +183,7 @@
                                 <td style="padding-left: 62px;">
                                     <table class="digit-grid" style="margin-left: 8px;">
                                         <tr>
-                                            <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                            <td colspan="9"><span t-esc="o.bin or ''"/></td>
                                         </tr>
                                     </table>
                                 </td>
@@ -194,7 +194,7 @@
                                 <td style="padding-left: 62px;">
                                     <table class="digit-grid">
                                         <tr>
-                                            <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                            <td colspan="11"><span t-esc="o.company_id.vat_legacy_bin or ''"/></td>
                                         </tr>
                                     </table>
                                 </td>
@@ -205,7 +205,7 @@
                                 <td style="padding-left: 62px;">
                                     <table class="digit-grid">
                                         <tr>
-                                            <td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td>
+                                            <td colspan="12"><span t-esc="o.application_id.tin or o.company_id.vat_tin or ''"/></td>
                                         </tr>
                                     </table>
                                 </td>
@@ -213,32 +213,32 @@
                             <tr>
                                 <td style="padding-left: 14px;">ঠিকানা</td>
                                 <td style="text-align: center;">:</td>
-                                <td>&#160;</td>
+                                <td><span t-esc="o.registered_address or o.company_id.vat_registered_address or o.company_id.partner_id.contact_address or ''"/></td>
                             </tr>
                             <tr>
                                 <td style="padding-left: 14px;">ইস্যুর তারিখ</td>
                                 <td style="text-align: center;">:</td>
-                                <td>&#160;</td>
+                                <td><span t-esc="o.issue_date.strftime('%d-%m-%Y') if o.issue_date else ''"/></td>
                             </tr>
                             <tr>
                                 <td style="padding-left: 14px;">কার্যকারিতার তারিখ</td>
                                 <td style="text-align: center;">:</td>
-                                <td>&#160;</td>
+                                <td><span t-esc="o.effective_date.strftime('%d-%m-%Y') if o.effective_date else ''"/></td>
                             </tr>
                             <tr>
                                 <td style="padding-left: 14px;">ব্যবসার প্রকৃতি</td>
                                 <td style="text-align: center;">:</td>
-                                <td>&#160;</td>
+                                <td><span t-esc="dict(o._fields['registration_type'].selection).get(o.registration_type, '')"/></td>
                             </tr>
                             <tr>
                                 <td style="padding-left: 14px;">অর্থনৈতিক কার্যক্রমের প্রকৃতি</td>
                                 <td style="text-align: center;">:</td>
-                                <td>&#160;</td>
+                                <td><span t-esc="o.application_id.business_activity or o.company_id.vat_business_nature or ''"/></td>
                             </tr>
                             <tr>
                                 <td style="padding-left: 14px;">অর্থনৈতিক কার্যক্রমকোড ও বিবরণ</td>
                                 <td style="text-align: center;">:</td>
-                                <td>&#160;</td>
+                                <td><span t-esc="o.certificate_reference or ''"/></td>
                             </tr>
                         </table>
 
