@@ -35,22 +35,25 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
-                    <div class="page mushak-62-page">
-                        <style type="text/css">
-                            @page {
-                                size: A4 landscape;
-                                margin: 40mm 33mm 35mm 42mm;
-                            }
-                            body {
-                                margin: 0;
-                                padding: 0;
-                            }
-                            .mushak-62-page {
-                                font-family: 'Nikosh', 'Noto Sans Bengali', Arial, sans-serif !important;
-                                color: #000;
-                                width: 100%;
-                                line-height: 1.15;
-                            }
+                    <style type="text/css">
+                        @page {
+                            size: A4 landscape;
+                            margin: 40mm 33mm 35mm 42mm;
+                        }
+                        body {
+                            margin: 0;
+                            padding: 0;
+                        }
+                        .mushak-62-page {
+                            font-family: 'Nikosh', 'Noto Sans Bengali', Arial, sans-serif !important;
+                            color: #000;
+                            width: 100%;
+                            line-height: 1.15;
+                        }
+                        .mushak-62-page-break {
+                            page-break-before: always;
+                            break-before: page;
+                        }
                             .mushak-62-top-gov {
                                 text-align: center;
                                 margin-bottom: 6px;
@@ -73,6 +76,19 @@
                                 padding: 5px 8px 6px 8px;
                                 box-sizing: border-box;
                                 position: relative;
+                            }
+                            .mushak-62-product-box {
+                                position: absolute;
+                                top: 8px;
+                                left: 8px;
+                                border: 1px solid #000;
+                                padding: 4px 10px;
+                                font-weight: bold;
+                                font-size: 10.5pt;
+                                text-align: center;
+                                min-width: 60px;
+                                max-width: 24%;
+                                word-wrap: break-word;
                             }
                             .mushak-62-badge-container {
                                 width: 100%;
@@ -152,13 +168,18 @@
                                 background-color: #fff !important;
                             }
                             .mushak-62-data-row td {
-                                height: 24px;
+                                height: 20px;
+                                padding: 1px;
                                 font-size: 6.5pt;
                             }
+                            .mushak-62-empty-cell {
+                                vertical-align: middle !important;
+                                text-align: center !important;
+                            }
                             .mushak-62-notes {
-                                margin-top: 12px;
-                                font-size: 10pt;
-                                line-height: 1.35;
+                                margin-top: 6px;
+                                font-size: 8.5pt;
+                                line-height: 1.2;
                                 text-align: left;
                                 page-break-inside: avoid;
                                 break-inside: avoid;
@@ -174,15 +195,33 @@
                             }
                         </style>
 
-                        <!-- Top Government Title -->
-                        <div class="mushak-62-top-gov">
-                            <div class="mushak-62-top-gov-1">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
-                            <div class="mushak-62-top-gov-2">জাতীয় রাজস্ব বোর্ড</div>
-                        </div>
+                    <t t-set="raw_rows" t-value="o.env['zsl_vat.official.mushak.pdf']._mushak_62_rows(o)"/>
+                    <t t-set="unique_prods" t-value="[]"/>
+                    <t t-foreach="raw_rows" t-as="r">
+                        <t t-set="p_pair" t-value="(r['product'].id if r.get('product') else (r.get('description') or ''), (r['product'].name if r.get('product') else '') or r.get('description') or '')"/>
+                        <t t-if="p_pair not in unique_prods">
+                            <t t-set="unique_prods" t-value="unique_prods + [p_pair]"/>
+                        </t>
+                    </t>
+                    <t t-if="not unique_prods">
+                        <t t-set="unique_prods" t-value="[('__empty__', '')]"/>
+                    </t>
 
-                        <!-- Statutory Header Box -->
-                        <div class="mushak-62-header-box">
-                            <div class="mushak-62-badge-container">
+                    <t t-foreach="unique_prods" t-as="up">
+                        <t t-set="grp_rows" t-value="[r for r in raw_rows if (r['product'].id if r.get('product') else (r.get('description') or '')) == up[0]]"/>
+                        <t t-set="serial_start" t-value="sum(len([r for r in raw_rows if (r['product'].id if r.get('product') else (r.get('description') or '')) == prev[0]]) for prev in unique_prods[:up_index])"/>
+                        <div t-attf-class="page mushak-62-page {{ 'mushak-62-page-break' if up_index != 0 else '' }}">
+
+                            <!-- Top Government Title -->
+                            <div class="mushak-62-top-gov">
+                                <div class="mushak-62-top-gov-1">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার</div>
+                                <div class="mushak-62-top-gov-2">জাতীয় রাজস্ব বোর্ড</div>
+                            </div>
+
+                            <!-- Statutory Header Box -->
+                            <div class="mushak-62-header-box">
+                                <div t-if="up[1]" class="mushak-62-product-box"><t t-esc="up[1]"/></div>
+                                <div class="mushak-62-badge-container">
                                 <div class="mushak-62-badge">মূসক-৬.২</div>
                             </div>
                             <div class="mushak-62-title-block">
@@ -296,31 +335,40 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-set="rows" t-value="o.env['zsl_vat.official.mushak.pdf']._mushak_62_rows(o)"/>
-                                <t t-if="rows">
-                                    <t t-foreach="rows" t-as="row">
+                                <t t-if="grp_rows">
+                                    <t t-foreach="grp_rows" t-as="row">
+                                        <t t-set="txt" t-value="{
+                                            'date': row['date'].strftime('%d-%m-%Y') if row.get('date') else '',
+                                            'partner': str(row.get('partner') or '').strip(),
+                                            'address': str(row.get('address') or '').strip(),
+                                            'tax_id': str(row.get('supplier_tax_id') or '').strip(),
+                                            'doc': str(row.get('document') or '').strip(),
+                                            'doc_date': row['document_date'].strftime('%d-%m-%Y') if row.get('document_date') else '',
+                                            'desc': str(row.get('description') or '').strip(),
+                                            'remarks': str(row.get('remarks') or '').strip(),
+                                        }"/>
                                         <tr class="mushak-62-data-row">
-                                            <td><t t-esc="row_index + 1"/></td>
-                                            <td><t t-esc="row['date'].strftime('%d-%m-%Y') if row.get('date') else ''"/></td>
+                                            <td><t t-esc="serial_start + row_index + 1"/></td>
+                                            <td t-att-class="'' if txt['date'] else 'mushak-62-empty-cell'"><t t-esc="txt['date'] or '--'"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('opening_qty') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('opening_value') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('production_qty') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('production_value') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('total_qty') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('total_value') or 0.0)"/></td>
-                                            <td><t t-esc="row.get('partner') or ''"/></td>
-                                            <td><t t-esc="row.get('address') or ''"/></td>
-                                            <td><t t-esc="row.get('supplier_tax_id') or ''"/></td>
-                                            <td><t t-esc="row.get('document') or ''"/></td>
-                                            <td><t t-esc="row['document_date'].strftime('%d-%m-%Y') if row.get('document_date') else ''"/></td>
-                                            <td><t t-esc="row.get('description') or ''"/></td>
+                                            <td t-att-class="'' if txt['partner'] else 'mushak-62-empty-cell'"><t t-esc="txt['partner'] or '--'"/></td>
+                                            <td t-att-class="'' if txt['address'] else 'mushak-62-empty-cell'"><t t-esc="txt['address'] or '--'"/></td>
+                                            <td t-att-class="'' if txt['tax_id'] else 'mushak-62-empty-cell'"><t t-esc="txt['tax_id'] or '--'"/></td>
+                                            <td t-att-class="'' if txt['doc'] else 'mushak-62-empty-cell'"><t t-esc="txt['doc'] or '--'"/></td>
+                                            <td t-att-class="'' if txt['doc_date'] else 'mushak-62-empty-cell'"><t t-esc="txt['doc_date'] or '--'"/></td>
+                                            <td t-att-class="'' if txt['desc'] else 'mushak-62-empty-cell'"><t t-esc="txt['desc'] or '--'"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('quantity') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('value') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('sd') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('vat') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('closing_qty') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('closing_value') or 0.0)"/></td>
-                                            <td><t t-esc="row.get('remarks') or ''"/></td>
+                                            <td t-att-class="'' if txt['remarks'] else 'mushak-62-empty-cell'"><t t-esc="txt['remarks'] or '--'"/></td>
                                         </tr>
                                     </t>
                                 </t>
@@ -359,7 +407,8 @@
                             <div class="mushak-62-notes-item">* যেইক্ষেত্রে অনিবন্ধিত ব্যক্তির নিকট পণ্য বিক্রয় করা হইবে সেইক্ষেত্রে উক্ত ব্যক্তির পূর্ণাঙ্গ নাম,ঠিকানা ও জাতীয় পরিচয়পত্র নম্বর যথাযথভাবে সংশ্লিষ্ট কলাম [(৯),(১০) ও (১১)] আবশ্যিকভাবে উল্লেখ করিতে হইবে।</div>
                         </div>
 
-                    </div>
+                        </div>
+                    </t>
                 </div>
             </t>
         </t>
