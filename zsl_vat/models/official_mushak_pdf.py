@@ -373,11 +373,17 @@ class OfficialMushakPdf(models.AbstractModel):
             for line in wizard._lines(move):
                 partner = move.partner_id
                 vat, sd = line._vat_tax_components()
+                po = line.purchase_line_id.order_id
+                confirmation_date = (
+                    fields.Datetime.context_timestamp(wizard, po.date_approve).date()
+                    if po and po.date_approve
+                    else False
+                )
                 events.append({
                     'kind': 'purchase',
-                    # Column 2 is the book-entry (today's report) date;
-                    # column 6 retains the actual material purchase date.
-                    'date': fields.Date.context_today(wizard),
+                    # Column 2 displays the linked Purchase Order Confirmation Date
+                    # in the caller's timezone; column 6 retains the challan/bill date.
+                    'date': confirmation_date,
                     'event_date': move.invoice_date or move.date,
                     'product': line.product_id,
                     # Imported goods use the statutory Bill of Entry in
@@ -421,7 +427,7 @@ class OfficialMushakPdf(models.AbstractModel):
                 if quantity:
                     events.append({
                         'kind': 'usage',
-                        'date': fields.Date.context_today(wizard),
+                        'date': False,
                         'event_date': (raw_move.date or production.date_finished).date(),
                         'product': raw_move.product_id,
                         'document': '',

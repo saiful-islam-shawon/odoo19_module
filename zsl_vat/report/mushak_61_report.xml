@@ -156,6 +156,10 @@
                                 padding: 1px;
                                 font-size: 6.5pt;
                             }
+                            .mushak-61-empty-cell {
+                                vertical-align: middle !important;
+                                text-align: center !important;
+                            }
                             .mushak-61-notes {
                                 margin-top: 6px;
                                 font-size: 8.5pt;
@@ -307,17 +311,27 @@
                             <tbody>
                                 <t t-if="grp_rows">
                                     <t t-foreach="grp_rows" t-as="row">
+                                        <t t-set="txt" t-value="{
+                                            'date': row['date'].strftime('%d-%m-%Y') if row.get('date') else '',
+                                            'doc': str(row.get('document') or '').strip(),
+                                            'doc_date': row['document_date'].strftime('%d-%m-%Y') if row.get('document_date') else '',
+                                            'partner': str(row.get('partner') or '').strip(),
+                                            'address': str(row.get('address') or '').strip(),
+                                            'tax_id': str(row.get('supplier_tax_id') or '').strip(),
+                                            'desc': str(row.get('description') or '').strip(),
+                                            'remarks': str(row.get('remarks') or '').strip(),
+                                        }"/>
                                         <tr class="mushak-61-data-row">
                                             <td><t t-esc="serial_start + row_index + 1"/></td>
-                                            <td><t t-esc="row['date'].strftime('%d-%m-%Y') if row.get('date') else ''"/></td>
+                                            <td t-att-class="'' if txt['date'] else 'mushak-61-empty-cell'"><t t-esc="txt['date'] or '--'"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('opening_qty') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('opening_value') or 0.0)"/></td>
-                                            <td><t t-esc="row.get('document') or ''"/></td>
-                                            <td><t t-esc="row['document_date'].strftime('%d-%m-%Y') if row.get('document_date') else ''"/></td>
-                                            <td><t t-esc="row.get('partner') or ''"/></td>
-                                            <td><t t-esc="row.get('address') or ''"/></td>
-                                            <td><t t-esc="row.get('supplier_tax_id') or ''"/></td>
-                                            <td><t t-esc="row.get('description') or ''"/></td>
+                                            <td t-att-class="'' if txt['doc'] else 'mushak-61-empty-cell'"><t t-esc="txt['doc'] or '--'"/></td>
+                                            <td t-att-class="'' if txt['doc_date'] else 'mushak-61-empty-cell'"><t t-esc="txt['doc_date'] or '--'"/></td>
+                                            <td t-att-class="'' if txt['partner'] else 'mushak-61-empty-cell'"><t t-esc="txt['partner'] or '--'"/></td>
+                                            <td t-att-class="'' if txt['address'] else 'mushak-61-empty-cell'"><t t-esc="txt['address'] or '--'"/></td>
+                                            <td t-att-class="'' if txt['tax_id'] else 'mushak-61-empty-cell'"><t t-esc="txt['tax_id'] or '--'"/></td>
+                                            <td t-att-class="'' if txt['desc'] else 'mushak-61-empty-cell'"><t t-esc="txt['desc'] or '--'"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('purchase_qty') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('purchase_value') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('sd') or 0.0)"/></td>
@@ -328,7 +342,7 @@
                                             <td><t t-esc="'{:,.2f}'.format(row.get('used_value') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('closing_qty') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('closing_value') or 0.0)"/></td>
-                                            <td><t t-esc="row.get('remarks') or ''"/></td>
+                                            <td t-att-class="'' if txt['remarks'] else 'mushak-61-empty-cell'"><t t-esc="txt['remarks'] or '--'"/></td>
                                         </tr>
                                     </t>
                                 </t>
