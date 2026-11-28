@@ -35,30 +35,46 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
-                    <div class="page mushak-61-page">
-                        <style type="text/css">
-                            @page {
-                                size: A4 landscape;
-                                margin: 44mm 22mm 35mm 42mm;
-                            }
-                            body {
-                                margin: 0;
-                                padding: 0;
-                            }
-                            .mushak-61-page {
-                                font-family: 'Nikosh', 'Noto Sans Bengali', Arial, sans-serif !important;
-                                color: #000;
-                                width: 100%;
-                                line-height: 1.15;
-                            }
-                            .mushak-61-header-box {
-                                width: 100%;
-                                border: 1px solid #000;
-                                border-bottom: none;
-                                padding: 6px 8px 8px 8px;
-                                box-sizing: border-box;
-                                position: relative;
-                            }
+                    <style type="text/css">
+                        @page {
+                            size: A4 landscape;
+                            margin: 44mm 22mm 35mm 42mm;
+                        }
+                        body {
+                            margin: 0;
+                            padding: 0;
+                        }
+                        .mushak-61-page {
+                            font-family: 'Nikosh', 'Noto Sans Bengali', Arial, sans-serif !important;
+                            color: #000;
+                            width: 100%;
+                            line-height: 1.15;
+                        }
+                        .mushak-61-page-break {
+                            page-break-before: always;
+                            break-before: page;
+                        }
+                        .mushak-61-header-box {
+                            width: 100%;
+                            border: 1px solid #000;
+                            border-bottom: none;
+                            padding: 6px 8px 8px 8px;
+                            box-sizing: border-box;
+                            position: relative;
+                        }
+                        .mushak-61-product-box {
+                            position: absolute;
+                            top: 8px;
+                            left: 8px;
+                            border: 1px solid #000;
+                            padding: 4px 10px;
+                            font-weight: bold;
+                            font-size: 10.5pt;
+                            text-align: center;
+                            min-width: 60px;
+                            max-width: 24%;
+                            word-wrap: break-word;
+                        }
                             .mushak-61-badge-container {
                                 width: 100%;
                                 text-align: right;
@@ -136,13 +152,14 @@
                                 background-color: #fff !important;
                             }
                             .mushak-61-data-row td {
-                                height: 24px;
+                                height: 20px;
+                                padding: 1px;
                                 font-size: 6.5pt;
                             }
                             .mushak-61-notes {
-                                margin-top: 12px;
-                                font-size: 10pt;
-                                line-height: 1.35;
+                                margin-top: 6px;
+                                font-size: 8.5pt;
+                                line-height: 1.2;
                                 text-align: left;
                                 page-break-inside: avoid;
                                 break-inside: avoid;
@@ -158,11 +175,29 @@
                             }
                         </style>
 
-                        <!-- Statutory Header Box -->
-                        <div class="mushak-61-header-box">
-                            <div class="mushak-61-badge-container">
-                                <div class="mushak-61-badge">মূসক-৬.১</div>
-                            </div>
+                    <t t-set="raw_rows" t-value="o.env['zsl_vat.official.mushak.pdf']._mushak_61_rows(o)"/>
+                    <t t-set="unique_prods" t-value="[]"/>
+                    <t t-foreach="raw_rows" t-as="r">
+                        <t t-set="p_pair" t-value="(r['product'].id if r.get('product') else (r.get('description') or ''), (r['product'].name if r.get('product') else '') or r.get('description') or '')"/>
+                        <t t-if="p_pair not in unique_prods">
+                            <t t-set="unique_prods" t-value="unique_prods + [p_pair]"/>
+                        </t>
+                    </t>
+                    <t t-if="not unique_prods">
+                        <t t-set="unique_prods" t-value="[('__empty__', '')]"/>
+                    </t>
+
+                    <t t-foreach="unique_prods" t-as="up">
+                        <t t-set="grp_rows" t-value="[r for r in raw_rows if (r['product'].id if r.get('product') else (r.get('description') or '')) == up[0]]"/>
+                        <t t-set="serial_start" t-value="sum(len([r for r in raw_rows if (r['product'].id if r.get('product') else (r.get('description') or '')) == prev[0]]) for prev in unique_prods[:up_index])"/>
+                        <div t-attf-class="page mushak-61-page {{ 'mushak-61-page-break' if up_index != 0 else '' }}">
+
+                            <!-- Statutory Header Box -->
+                            <div class="mushak-61-header-box">
+                                <div t-if="up[1]" class="mushak-61-product-box"><t t-esc="up[1]"/></div>
+                                <div class="mushak-61-badge-container">
+                                    <div class="mushak-61-badge">মূসক-৬.১</div>
+                                </div>
                             <div class="mushak-61-title-block">
                                 <div class="mushak-61-title-1">প্রতিষ্ঠানের নাম, ঠিকানা ও ব্যবসা সনাক্তকরণ সংখ্যা</div>
                                 <div class="mushak-61-title-2">ক্রয় হিসাব পুস্তক</div>
@@ -270,11 +305,10 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-set="rows" t-value="o.env['zsl_vat.official.mushak.pdf']._mushak_61_rows(o)"/>
-                                <t t-if="rows">
-                                    <t t-foreach="rows" t-as="row">
+                                <t t-if="grp_rows">
+                                    <t t-foreach="grp_rows" t-as="row">
                                         <tr class="mushak-61-data-row">
-                                            <td><t t-esc="row_index + 1"/></td>
+                                            <td><t t-esc="serial_start + row_index + 1"/></td>
                                             <td><t t-esc="row['date'].strftime('%d-%m-%Y') if row.get('date') else ''"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('opening_qty') or 0.0)"/></td>
                                             <td><t t-esc="'{:,.2f}'.format(row.get('opening_value') or 0.0)"/></td>
@@ -335,7 +369,8 @@
                             <div class="mushak-61-notes-item">৩।  উপকরণ ক্রয়ের স্বপক্ষে প্রামাণিক দলিল হিসাবে বিল অব এন্ট্রি বা চালানপত্রের কপি সংরক্ষণ করিতে হইবে।</div>
                         </div>
 
-                    </div>
+                        </div>
+                    </t>
                 </div>
             </t>
         </t>
